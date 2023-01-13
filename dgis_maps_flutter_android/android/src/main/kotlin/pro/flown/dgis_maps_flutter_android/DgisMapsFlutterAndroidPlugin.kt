@@ -1,4 +1,4 @@
-package com.example.dgis_maps_flutter_android
+package pro.flown.dgis_maps_flutter_android
 
 import androidx.annotation.NonNull
 

@@ -1,4 +1,4 @@
-group 'com.example.dgis_maps_flutter_android'
+group 'pro.flown.dgis_maps_flutter_android'
 version '1.0-SNAPSHOT'
 
 buildscript {
@@ -14,10 +14,13 @@ buildscript {
     }
 }
 
-allprojects {
+rootProject.allprojects {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url "https://artifactory.2gis.dev/sdk-maven-release"
+        }
     }
 }
 
@@ -32,6 +35,11 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    dependencies {
+        implementation "androidx.annotation:annotation:1.1.0"
+    }
+
+
     kotlinOptions {
         jvmTarget = '1.8'
     }
@@ -41,6 +49,10 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 21
     }
+}
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'ru.dgis.sdk:sdk-full:5.1.0'
 }
