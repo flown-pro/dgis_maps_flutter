@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "dgis_maps_flutter"
+		},
+		{
+			"path": "dgis_maps_flutter_android"
+		},
+		{
+			"path": "dgis_maps_flutter_ios"
+		},
+		{
+			"path": "dgis_maps_flutter_platform_interface"
+		}
+	],
+	"settings": {}
+}
