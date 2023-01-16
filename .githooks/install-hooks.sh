@@ -16,7 +16,8 @@ fi
 # Append hook code into script
 cat >> "$HOOK_FILE" <<EOF
 
+cp ./dgis_maps_flutter/example/android/app/build.gradle ./dgis_maps_flutter/example/android/app/build.gradle.bak
 sed -i '' -e 's/applicationId ".*"/applicationId "pro.flown.dgis_maps_flutter_android_example"/' ./dgis_maps_flutter/example/android/app/build.gradle
 git add ./dgis_maps_flutter/example/android/app/build.gradle
-
+mv ./dgis_maps_flutter/example/android/app/build.gradle.bak ./dgis_maps_flutter/example/android/app/build.gradle
 EOF
