@@ -11,9 +11,12 @@
 		},
 		{
 			"path": "dgis_maps_flutter_platform_interface"
+		},
+		{
+			"path": ".githooks"
 		}
 	],
 	"settings": {
-		"java.configuration.updateBuildConfiguration": "interactive"
+		"java.configuration.updateBuildConfiguration": "disabled"
 	}
 }

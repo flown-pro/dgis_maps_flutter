@@ -1,0 +1,4 @@
+#!/bin/sh
+
+sed -i '' -e 's/applicationId ".*"/applicationId "pro.flown.dgis_maps_flutter_android_example"/' ./dgis_maps_flutter/example/android/app/build.gradle
+git add ./dgis_maps_flutter/example/android/app/build.gradle
