@@ -1,0 +1,29 @@
+PODS:
+  - dgis_maps_flutter_ios (0.0.1):
+    - DGisMobileSDK
+    - Flutter
+  - DGisMobileSDK (2.2.0)
+  - Flutter (1.0.0)
+
+DEPENDENCIES:
+  - dgis_maps_flutter_ios (from `.symlinks/plugins/dgis_maps_flutter_ios/ios`)
+  - Flutter (from `Flutter`)
+
+SPEC REPOS:
+  trunk:
+    - DGisMobileSDK
+
+EXTERNAL SOURCES:
+  dgis_maps_flutter_ios:
+    :path: ".symlinks/plugins/dgis_maps_flutter_ios/ios"
+  Flutter:
+    :path: Flutter
+
+SPEC CHECKSUMS:
+  dgis_maps_flutter_ios: c36ce8a63ee57811b237a3a9a5f491c15db00ddf
+  DGisMobileSDK: ebb726ecc37163b0fbb0adf9759ada90afce38ef
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+
+PODFILE CHECKSUM: cc1f88378b4bfcf93a6ce00d2c587857c6008d3b
+
+COCOAPODS: 1.11.3
