@@ -13,7 +13,7 @@ import SwiftUI
 class DGisNativeView: NSObject, FlutterPlatformView {
     
     @ObservedObject private var viewModel: DGisViewModel
-   
+    
     private var _view: UIView
     
     init(
@@ -34,9 +34,9 @@ class DGisNativeView: NSObject, FlutterPlatformView {
     
     private func makeMapView() -> some View {
         let mapView = viewModel.makeMapViewFactory()
-        return mapView.makeMapViewWithMarkerViewOverlay()
+        return mapView.makeMapViewWithMarkerViewOverlay(tapRecognizerCallback: viewModel.onMapTap)
     }
-
+    
     func view() -> UIView {
         return _view
     }

@@ -10,9 +10,11 @@ import DGis
 
 
 final class DGisViewModel: ObservableObject {
-        
+    
     var sdk: DGis.Container
     var mapFactory : IMapFactory
+    var map : Map
+    var iconsService: IconsService
     
     lazy var mapFactoryProvider = MapFactoryProvider(container: self.sdk, mapGesturesType: .default(.event))
     lazy var settingsStorage: IKeyValueStorage = UserDefaults.standard
@@ -25,6 +27,11 @@ final class DGisViewModel: ObservableObject {
         }
         return service
     }()
+    let locationServiceFactory = {
+        LocationService()
+    }
+    var cameraMoveService: CameraMoveService
+    
     
     init(
         arguments args: Any?,
@@ -37,6 +44,18 @@ final class DGisViewModel: ObservableObject {
         mapOptions.position = cameraPosition
         mapOptions.deviceDensity = DeviceDensity(value: Float(UIScreen.main.nativeScale))
         mapFactory = try! sdk.makeMapFactory(options: mapOptions)
+        map = mapFactory.map
+        iconsService = IconsService(
+            map: map,
+            imageFactory: sdk.imageFactory
+        )
+        
+        cameraMoveService = CameraMoveService(
+            locationManagerFactory: locationServiceFactory,
+            map: map,
+            sdkContext: sdk.context
+        )
+        self.addTestMarker()
     }
     
     func makeMapViewFactory() -> MapViewFactory {
@@ -46,6 +65,26 @@ final class DGisViewModel: ObservableObject {
             settingsService: self.settingsService
         )
     }
+    
+    func addTestMarker() {
+        let flatPoint = self.map.camera.position.point
+        let point = GeoPointWithElevation(
+            latitude: flatPoint.latitude,
+            longitude: flatPoint.longitude
+        )
+        iconsService.createMarker(
+            geoPoint: point,
+            image: UIImage(systemName: "camera.fill")!
+                .withTintColor(.systemGray),
+            text: "hello, world"
+        )
+    }
+    
+    
+    func onMapTap(point: CGPoint) -> Void {
+        cameraMoveService.moveToSelfPosition()
+    }
+    
     
 }
 

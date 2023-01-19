@@ -12,12 +12,12 @@ import SwiftUI
 
 class DGisNativeViewFactory: NSObject, FlutterPlatformViewFactory {
     private var messenger: FlutterBinaryMessenger
-
+    
     init(messenger: FlutterBinaryMessenger) {
         self.messenger = messenger
         super.init()
     }
-
+    
     func create(
         withFrame frame: CGRect,
         viewIdentifier viewId: Int64,
@@ -27,6 +27,7 @@ class DGisNativeViewFactory: NSObject, FlutterPlatformViewFactory {
             frame: frame,
             viewIdentifier: viewId,
             arguments: args,
-            binaryMessenger: messenger)
+            binaryMessenger: messenger
+        )
     }
 }
