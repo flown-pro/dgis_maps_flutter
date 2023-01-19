@@ -52,7 +52,7 @@ final class MapObjectService {
         self.imageFactory = imageFactory
     }
     
-    func createMarker(geoPoint: GeoPointWithElevation, image: UIImage, text: String) {
+    func createMarker(geoPoint: GeoPointWithElevation, image: UIImage, text: String?) {
         let icon = self.makeIcon(
             image: image,
             size: self.size

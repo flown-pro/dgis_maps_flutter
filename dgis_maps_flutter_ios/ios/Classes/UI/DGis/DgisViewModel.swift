@@ -15,6 +15,7 @@ final class DGisViewModel: ObservableObject {
     var mapFactory : IMapFactory
     var map : Map
     var mapObjectService: MapObjectService
+    var flutterArgs: FlutterArgs?
     
     lazy var mapFactoryProvider = MapFactoryProvider(container: self.sdk, mapGesturesType: .default(.event))
     lazy var settingsStorage: IKeyValueStorage = UserDefaults.standard
@@ -38,28 +39,39 @@ final class DGisViewModel: ObservableObject {
         arguments args: Any?,
         binaryMessenger messenger: FlutterBinaryMessenger?
     ) {
+        flutterArgs = FlutterArgs(args: args)
         sdk = DGis.Container()
-        let coordinate = GeoPoint(latitude: 55.759909, longitude: 37.618806)
-        let cameraPosition = CameraPosition(point: coordinate, zoom: Zoom(value: 17))
         var mapOptions = MapOptions.default
-        mapOptions.position = cameraPosition
         mapOptions.deviceDensity = DeviceDensity(value: Float(UIScreen.main.nativeScale))
+        if (flutterArgs != nil) {
+            let args = flutterArgs!
+            let coordinate = GeoPoint(
+                latitude: DGis.Latitude(value: args.initLatitude),
+                longitude: DGis.Longitude(value: args.initLongitude)
+            )
+            let cameraPosition = CameraPosition(
+                point: coordinate,
+                zoom: Zoom(value: args.initZoom)
+            )
+            mapOptions.position = cameraPosition
+        }
         mapFactory = try! sdk.makeMapFactory(options: mapOptions)
         map = mapFactory.map
         mapObjectService = MapObjectService(
             map: map,
             imageFactory: sdk.imageFactory
         )
-        
         cameraMoveService = CameraMoveService(
             locationManagerFactory: locationServiceFactory,
             map: map,
             sdkContext: sdk.context
         )
-        self.addTestMarker()
-        self.addTestPolyline()
-        self.startVisibleRectTracking()
+        //
+        addTestMarker()
+        addTestPolyline()
+        startVisibleRectTracking()
     }
+    
     
     func makeMapViewFactory() -> MapViewFactory {
         MapViewFactory(
