@@ -9,7 +9,7 @@ HOOK_FILE="$HOOK_DIR"/pre-commit
 
 # Create script file if doesn't exist
 if [ ! -e "$HOOK_FILE" ] ; then
-        echo '#!/usr/bin/bash' >> "$HOOK_FILE"
+        echo '#!/bin/bash' >> "$HOOK_FILE"
         chmod 700 "$HOOK_FILE"
 fi
 
@@ -27,7 +27,7 @@ mv ./dgis_maps_flutter/example/android/app/build.gradle.bak ./dgis_maps_flutter/
 ### ./dgis_maps_flutter/example/ios/Runner.xcodeproj/project.pbxproj
 
 cp ./dgis_maps_flutter/example/ios/Runner.xcodeproj/project.pbxproj ./dgis_maps_flutter/example/ios/Runner.xcodeproj/project.pbxproj.bak
-sed -i '' -e 's/PRODUCT_BUNDLE_IDENTIFIER = .*;/PRODUCT_BUNDLE_IDENTIFIER = pro.flown.dgis_maps_flutter_ios_example/g' ./dgis_maps_flutter/example/ios/Runner.xcodeproj/project.pbxproj
+sed -i '' -e 's/PRODUCT_BUNDLE_IDENTIFIER = .*;/PRODUCT_BUNDLE_IDENTIFIER = pro.flown.dgis_maps_flutter_ios_example;/g' ./dgis_maps_flutter/example/ios/Runner.xcodeproj/project.pbxproj
 git add ./dgis_maps_flutter/example/ios/Runner.xcodeproj/project.pbxproj
 mv ./dgis_maps_flutter/example/ios/Runner.xcodeproj/project.pbxproj.bak ./dgis_maps_flutter/example/ios/Runner.xcodeproj/project.pbxproj
 
