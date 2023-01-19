@@ -21,23 +21,28 @@ struct MapViewFactory {
         alignment: CopyrightAlignment = .bottomRight,
         mapGesturesType: MapGesturesType = .default(.event),
         copyrightInsets: UIEdgeInsets = .zero,
-        showsAPIVersion: Bool = true,
-        overlayFactory: IMapViewOverlayFactory? = nil,
-        tapRecognizerCallback: MapView.TapRecognizerCallback? = nil
-
+        tapRecognizerCallback: MapView.TapRecognizerCallback? = nil,
+        markerViewOverlay: IMarkerViewOverlay? = nil
     ) -> MapView {
         MapView(
             mapGesturesType: mapGesturesType,
             appearance: appearance,
             copyrightInsets: copyrightInsets,
             copyrightAlignment: alignment,
-            showsAPIVersion: showsAPIVersion,
-            overlayFactory: overlayFactory,
             tapRecognizerCallback: tapRecognizerCallback,
             mapUIViewFactory: { [mapFactory = self.mapFactory] in
                 mapFactory.mapView
-            }
-
+            },
+            markerViewOverlay: markerViewOverlay
+        )
+    }
+    
+    func makeMapViewWithMarkerViewOverlay(
+        tapRecognizerCallback: MapView.TapRecognizerCallback? = nil
+    ) -> MapView {
+        self.makeMapView(
+            tapRecognizerCallback: tapRecognizerCallback,
+            markerViewOverlay: mapFactory.markerViewOverlay
         )
     }
 
