@@ -31,7 +31,8 @@ final class DGisViewModel: ObservableObject {
         LocationService()
     }
     var cameraMoveService: CameraMoveService
-    
+    var visibleRect: GeoRect?
+    private var initialRectCancellable: DGis.Cancellable?
     
     init(
         arguments args: Any?,
@@ -56,6 +57,7 @@ final class DGisViewModel: ObservableObject {
             sdkContext: sdk.context
         )
         self.addTestMarker()
+        self.startVisibleRectTracking()
     }
     
     func makeMapViewFactory() -> MapViewFactory {
@@ -80,9 +82,26 @@ final class DGisViewModel: ObservableObject {
         )
     }
     
+    func startVisibleRectTracking() {
+        let visibleRectChannel = self.map.camera.visibleRectChannel
+        self.initialRectCancellable = visibleRectChannel.sinkOnMainThread{ [weak self] rect in
+            self?.updateVisibleRect(rect)
+        }
+    }
+    
+    func stopVisibleRectTracking() {
+        self.initialRectCancellable?.cancel()
+        self.initialRectCancellable = nil
+    }
+    
     
     func onMapTap(point: CGPoint) -> Void {
         cameraMoveService.moveToSelfPosition()
+    }
+    
+    private func updateVisibleRect(_ rect: GeoRect) {
+        visibleRect = rect
+        print(rect)
     }
     
     
