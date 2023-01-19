@@ -14,7 +14,7 @@ final class DGisViewModel: ObservableObject {
     var sdk: DGis.Container
     var mapFactory : IMapFactory
     var map : Map
-    var iconsService: IconsService
+    var mapObjectService: MapObjectService
     
     lazy var mapFactoryProvider = MapFactoryProvider(container: self.sdk, mapGesturesType: .default(.event))
     lazy var settingsStorage: IKeyValueStorage = UserDefaults.standard
@@ -46,7 +46,7 @@ final class DGisViewModel: ObservableObject {
         mapOptions.deviceDensity = DeviceDensity(value: Float(UIScreen.main.nativeScale))
         mapFactory = try! sdk.makeMapFactory(options: mapOptions)
         map = mapFactory.map
-        iconsService = IconsService(
+        mapObjectService = MapObjectService(
             map: map,
             imageFactory: sdk.imageFactory
         )
@@ -57,14 +57,15 @@ final class DGisViewModel: ObservableObject {
             sdkContext: sdk.context
         )
         self.addTestMarker()
+        self.addTestPolyline()
         self.startVisibleRectTracking()
     }
     
     func makeMapViewFactory() -> MapViewFactory {
         MapViewFactory(
-            sdk: self.sdk,
-            mapFactory: self.mapFactory,
-            settingsService: self.settingsService
+            sdk: sdk,
+            mapFactory: mapFactory,
+            settingsService: settingsService
         )
     }
     
@@ -74,11 +75,19 @@ final class DGisViewModel: ObservableObject {
             latitude: flatPoint.latitude,
             longitude: flatPoint.longitude
         )
-        iconsService.createMarker(
+        mapObjectService.createMarker(
             geoPoint: point,
             image: UIImage(systemName: "camera.fill")!
                 .withTintColor(.systemGray),
             text: "hello, world"
+        )
+    }
+    
+    func addTestPolyline() {
+        mapObjectService.createPolyline(
+            polyline: "miaz@}mvrVkez@?sbAgtcApu^_wXbubAucAdjErwg@ejE~|x@iuKfxv@y~u@?go`AidPwbg@inc@cmGehjBztdAkdPt~hA}vXpn~@?vs\\f~vA?||x@glXpqnBoi`B?qvwArcA",
+            width: 4,
+            color: DGis.Color.init(argb: 0x80FF0000)
         )
     }
     

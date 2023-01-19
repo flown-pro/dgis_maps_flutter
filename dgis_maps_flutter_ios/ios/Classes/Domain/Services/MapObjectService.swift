@@ -6,8 +6,9 @@
 //
 
 import DGis
+import CoreLocation
 
-final class IconsService {
+final class MapObjectService {
     
     
     enum MarkerSize: UInt {
@@ -66,9 +67,7 @@ final class IconsService {
         self.mapObjectManager.addObject(item: marker)
     }
     
-    func removeAll() {
-        self.mapObjectManager.removeAll()
-    }
+    
     
     private func makeIcon(image: UIImage, size: MarkerSize) -> DGis.Image? {
         let typeSize = TypeSize(image: image, size: size)
@@ -81,5 +80,27 @@ final class IconsService {
         } else {
             return nil
         }
+    }
+    
+    func createPolyline(polyline: String, width: Float = 2, color: DGis.Color = DGis.Color.init()) {
+        let coordinates: [CLLocationCoordinate2D]? = decodePolyline(polyline)
+        var points = [GeoPoint]()
+        coordinates?.forEach({ points.append(GeoPoint(latitude: $0.latitude, longitude: $0.longitude)) })
+        
+        // Line settings.
+        let options = PolylineOptions(
+            points: points,
+            width: LogicalPixel(value: width),
+            color: color
+        )
+        
+        // Create and add the line to the map.
+        let polyline = DGis.Polyline(options: options)
+        self.mapObjectManager.addObject(item: polyline)
+        
+    }
+    
+    func removeAll() {
+        self.mapObjectManager.removeAll()
     }
 }
