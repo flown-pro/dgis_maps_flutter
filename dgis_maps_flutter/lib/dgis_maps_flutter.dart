@@ -13,23 +13,38 @@ class DGisMap extends StatefulWidget {
 }
 
 class _DGisMapState extends State<DGisMap> {
+  late MethodChannel channel;
+  void onViewCreated(int id) {
+    channel = MethodChannel('dgis_maps_flutter_$id');
+    channel.setMethodCallHandler(onMethodCall);
+  }
+
+  Future<dynamic> onMethodCall(MethodCall call) async {
+    switch (call.method) {
+      case 'blah':
+        print(call.arguments);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (Platform.isIOS) {
-      return const UiKitView(
+      return UiKitView(
         viewType: 'dgis_maps_flutter',
+        onPlatformViewCreated: onViewCreated,
         // layoutDirection: TextDirection.ltr,
         // creationParams: {},
         // gestureRecognizers: widgetConfiguration.gestureRecognizers,
-        creationParamsCodec: StandardMessageCodec(),
+        creationParamsCodec: const StandardMessageCodec(),
       );
     } else {
-      return const AndroidView(
+      return AndroidView(
         viewType: 'dgis_maps_flutter',
+        onPlatformViewCreated: onViewCreated,
         // layoutDirection: TextDirection.ltr,
         // creationParams: {},        // onPlatformViewCreated: onPlatformViewCreated,
         // gestureRecognizers: widgetConfiguration.gestureRecognizers,
-        creationParamsCodec: StandardMessageCodec(),
+        creationParamsCodec: const StandardMessageCodec(),
       );
     }
   }

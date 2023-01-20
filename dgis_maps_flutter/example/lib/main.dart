@@ -28,11 +28,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int i = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: const DGisMap(),
+      floatingActionButton: FloatingActionButton(
+          child: Text("t$i"),
+          onPressed: () => setState(() {
+                i++;
+              })),
+      body: DGisMap(
+        key: ValueKey(i),
+      ),
     );
   }
 }
