@@ -16,19 +16,19 @@ fi
 # Append hook code into script
 cat >> "$HOOK_FILE" <<EOF
 
-### ./dgis_maps_flutter/example/android/app/build.gradle
+### ./example/android/app/build.gradle
 
-cp ./dgis_maps_flutter/example/android/app/build.gradle ./dgis_maps_flutter/example/android/app/build.gradle.bak
-sed -i '' -e 's/applicationId ".*"/applicationId "pro.flown.dgis_maps_flutter_android_example"/' ./dgis_maps_flutter/example/android/app/build.gradle
-git add ./dgis_maps_flutter/example/android/app/build.gradle
-mv ./dgis_maps_flutter/example/android/app/build.gradle.bak ./dgis_maps_flutter/example/android/app/build.gradle
+cp ./example/android/app/build.gradle ./example/android/app/build.gradle.bak
+sed -i '' -e 's/applicationId ".*"/applicationId "pro.flown.dgis_maps_flutter_android_example"/' ./example/android/app/build.gradle
+git add ./example/android/app/build.gradle
+mv ./example/android/app/build.gradle.bak ./example/android/app/build.gradle
 
 
-### ./dgis_maps_flutter/example/ios/Runner.xcodeproj/project.pbxproj
+### ./example/ios/Runner.xcodeproj/project.pbxproj
 
-cp ./dgis_maps_flutter/example/ios/Runner.xcodeproj/project.pbxproj ./dgis_maps_flutter/example/ios/Runner.xcodeproj/project.pbxproj.bak
-sed -i '' -e 's/PRODUCT_BUNDLE_IDENTIFIER = .*;/PRODUCT_BUNDLE_IDENTIFIER = pro.flown.dgis_maps_flutter_ios_example;/g' ./dgis_maps_flutter/example/ios/Runner.xcodeproj/project.pbxproj
-git add ./dgis_maps_flutter/example/ios/Runner.xcodeproj/project.pbxproj
-mv ./dgis_maps_flutter/example/ios/Runner.xcodeproj/project.pbxproj.bak ./dgis_maps_flutter/example/ios/Runner.xcodeproj/project.pbxproj
+cp ./example/ios/Runner.xcodeproj/project.pbxproj ./example/ios/Runner.xcodeproj/project.pbxproj.bak
+sed -i '' -e 's/PRODUCT_BUNDLE_IDENTIFIER = .*;/PRODUCT_BUNDLE_IDENTIFIER = pro.flown.dgis_maps_flutter_ios_example;/g' ./example/ios/Runner.xcodeproj/project.pbxproj
+git add ./example/ios/Runner.xcodeproj/project.pbxproj
+mv ./example/ios/Runner.xcodeproj/project.pbxproj.bak ./example/ios/Runner.xcodeproj/project.pbxproj
 
 EOF

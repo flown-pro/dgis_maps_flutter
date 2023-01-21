@@ -1,0 +1,27 @@
+name: dgis_maps_flutter
+description: A Flutter plugin for integrating 2GIS Maps in iOS and Android applications.
+repository: https://github.com/flown-pro/dgis_maps_flutter
+homepage: https://github.com/flown-pro/dgis_maps_flutter
+version: 0.0.1
+
+environment:
+  sdk: ">=2.14.0 <3.0.0"
+  flutter: ">=1.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: pro.flown.dgis_maps_flutter_android
+        pluginClass: DgisMapsFlutterAndroidPlugin
+      ios:
+        pluginClass: DgisMapsFlutterIosPlugin

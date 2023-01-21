@@ -1,7 +1,6 @@
 package pro.flown.dgis_maps_flutter_android
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
@@ -10,6 +9,7 @@ import io.flutter.plugin.platform.PlatformView
 import ru.dgis.sdk.coordinates.GeoPoint
 import ru.dgis.sdk.map.*
 import ru.dgis.sdk.map.Map
+import ru.dgis.sdk.seconds
 
 class DgisMapController internal constructor(
     id: Int,
@@ -42,29 +42,34 @@ class DgisMapController internal constructor(
         methodChannel.setMethodCallHandler(null)
     }
 
-    private fun init(map: Map?) {
-        if (map == null) return
+    private fun init(map: Map) {
         this.map = map
         methodChannel.setMethodCallHandler(this)
-        methodChannel.invokeMethod("blah", 1234)
         map.camera.stateChannel.connect {
-            when(it){
-                CameraState.BUSY -> TODO()
-                CameraState.FLY -> TODO()
-                CameraState.FOLLOW_POSITION -> TODO()
-                CameraState.FREE -> TODO()
-            }
+            methodChannel.invokeMethod("cameraState", it.name.lowercase())
         }
-    }
-
-    fun pubIdle() {
-
+        map.camera.positionChannel.connect {
+            methodChannel.invokeMethod(
+                "cameraPosition",
+                listOf(
+                    it.point.latitude,
+                    it.point.longitude,
+                    it.zoom.value,
+                    it.tilt.value,
+                    it.bearing.value
+                )
+            )
+        }
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
-            "some" -> {
-
+            "camera#animate" -> {
+                map.camera.move(
+                    Convert.toCameraPosition(call.arguments),
+                    1.seconds,
+                    CameraAnimationType.DEFAULT
+                )
             }
         }
     }
