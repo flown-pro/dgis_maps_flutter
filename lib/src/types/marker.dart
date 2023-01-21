@@ -1,7 +1,7 @@
-import 'package:dgis_maps_flutter_platform_interface/src/types/bitmap.dart';
-import 'package:dgis_maps_flutter_platform_interface/src/types/location.dart';
 import 'package:flutter/foundation.dart';
 
+import 'bitmap.dart';
+import 'location.dart';
 import 'maps_object.dart';
 
 /// Уникальный идентификатор маркера

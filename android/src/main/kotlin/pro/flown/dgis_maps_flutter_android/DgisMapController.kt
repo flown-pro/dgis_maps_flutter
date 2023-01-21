@@ -13,9 +13,11 @@ import ru.dgis.sdk.seconds
 
 class DgisMapController internal constructor(
     id: Int,
-    context: Context,
+    private val context: Context,
     binaryMessenger: BinaryMessenger?
 ) : PlatformView, MethodChannel.MethodCallHandler {
+    private val sdkContext: ru.dgis.sdk.Context =
+        (context.applicationContext as DgisApplication).sdkContext;
     private val methodChannel: MethodChannel =
         MethodChannel(binaryMessenger!!, "dgis_maps_flutter_$id")
     private val mapView: MapView =
@@ -44,6 +46,9 @@ class DgisMapController internal constructor(
 
     private fun init(map: Map) {
         this.map = map
+
+        imageFromAsset(sdkContext,"");
+
         methodChannel.setMethodCallHandler(this)
         map.camera.stateChannel.connect {
             methodChannel.invokeMethod("cameraState", it.name.lowercase())

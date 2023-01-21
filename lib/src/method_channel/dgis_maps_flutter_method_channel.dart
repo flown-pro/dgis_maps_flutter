@@ -1,4 +1,3 @@
-import 'package:dgis_maps_flutter_platform_interface/src/platform_interface/dgis_maps_flutter_platform.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -27,8 +26,8 @@ class UnknownMapIDError extends Error {
   }
 }
 
-class DGisMapsFlutterMethodChannel extends DGisMapsFlutterPlatformInterface {
-
+class DGisMapsFlutterMethodChannel {
+  bool useAndroidViewSurface = false;
   String kChannelName = 'pro.flown/dgis_maps';
   // Keep a collection of id -> channel
   // Every method call passes the int mapId
@@ -56,13 +55,16 @@ class DGisMapsFlutterMethodChannel extends DGisMapsFlutterPlatformInterface {
     return channel;
   }
 
-  @override
   Future<void> init(int mapId) {
     final MethodChannel channel = ensureChannelInitialized(mapId);
     return channel.invokeMethod<void>('map#waitForMap');
   }
 
-  @override
+  Future<dynamic> _handleMethodCall(MethodCall call, int mapId) async {
+    switch (call.method) {
+    }
+  }
+
   Future<void> updateMarkers(
     MarkerUpdates markerUpdates, {
     required int mapId,
@@ -73,7 +75,6 @@ class DGisMapsFlutterMethodChannel extends DGisMapsFlutterPlatformInterface {
     );
   }
 
-  @override
   Future<void> animateCamera(
     CameraUpdate cameraUpdate, {
     required int mapId,
@@ -83,7 +84,6 @@ class DGisMapsFlutterMethodChannel extends DGisMapsFlutterPlatformInterface {
     });
   }
 
-  @override
   Future<void> moveCamera(
     CameraUpdate cameraUpdate, {
     required int mapId,
@@ -93,8 +93,6 @@ class DGisMapsFlutterMethodChannel extends DGisMapsFlutterPlatformInterface {
     });
   }
 
-  bool useAndroidViewSurface = false;
-  @override
   Widget buildView(
     int creationId,
     PlatformViewCreatedCallback onPlatformViewCreated, {
@@ -166,10 +164,5 @@ class DGisMapsFlutterMethodChannel extends DGisMapsFlutterPlatformInterface {
 
     return Text(
         '$defaultTargetPlatform is not yet supported by the maps plugin');
-  }
-
-  Future<dynamic> _handleMethodCall(MethodCall call, int mapId) async {
-    switch (call.method) {
-    }
   }
 }
