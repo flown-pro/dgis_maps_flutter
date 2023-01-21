@@ -6,6 +6,7 @@ import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
+import ru.dgis.sdk.DGis
 import ru.dgis.sdk.coordinates.GeoPoint
 import ru.dgis.sdk.map.*
 import ru.dgis.sdk.map.Map
@@ -13,15 +14,18 @@ import ru.dgis.sdk.seconds
 
 class DgisMapController internal constructor(
     id: Int,
-    private val context: Context,
+    context: Context,
     binaryMessenger: BinaryMessenger?
 ) : PlatformView, MethodChannel.MethodCallHandler {
-    private val sdkContext: ru.dgis.sdk.Context =
-        (context.applicationContext as DgisApplication).sdkContext;
     private val methodChannel: MethodChannel =
         MethodChannel(binaryMessenger!!, "dgis_maps_flutter_$id")
-    private val mapView: MapView =
-        MapView(
+    private val sdkContext: ru.dgis.sdk.Context
+    private val mapView: MapView
+    private lateinit var map: Map
+
+    init {
+        sdkContext = DGis.initialize(context.applicationContext)
+        mapView = MapView(
             context,
             MapOptions().also {
                 it.position = CameraPosition(
@@ -30,9 +34,6 @@ class DgisMapController internal constructor(
                 )
             }
         )
-    private lateinit var map: Map
-
-    init {
         mapView.getMapAsync { init(it) }
     }
 
@@ -47,7 +48,7 @@ class DgisMapController internal constructor(
     private fun init(map: Map) {
         this.map = map
 
-        imageFromAsset(sdkContext,"");
+        imageFromAsset(sdkContext, "");
 
         methodChannel.setMethodCallHandler(this)
         map.camera.stateChannel.connect {
@@ -57,8 +58,8 @@ class DgisMapController internal constructor(
             methodChannel.invokeMethod(
                 "cameraPosition",
                 listOf(
-                    it.point.latitude,
-                    it.point.longitude,
+                    it.point.latitude.value,
+                    it.point.longitude.value,
                     it.zoom.value,
                     it.tilt.value,
                     it.bearing.value
