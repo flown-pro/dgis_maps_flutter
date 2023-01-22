@@ -20,11 +20,15 @@ class DGisNativeView: NSObject, FlutterPlatformView {
         frame: CGRect,
         viewIdentifier viewId: Int64,
         arguments args: Any?,
-        binaryMessenger messenger: FlutterBinaryMessenger?
+        binaryMessenger messenger: FlutterBinaryMessenger?,
+        dgisService: DGisSdkService,
+        settingsService: ISettingsService
     ) {
         viewModel = DGisViewModel(
             arguments: args,
-            binaryMessenger: messenger
+            binaryMessenger: messenger,
+            dgisService: dgisService,
+            settingsService:settingsService
         )
         _view = UIView()
         super.init()
@@ -34,7 +38,8 @@ class DGisNativeView: NSObject, FlutterPlatformView {
     
     private func makeMapView() -> some View {
         let mapView = viewModel.makeMapViewFactory()
-        return mapView.makeMapViewWithMarkerViewOverlay(tapRecognizerCallback: viewModel.onMapTap)
+//        return mapView.makeMapViewWithMarkerViewOverlay(tapRecognizerCallback: viewModel.onMapTap)
+        return mapView.makeMapViewWithMarkerViewOverlay()
     }
     
     func view() -> UIView {

@@ -10,7 +10,7 @@ import UIKit
 import DGis
 import SwiftUI
 
-class DGisNativeViewFactory: NSObject, FlutterPlatformViewFactory {
+class DgisNativeViewFactory: NSObject, FlutterPlatformViewFactory {
     private var messenger: FlutterBinaryMessenger
     
     init(messenger: FlutterBinaryMessenger) {
@@ -23,11 +23,52 @@ class DGisNativeViewFactory: NSObject, FlutterPlatformViewFactory {
         viewIdentifier viewId: Int64,
         arguments args: Any?
     ) -> FlutterPlatformView {
+        
+        let dgisService = DGisSdkService()
+        let settingsStorage = UserDefaults.standard
+        let settingsService = SettingsService(
+            storage: settingsStorage
+        )
+        settingsService.onCurrentLanguageDidChange = {
+            dgisService.mapFactoryProvider.resetMapFactory()
+        }
+        let locationServiceFactory = {
+            LocationService()
+        }
+        let map = dgisService.mapFactory.map
+        let mapObjectService = MapObjectService(
+            map: map,
+            imageFactory: dgisService.sdk.imageFactory
+        )
+        let cameraMoveService = CameraMoveService(
+            locationManagerFactory: locationServiceFactory,
+            map: map,
+            sdkContext: dgisService.sdk.context
+        )
+        let dgisChannelHandler = DgisFlutterHandlerService(
+            sdk: dgisService.sdk,
+            mapFactory: dgisService.mapFactory,
+            mapFactoryProvider: dgisService.mapFactoryProvider,
+            mapObjectService: mapObjectService,
+            settingsService: settingsService,
+            cameraMoveService: cameraMoveService
+        )
+        let  dgisMethodChannel = FlutterMethodChannel(
+            name: "dgis_maps_flutter_\(viewId)",
+            binaryMessenger: messenger
+        )
+        dgisMethodChannel.setMethodCallHandler(dgisChannelHandler.handle)
+        
         return DGisNativeView(
             frame: frame,
             viewIdentifier: viewId,
             arguments: args,
-            binaryMessenger: messenger
+            binaryMessenger: messenger,
+            dgisService: dgisService,
+            settingsService: settingsService
         )
     }
+    
+   
+    
 }
