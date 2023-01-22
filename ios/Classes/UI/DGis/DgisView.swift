@@ -1,6 +1,6 @@
 //
 //  DgisView.swift
-//  dgis_maps_flutter_ios
+//  dgis_maps_flutter
 //
 //  Created by Михаил Колчанов on 13.01.2023.
 //

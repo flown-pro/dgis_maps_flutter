@@ -1,26 +1,26 @@
 PODS:
-  - dgis_maps_flutter_ios (0.0.1):
+  - dgis_maps_flutter (0.0.1):
     - DGisMobileSDK
     - Flutter
-  - DGisMobileSDK (5.1.0-full)
+  - DGisMobileSDK (4.6.2-full)
   - Flutter (1.0.0)
 
 DEPENDENCIES:
-  - dgis_maps_flutter_ios (from `.symlinks/plugins/dgis_maps_flutter_ios/ios`)
+  - dgis_maps_flutter (from `.symlinks/plugins/dgis_maps_flutter/ios`)
   - DGisMobileSDK (from `https://raw.githubusercontent.com/2gis/mobile-sdk-full-swift-package/master/DGisMobileSDK.podspec`)
   - Flutter (from `Flutter`)
 
 EXTERNAL SOURCES:
-  dgis_maps_flutter_ios:
-    :path: ".symlinks/plugins/dgis_maps_flutter_ios/ios"
+  dgis_maps_flutter:
+    :path: ".symlinks/plugins/dgis_maps_flutter/ios"
   DGisMobileSDK:
     :podspec: https://raw.githubusercontent.com/2gis/mobile-sdk-full-swift-package/master/DGisMobileSDK.podspec
   Flutter:
     :path: Flutter
 
 SPEC CHECKSUMS:
-  dgis_maps_flutter_ios: c36ce8a63ee57811b237a3a9a5f491c15db00ddf
-  DGisMobileSDK: 88fef2df50f069c2bd04c25ecf5f39056313abbf
+  dgis_maps_flutter: 22d4a7cccd90e127125425e1530453e5ba42be54
+  DGisMobileSDK: 8a61b1c28e184f7e7ba59935f94902fd06452676
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
 
 PODFILE CHECKSUM: 20201416ad7c066a19252538844992caac6fdbe1

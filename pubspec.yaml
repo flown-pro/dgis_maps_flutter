@@ -24,4 +24,4 @@ flutter:
         package: pro.flown.dgis_maps_flutter_android
         pluginClass: DgisMapsFlutterAndroidPlugin
       ios:
-        pluginClass: DgisMapsFlutterIosPlugin
+        pluginClass: DgisMapsFlutterPlugin

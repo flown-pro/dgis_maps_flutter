@@ -27,7 +27,7 @@ mv ./example/android/app/build.gradle.bak ./example/android/app/build.gradle
 ### ./example/ios/Runner.xcodeproj/project.pbxproj
 
 cp ./example/ios/Runner.xcodeproj/project.pbxproj ./example/ios/Runner.xcodeproj/project.pbxproj.bak
-sed -i '' -e 's/PRODUCT_BUNDLE_IDENTIFIER = .*;/PRODUCT_BUNDLE_IDENTIFIER = pro.flown.dgis_maps_flutter_ios_example;/g' ./example/ios/Runner.xcodeproj/project.pbxproj
+sed -i '' -e 's/PRODUCT_BUNDLE_IDENTIFIER = .*;/PRODUCT_BUNDLE_IDENTIFIER = pro.flown.dgis_maps_flutter_example;/g' ./example/ios/Runner.xcodeproj/project.pbxproj
 git add ./example/ios/Runner.xcodeproj/project.pbxproj
 mv ./example/ios/Runner.xcodeproj/project.pbxproj.bak ./example/ios/Runner.xcodeproj/project.pbxproj
 
