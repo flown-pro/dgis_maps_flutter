@@ -1,4 +1,4 @@
-group 'pro.flown.dgis_maps_flutter_android'
+group 'pro.flown.dgis_maps_flutter'
 version '1.0-SNAPSHOT'
 
 buildscript {

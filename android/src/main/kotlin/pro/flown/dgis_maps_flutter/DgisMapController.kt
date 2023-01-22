@@ -1,4 +1,4 @@
-package pro.flown.dgis_maps_flutter_android
+package pro.flown.dgis_maps_flutter
 
 import android.content.Context
 import android.view.View
@@ -48,7 +48,7 @@ class DgisMapController internal constructor(
     private fun init(map: Map) {
         this.map = map
 
-        imageFromAsset(sdkContext, "");
+        imageFromAsset(sdkContext, "")
 
         methodChannel.setMethodCallHandler(this)
         map.camera.stateChannel.connect {

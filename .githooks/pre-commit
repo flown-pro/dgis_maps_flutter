@@ -3,7 +3,7 @@
 ### ./example/android/app/build.gradle
 
 cp ./example/android/app/build.gradle ./example/android/app/build.gradle.bak
-sed -i '' -e 's/applicationId ".*"/applicationId "pro.flown.dgis_maps_flutter_android_example"/' ./example/android/app/build.gradle
+sed -i '' -e 's/applicationId ".*"/applicationId "pro.flown.dgis_maps_flutter_example"/' ./example/android/app/build.gradle
 git add ./example/android/app/build.gradle
 mv ./example/android/app/build.gradle.bak ./example/android/app/build.gradle
 

@@ -1,9 +1,9 @@
-package pro.flown.dgis_maps_flutter_android
+package pro.flown.dgis_maps_flutter
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
 
-class DgisMapsFlutterAndroidPlugin : FlutterPlugin {
+class DgisMapsFlutterPlugin : FlutterPlugin {
 
   private val VIEW_TYPE = "dgis_maps_flutter"
 

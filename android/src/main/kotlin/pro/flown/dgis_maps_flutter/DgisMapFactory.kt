@@ -1,4 +1,4 @@
-package pro.flown.dgis_maps_flutter_android
+package pro.flown.dgis_maps_flutter
 
 import android.content.Context
 import io.flutter.plugin.common.BinaryMessenger

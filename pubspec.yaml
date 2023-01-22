@@ -16,12 +16,14 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+  pigeon:
+    path: ./dev_plugins/pigeon
 
 flutter:
   plugin:
     platforms:
       android:
-        package: pro.flown.dgis_maps_flutter_android
-        pluginClass: DgisMapsFlutterAndroidPlugin
+        package: pro.flown.dgis_maps_flutter
+        pluginClass: DgisMapsFlutterPlugin
       ios:
         pluginClass: DgisMapsFlutterPlugin
