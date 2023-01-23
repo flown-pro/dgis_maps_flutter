@@ -3,12 +3,12 @@
 // found in the LICENSE file.
 // https://github.com/flutter/plugins/blob/main/packages/google_maps_flutter/google_maps_flutter_platform_interface/lib/src/types/location.dart
 
-import 'package:flutter/foundation.dart'
-    show immutable, objectRuntimeType, visibleForTesting;
+import 'package:flutter/foundation.dart' show immutable, objectRuntimeType;
+
+import '../method_channel/method_channel.g.dart' as data;
 
 /// A pair of latitude and longitude coordinates, stored as degrees.
-@immutable
-class LatLng {
+class LatLng extends data.LatLng {
   /// Creates a geographical location specified in degrees [latitude] and
   /// [longitude].
   ///
@@ -16,34 +16,13 @@ class LatLng {
   ///
   /// The longitude is normalized to the half-open interval from -180.0
   /// (inclusive) to +180.0 (exclusive).
-  const LatLng(double latitude, double longitude)
-      : latitude =
-            latitude < -90.0 ? -90.0 : (90.0 < latitude ? 90.0 : latitude),
-        // Avoids normalization if possible to prevent unnecessary loss of precision
-        longitude = longitude >= -180 && longitude < 180
-            ? longitude
-            : (longitude + 180.0) % 360.0 - 180.0;
-
-  /// The latitude in degrees between -90.0 and 90.0, both inclusive.
-  final double latitude;
-
-  /// The longitude in degrees between -180.0 (inclusive) and 180.0 (exclusive).
-  final double longitude;
-
-  /// Converts this object to something serializable in JSON.
-  Object toJson() {
-    return <double>[latitude, longitude];
-  }
-
-  /// Initialize a LatLng from an \[lat, lng\] array.
-  static LatLng? fromJson(Object? json) {
-    if (json == null) {
-      return null;
-    }
-    assert(json is List && json.length == 2);
-    final List<Object?> list = json as List<Object?>;
-    return LatLng(list[0]! as double, list[1]! as double);
-  }
+  LatLng(double latitude, double longitude)
+      : super(
+            latitude:
+                latitude < -90.0 ? -90.0 : (90.0 < latitude ? 90.0 : latitude),
+            longitude: longitude >= -180 && longitude < 180
+                ? longitude
+                : (longitude + 180.0) % 360.0 - 180.0);
 
   @override
   String toString() =>
@@ -83,11 +62,6 @@ class LatLngBounds {
   /// The northeast corner of the rectangle.
   final LatLng northeast;
 
-  /// Converts this object to something serializable in JSON.
-  Object toJson() {
-    return <Object>[southwest.toJson(), northeast.toJson()];
-  }
-
   /// Returns whether this rectangle contains the given [LatLng].
   bool contains(LatLng point) {
     return _containsLatitude(point.latitude) &&
@@ -104,20 +78,6 @@ class LatLngBounds {
     } else {
       return southwest.longitude <= lng || lng <= northeast.longitude;
     }
-  }
-
-  /// Converts a list to [LatLngBounds].
-  @visibleForTesting
-  static LatLngBounds? fromList(Object? json) {
-    if (json == null) {
-      return null;
-    }
-    assert(json is List && json.length == 2);
-    final List<Object?> list = json as List<Object?>;
-    return LatLngBounds(
-      southwest: LatLng.fromJson(list[0])!,
-      northeast: LatLng.fromJson(list[1])!,
-    );
   }
 
   @override

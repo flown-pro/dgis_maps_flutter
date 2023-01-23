@@ -8,6 +8,32 @@ import 'dart:typed_data' show Float64List, Int32List, Int64List, Uint8List;
 import 'package:flutter/foundation.dart' show ReadBuffer, WriteBuffer;
 import 'package:flutter/services.dart';
 
+class CreationParams {
+  CreationParams({
+    required this.position,
+    required this.zoom,
+  });
+
+  LatLng position;
+
+  double zoom;
+
+  Object encode() {
+    return <Object?>[
+      position.encode(),
+      zoom,
+    ];
+  }
+
+  static CreationParams decode(Object result) {
+    result as List<Object?>;
+    return CreationParams(
+      position: LatLng.decode(result[0]! as List<Object?>),
+      zoom: result[1]! as double,
+    );
+  }
+}
+
 class LatLng {
   LatLng({
     required this.latitude,

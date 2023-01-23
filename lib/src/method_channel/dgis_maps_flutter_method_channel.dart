@@ -4,108 +4,25 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../types/types.dart';
-import '../types/utils/marker.dart';
-
-class UnknownMapIDError extends Error {
-  /// Creates an assertion error with the provided [mapId] and optional
-  /// [message].
-  UnknownMapIDError(this.mapId, [this.message]);
-
-  /// The unknown ID.
-  final int mapId;
-
-  /// Message describing the assertion error.
-  final Object? message;
-
-  @override
-  String toString() {
-    if (message != null) {
-      return 'Unknown map ID $mapId: ${Error.safeToString(message)}';
-    }
-    return 'Unknown map ID $mapId';
-  }
-}
+import 'method_channel.g.dart';
 
 class DGisMapsFlutterMethodChannel {
-  bool useAndroidViewSurface = false;
-  String kChannelName = 'pro.flown/dgis_maps';
-  // Keep a collection of id -> channel
-  // Every method call passes the int mapId
-  final Map<int, MethodChannel> _channels = <int, MethodChannel>{};
+  static bool useAndroidViewSurface = false;
+  static const String kChannelName = 'pro.flown/dgis_maps';
 
-  /// Accesses the MethodChannel associated to the passed mapId.
-  MethodChannel channel(int mapId) {
-    final MethodChannel? channel = _channels[mapId];
-    if (channel == null) {
-      throw UnknownMapIDError(mapId);
-    }
-    return channel;
-  }
-
-  /// Returns the channel for [mapId], creating it if it doesn't already exist.
-  @visibleForTesting
-  MethodChannel ensureChannelInitialized(int mapId) {
-    MethodChannel? channel = _channels[mapId];
-    if (channel == null) {
-      channel = MethodChannel('${kChannelName}_$mapId');
-      channel.setMethodCallHandler(
-          (MethodCall call) => _handleMethodCall(call, mapId));
-      _channels[mapId] = channel;
-    }
-    return channel;
-  }
-
-  Future<void> init(int mapId) {
-    final MethodChannel channel = ensureChannelInitialized(mapId);
-    return channel.invokeMethod<void>('map#waitForMap');
-  }
-
-  Future<dynamic> _handleMethodCall(MethodCall call, int mapId) async {
-    switch (call.method) {
-    }
-  }
-
-  Future<void> updateMarkers(
-    MarkerUpdates markerUpdates, {
-    required int mapId,
-  }) {
-    return channel(mapId).invokeMethod<void>(
-      'markers#update',
-      markerUpdates.toJson(),
-    );
-  }
-
-  Future<void> animateCamera(
-    CameraUpdate cameraUpdate, {
-    required int mapId,
-  }) {
-    return channel(mapId).invokeMethod<void>('camera#animate', <String, Object>{
-      'cameraUpdate': cameraUpdate.toJson(),
-    });
-  }
-
-  Future<void> moveCamera(
-    CameraUpdate cameraUpdate, {
-    required int mapId,
-  }) {
-    return channel(mapId).invokeMethod<void>('camera#move', <String, dynamic>{
-      'cameraUpdate': cameraUpdate.toJson(),
-    });
-  }
-
-  Widget buildView(
-    int creationId,
+  static Widget buildView(
     PlatformViewCreatedCallback onPlatformViewCreated, {
     required CameraPosition initialPosition,
     MapObjects mapObjects = const MapObjects(),
     Map<String, dynamic> mapOptions = const <String, dynamic>{},
   }) {
-    final Map<String, dynamic> creationParams = <String, dynamic>{
-      'initialCameraPosition': initialPosition.toMap(),
-      'options': mapOptions,
-      'markersToAdd': serializeMarkerSet(mapObjects.markers),
+    final creationParams = CreationParams(
+      position: initialPosition.target,
+      zoom: initialPosition.zoom,
+      // 'options': mapOptions,
+      // 'markersToAdd': serializeMarkerSet(mapObjects.markers),
       // 'polylinesToAdd': serializePolylineSet(mapObjects.polylines),
-    };
+    ).encode();
 
     if (defaultTargetPlatform == TargetPlatform.android) {
       if (useAndroidViewSurface) {

@@ -24,6 +24,28 @@ private fun wrapError(exception: Throwable): List<Any> {
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
+data class CreationParams (
+  val position: LatLng,
+  val zoom: Double
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): CreationParams {
+      val position = LatLng.fromList(list[0] as List<Any?>)
+      val zoom = list[1] as Double
+      return CreationParams(position, zoom)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      position?.toList(),
+      zoom,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
 data class LatLng (
   val latitude: Double,
   val longitude: Double

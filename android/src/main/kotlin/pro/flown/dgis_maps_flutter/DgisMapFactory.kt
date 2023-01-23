@@ -6,12 +6,9 @@ import io.flutter.plugin.common.StandardMessageCodec
 import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory
 
-class DgisMapFactory internal constructor(
-    private val binaryMessenger: BinaryMessenger,
-    context: Context?
-) :
+class DgisMapFactory internal constructor(private val binaryMessenger: BinaryMessenger) :
     PlatformViewFactory(StandardMessageCodec.INSTANCE) {
     override fun create(context: Context, id: Int, args: Any?): PlatformView {
-        return DgisMapController(id, context, binaryMessenger)
+        return DgisMapController(id, context, args, binaryMessenger)
     }
 }

@@ -25,6 +25,28 @@ private func wrapError(_ error: FlutterError) -> [Any?] {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
+struct CreationParams {
+  var position: LatLng
+  var zoom: Double
+
+  static func fromList(_ list: [Any?]) -> CreationParams? {
+    let position = LatLng.fromList(list[0] as! [Any?])!
+    let zoom = list[1] as! Double
+
+    return CreationParams(
+      position: position,
+      zoom: zoom
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      position.toList(),
+      zoom,
+    ]
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
 struct LatLng {
   var latitude: Double
   var longitude: Double

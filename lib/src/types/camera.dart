@@ -58,35 +58,6 @@ class CameraPosition {
   /// will be silently clamped to the supported range.
   final double zoom;
 
-  /// Serializes [CameraPosition].
-  ///
-  /// Mainly for internal use when calling [CameraUpdate.newCameraPosition].
-  Object toMap() => <String, Object>{
-        'bearing': bearing,
-        'target': target.toJson(),
-        'tilt': tilt,
-        'zoom': zoom,
-      };
-
-  /// Deserializes [CameraPosition] from a map.
-  ///
-  /// Mainly for internal use.
-  static CameraPosition? fromMap(Object? json) {
-    if (json == null || json is! Map<dynamic, dynamic>) {
-      return null;
-    }
-    final LatLng? target = LatLng.fromJson(json['target']);
-    if (target == null) {
-      return null;
-    }
-    return CameraPosition(
-      bearing: json['bearing'] as double,
-      target: target,
-      tilt: json['tilt'] as double,
-      zoom: json['zoom'] as double,
-    );
-  }
-
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) {
@@ -115,38 +86,38 @@ class CameraPosition {
 class CameraUpdate {
   const CameraUpdate._(this._json);
 
-  /// Returns a camera update that moves the camera to the specified position.
-  static CameraUpdate newCameraPosition(CameraPosition cameraPosition) {
-    return CameraUpdate._(
-      <Object>['newCameraPosition', cameraPosition.toMap()],
-    );
-  }
+  // /// Returns a camera update that moves the camera to the specified position.
+  // static CameraUpdate newCameraPosition(CameraPosition cameraPosition) {
+  //   return CameraUpdate._(
+  //     <Object>['newCameraPosition', cameraPosition.toMap()],
+  //   );
+  // }
 
-  /// Returns a camera update that moves the camera target to the specified
-  /// geographical location.
-  static CameraUpdate newLatLng(LatLng latLng) {
-    return CameraUpdate._(<Object>['newLatLng', latLng.toJson()]);
-  }
+  // /// Returns a camera update that moves the camera target to the specified
+  // /// geographical location.
+  // static CameraUpdate newLatLng(LatLng latLng) {
+  //   return CameraUpdate._(<Object>['newLatLng', latLng.toJson()]);
+  // }
 
-  /// Returns a camera update that transforms the camera so that the specified
-  /// geographical bounding box is centered in the map view at the greatest
-  /// possible zoom level. A non-zero [padding] insets the bounding box from the
-  /// map view's edges. The camera's new tilt and bearing will both be 0.0.
-  static CameraUpdate newLatLngBounds(LatLngBounds bounds, double padding) {
-    return CameraUpdate._(<Object>[
-      'newLatLngBounds',
-      bounds.toJson(),
-      padding,
-    ]);
-  }
+  // /// Returns a camera update that transforms the camera so that the specified
+  // /// geographical bounding box is centered in the map view at the greatest
+  // /// possible zoom level. A non-zero [padding] insets the bounding box from the
+  // /// map view's edges. The camera's new tilt and bearing will both be 0.0.
+  // static CameraUpdate newLatLngBounds(LatLngBounds bounds, double padding) {
+  //   return CameraUpdate._(<Object>[
+  //     'newLatLngBounds',
+  //     bounds.toJson(),
+  //     padding,
+  //   ]);
+  // }
 
-  /// Returns a camera update that moves the camera target to the specified
-  /// geographical location and zoom level.
-  static CameraUpdate newLatLngZoom(LatLng latLng, double zoom) {
-    return CameraUpdate._(
-      <Object>['newLatLngZoom', latLng.toJson(), zoom],
-    );
-  }
+  // /// Returns a camera update that moves the camera target to the specified
+  // /// geographical location and zoom level.
+  // static CameraUpdate newLatLngZoom(LatLng latLng, double zoom) {
+  //   return CameraUpdate._(
+  //     <Object>['newLatLngZoom', latLng.toJson(), zoom],
+  //   );
+  // }
 
   /// Returns a camera update that moves the camera target the specified screen
   /// distance.

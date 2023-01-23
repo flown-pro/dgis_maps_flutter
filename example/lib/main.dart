@@ -1,4 +1,5 @@
 import 'package:dgis_maps_flutter/dgis_maps_flutter.dart';
+import 'package:dgis_maps_flutter/src/controller.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -29,17 +30,53 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int i = 0;
+  late DGisMapController controller;
+  void onMapCreated(DGisMapController controller) {
+    this.controller = controller;
+  }
+
+  Future<void> onAsyPressed() async {
+    final newPos = await controller.api.asy(LatLng(1, 1));
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.fixed,
+        duration: const Duration(seconds: 1),
+        dismissDirection: DismissDirection.horizontal,
+        content: Text(
+          newPos.encode().toString(),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
       floatingActionButton: FloatingActionButton(
-          child: Text("t$i"),
-          onPressed: () => setState(() {
-                i++;
-              })),
-      body: DGisMap(
-        key: ValueKey(i),
+        child: Text("iter\n$i"),
+        onPressed: () => setState(() => i++),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: DGisMap(
+              key: ValueKey(i),
+              initialPosition: CameraPosition(target: LatLng(60, 30), zoom: 7),
+              onMapCreated: onMapCreated,
+            ),
+          ),
+          Row(
+            children: [
+              TextButton(
+                onPressed: onAsyPressed,
+                child: const Text('moveMap'),
+              )
+            ],
+          ),
+          const SizedBox(height: 52),
+        ],
       ),
     );
   }

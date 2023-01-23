@@ -6,7 +6,6 @@
 
 import 'dart:convert';
 import 'dart:io';
-import 'dart:mirrors';
 
 import 'package:analyzer/dart/analysis/analysis_context.dart'
     show AnalysisContext;
@@ -1174,7 +1173,14 @@ ${_argParser.usage}''';
       print(usage);
       return 1;
     }
-
+    parseResults.root.apis = parseResults.root.apis
+        .where((element) => !element.name.startsWith('_'))
+        .toList()
+      ..forEach((api) {
+        api.methods = api.methods
+            .where((element) => !element.name.startsWith('_'))
+            .toList();
+      });
     for (final GeneratorAdapter adapter in safeGeneratorAdapters) {
       for (final FileType fileType in adapter.fileTypeList) {
         final IOSink? sink = adapter.shouldGenerate(options, fileType);

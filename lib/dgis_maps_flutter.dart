@@ -1,51 +1,52 @@
 library dgis_maps_flutter;
 
-import 'dart:io';
+import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import 'src/controller.dart';
+import 'src/method_channel/dgis_maps_flutter_method_channel.dart';
+import 'src/types/types.dart';
+
+export 'src/types/types.dart';
+
+typedef MapCreatedCallback = void Function(DGisMapController controller);
+
 class DGisMap extends StatefulWidget {
-  const DGisMap({Key? key}) : super(key: key);
+  const DGisMap({
+    Key? key,
+    this.onMapCreated,
+    required this.initialPosition,
+  }) : super(key: key);
+
+  final CameraPosition initialPosition;
+
+  final MapCreatedCallback? onMapCreated;
 
   @override
   State<DGisMap> createState() => _DGisMapState();
 }
 
 class _DGisMapState extends State<DGisMap> {
-  late MethodChannel channel;
-  void onViewCreated(int id) {
-    channel = MethodChannel('dgis_maps_flutter_$id');
-    channel.setMethodCallHandler(onMethodCall);
-  }
+  final _controller = Completer<DGisMapController>();
 
-  Future<dynamic> onMethodCall(MethodCall call) async {
-    switch (call.method) {
-      case 'blah':
-        print(call.arguments);
+  Future<void> onViewCreated(int id) async {
+    final DGisMapController controller = await DGisMapController.init(
+      id,
+      // this,
+    );
+    _controller.complete(controller);
+    final MapCreatedCallback? onMapCreated = widget.onMapCreated;
+    if (onMapCreated != null) {
+      onMapCreated(controller);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (Platform.isIOS) {
-      return UiKitView(
-        viewType: 'dgis_maps_flutter',
-        onPlatformViewCreated: onViewCreated,
-        // layoutDirection: TextDirection.ltr,
-        // creationParams: {},
-        // gestureRecognizers: widgetConfiguration.gestureRecognizers,
-        creationParamsCodec: const StandardMessageCodec(),
-      );
-    } else {
-      return AndroidView(
-        viewType: 'dgis_maps_flutter',
-        onPlatformViewCreated: onViewCreated,
-        // layoutDirection: TextDirection.ltr,
-        // creationParams: {},        // onPlatformViewCreated: onPlatformViewCreated,
-        // gestureRecognizers: widgetConfiguration.gestureRecognizers,
-        creationParamsCodec: const StandardMessageCodec(),
-      );
-    }
+    return DGisMapsFlutterMethodChannel.buildView(
+      onViewCreated,
+      initialPosition: widget.initialPosition,
+    );
   }
 }

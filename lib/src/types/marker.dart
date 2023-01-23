@@ -54,16 +54,16 @@ class Marker implements MapsObject<Marker> {
   Object toJson() {
     final Map<String, Object> json = <String, Object>{};
 
-    void addIfPresent(String fieldName, Object? value) {
-      if (value != null) {
-        json[fieldName] = value;
-      }
-    }
+    // void addIfPresent(String fieldName, Object? value) {
+    //   if (value != null) {
+    //     json[fieldName] = value;
+    //   }
+    // }
 
-    addIfPresent('markerId', markerId);
-    addIfPresent('bitmap', bitmap.toJson());
-    addIfPresent('position', position.toJson());
-    addIfPresent('infoText', infoText);
+    // addIfPresent('markerId', markerId);
+    // addIfPresent('bitmap', bitmap.toJson());
+    // addIfPresent('position', position.toJson());
+    // addIfPresent('infoText', infoText);
     return json;
   }
 }
