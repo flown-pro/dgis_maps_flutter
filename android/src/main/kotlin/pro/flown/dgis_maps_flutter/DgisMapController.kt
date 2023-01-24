@@ -7,6 +7,7 @@ import io.flutter.plugin.platform.PlatformView
 import ru.dgis.sdk.DGis
 import ru.dgis.sdk.coordinates.GeoPoint
 import ru.dgis.sdk.map.*
+import ru.dgis.sdk.map.CameraPosition
 import ru.dgis.sdk.map.Map
 
 class DgisMapController internal constructor(
@@ -29,7 +30,7 @@ class DgisMapController internal constructor(
                 Zoom(params.zoom.toFloat()),
             )
         })
-        PluginHostApi.setUp(binaryMessenger, this, id)
+        PluginHostApi.setUp(binaryMessenger, id, this)
         mapView.getMapAsync { init(it) }
     }
 
@@ -85,9 +86,10 @@ class DgisMapController internal constructor(
 
     }
 
-     fun sy(msg: LatLng): LatLng {
+    fun sy(msg: LatLng): LatLng {
 //        TODO("Not yet implemented")
         return LatLng(0.0, 0.0)
     }
-    override fun m(msg: Marker, callback: () -> Unit){}
+
+    override fun m(msg: Marker, callback: () -> Unit) {}
 }

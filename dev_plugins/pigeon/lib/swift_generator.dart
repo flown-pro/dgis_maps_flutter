@@ -284,9 +284,9 @@ import FlutterMacOS
     indent.write('class ${api.name} ');
     indent.addScoped('{', '}', () {
       indent.writeln('private let binaryMessenger: FlutterBinaryMessenger');
-      indent.writeln('private let id: Int64?');
+      indent.writeln('private let id: Int64');
       indent.write(
-          'init(binaryMessenger: FlutterBinaryMessenger${generatorOptions.withId ? ', id: Int64?' : ''})');
+          'init(binaryMessenger: FlutterBinaryMessenger${generatorOptions.withId ? ', id: Int64' : ''})');
       indent.addScoped('{', '}', () {
         indent.writeln('self.binaryMessenger = binaryMessenger');
         if (generatorOptions.withId) {
@@ -304,7 +304,7 @@ import FlutterMacOS
       }
       for (final Method func in api.methods) {
         final String channelName =
-            makeIosChannelName(api, func, generatorOptions.withId);
+            makeChannelName(api, func, generatorOptions.withId);
         final String returnType = func.returnType.isVoid
             ? ''
             : _nullsafeSwiftTypeForDartType(func.returnType);
@@ -435,11 +435,11 @@ import FlutterMacOS
       indent.writeln(
           '$_docCommentPrefix Sets up an instance of `$apiName` to handle messages through the `binaryMessenger`.');
       indent.write(
-          'static func setUp(binaryMessenger: FlutterBinaryMessenger, api: $apiName?${generatorOptions.withId ? ', id: Int64?' : ''}) ');
+          'static func setUp(binaryMessenger: FlutterBinaryMessenger${generatorOptions.withId ? ', id: Int64' : ''}, api: $apiName?) ');
       indent.addScoped('{', '}', () {
         for (final Method method in api.methods) {
           final String channelName =
-              makeIosChannelName(api, method, generatorOptions.withId);
+              makeChannelName(api, method, generatorOptions.withId);
           final String varChannelName = '${method.name}Channel';
           addDocumentationComments(
               indent, method.documentationComments, _docCommentSpec);

@@ -330,7 +330,7 @@ class KotlinGenerator extends StructuredGenerator<KotlinOptions> {
     final String apiName = api.name;
     indent.writeln('@Suppress("UNCHECKED_CAST")');
     indent.write(
-        'class $apiName(private val binaryMessenger: BinaryMessenger${generatorOptions.withId?', private val id: Int?':''}) ');
+        'class $apiName(private val binaryMessenger: BinaryMessenger${generatorOptions.withId?', private val id: Int':''}) ');
     indent.addScoped('{', '}', () {
       indent.write('companion object ');
       indent.addScoped('{', '}', () {
@@ -475,7 +475,7 @@ class KotlinGenerator extends StructuredGenerator<KotlinOptions> {
             '/** Sets up an instance of `$apiName` to handle messages through the `binaryMessenger`. */');
         indent.writeln('@Suppress("UNCHECKED_CAST")');
         indent.write(
-            'fun setUp(binaryMessenger: BinaryMessenger, api: $apiName?${generatorOptions.withId?', id: Int?':''}) ');
+            'fun setUp(binaryMessenger: BinaryMessenger${generatorOptions.withId?', id: Int':''}, api: $apiName?) ');
         indent.addScoped('{', '}', () {
           for (final Method method in api.methods) {
             indent.write('run ');

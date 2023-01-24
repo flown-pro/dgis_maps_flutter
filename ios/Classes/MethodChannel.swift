@@ -329,12 +329,12 @@ class PluginHostApiSetup {
   /// The codec used by PluginHostApi.
   static var codec: FlutterStandardMessageCodec { PluginHostApiCodec.shared }
   /// Sets up an instance of `PluginHostApi` to handle messages through the `binaryMessenger`.
-  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: PluginHostApi?, id: Int64?) {
+  static func setUp(binaryMessenger: FlutterBinaryMessenger, id: Int64, api: PluginHostApi?) {
     /// Получение текущей позиции камеры
     ///
     /// Возвращает [CameraPosition]
     /// Позицию камеры в текущий момент времени
-    let getCameraPositionChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id ?? 0).getCameraPosition", binaryMessenger: binaryMessenger, codec: codec)
+    let getCameraPositionChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_$id.getCameraPosition", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       getCameraPositionChannel.setMessageHandler { _, reply in
         api.getCameraPosition() { result in
@@ -348,7 +348,7 @@ class PluginHostApiSetup {
     /// [duration] - длительность анимации в миллисекундах,
     /// если не указана, используется нативное значение
     /// [cameraAnimationType] - тип анимации
-    let moveCameraChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id ?? 0).moveCamera", binaryMessenger: binaryMessenger, codec: codec)
+    let moveCameraChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_$id.moveCamera", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       moveCameraChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -365,7 +365,7 @@ class PluginHostApiSetup {
     /// Обновление маркеров
     ///
     /// [markerUpdates] - объект с информацией об обновлении маркеров
-    let updateMarkersChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id ?? 0).updateMarkers", binaryMessenger: binaryMessenger, codec: codec)
+    let updateMarkersChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_$id.updateMarkers", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       updateMarkersChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -381,8 +381,8 @@ class PluginHostApiSetup {
 /// Generated class from Pigeon that represents Flutter messages that can be called from Swift.
 class PluginFlutterApi {
   private let binaryMessenger: FlutterBinaryMessenger
-  private let id: Int64?
-  init(binaryMessenger: FlutterBinaryMessenger, id: Int64?){
+  private let id: Int64
+  init(binaryMessenger: FlutterBinaryMessenger, id: Int64){
     self.binaryMessenger = binaryMessenger
     self.id = id
   }
@@ -391,7 +391,7 @@ class PluginFlutterApi {
   /// TODO(kit): Изменить на enum после фикса
   /// https://github.com/flutter/flutter/issues/87307
   func onCameraStateChanged(cameraState cameraStateArg: CameraState, completion: @escaping () -> Void) {
-    let channel = FlutterBasicMessageChannel(name: "pro.flown.PluginFlutterApi_\(id ?? 0).onCameraStateChanged", binaryMessenger: binaryMessenger)
+    let channel = FlutterBasicMessageChannel(name: "pro.flown.PluginFlutterApi_$id.onCameraStateChanged", binaryMessenger: binaryMessenger)
     channel.sendMessage([cameraStateArg] as [Any?]) { _ in
       completion()
     }

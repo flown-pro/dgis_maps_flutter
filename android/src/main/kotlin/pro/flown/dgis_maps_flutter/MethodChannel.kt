@@ -362,7 +362,7 @@ interface PluginHostApi {
     }
     /** Sets up an instance of `PluginHostApi` to handle messages through the `binaryMessenger`. */
     @Suppress("UNCHECKED_CAST")
-    fun setUp(binaryMessenger: BinaryMessenger, api: PluginHostApi?, id: Int?) {
+    fun setUp(binaryMessenger: BinaryMessenger, id: Int, api: PluginHostApi?) {
       run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginHostApi_$id.getCameraPosition", codec)
         if (api != null) {
@@ -427,7 +427,7 @@ interface PluginHostApi {
 }
 /** Generated class from Pigeon that represents Flutter messages that can be called from Kotlin. */
 @Suppress("UNCHECKED_CAST")
-class PluginFlutterApi(private val binaryMessenger: BinaryMessenger, private val id: Int?) {
+class PluginFlutterApi(private val binaryMessenger: BinaryMessenger, private val id: Int) {
   companion object {
     /** The codec used by PluginFlutterApi. */
     private val codec: MessageCodec<Any?> by lazy {

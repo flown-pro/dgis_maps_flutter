@@ -318,10 +318,10 @@ class PluginHostApi {
   /// Constructor for [PluginHostApi].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  PluginHostApi({BinaryMessenger? binaryMessenger, this.id})
+  PluginHostApi({BinaryMessenger? binaryMessenger, required this.id})
       : _binaryMessenger = binaryMessenger;
   final BinaryMessenger? _binaryMessenger;
-  final int? id;
+  final int id;
 
   static const MessageCodec<Object?> codec = _PluginHostApiCodec();
 
@@ -417,7 +417,7 @@ abstract class PluginFlutterApi {
   /// https://github.com/flutter/flutter/issues/87307
   void onCameraStateChanged(CameraState cameraState);
 
-  static void setup(PluginFlutterApi? api, {BinaryMessenger? binaryMessenger, int? id}) {
+  static void setup(PluginFlutterApi? api, {BinaryMessenger? binaryMessenger, required int id}) {
     {
       final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
           'pro.flown.PluginFlutterApi_$id.onCameraStateChanged', codec,

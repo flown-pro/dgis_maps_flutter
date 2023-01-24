@@ -319,7 +319,7 @@ $resultAt != null
         indent.newln();
       }
       indent.write(
-          'static void setup(${api.name}? api, {BinaryMessenger? binaryMessenger${generatorOptions.withId?', int? id':''}}) ');
+          'static void setup(${api.name}? api, {BinaryMessenger? binaryMessenger${generatorOptions.withId?', required int id':''}}) ');
       indent.addScoped('{', '}', () {
         for (final Method func in api.methods) {
           indent.write('');
@@ -459,10 +459,10 @@ $resultAt != null
 /// Constructor for [${api.name}].  The [binaryMessenger] named argument is
 /// available for dependency injection.  If it is left null, the default
 /// BinaryMessenger will be used which routes to the host platform.
-${api.name}({BinaryMessenger? binaryMessenger${generatorOptions.withId?', this.id':''}})
+${api.name}({BinaryMessenger? binaryMessenger${generatorOptions.withId?', required this.id':''}})
 \t\t: _binaryMessenger = binaryMessenger;
 final BinaryMessenger? _binaryMessenger;
-${generatorOptions.withId?'final int? id;':''}
+${generatorOptions.withId?'final int id;':''}
 ''');
 
       indent
