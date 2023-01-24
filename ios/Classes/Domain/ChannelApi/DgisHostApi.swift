@@ -8,13 +8,7 @@
 import DGis
 
 class DgisHostApi : NSObject, PluginHostApi {
-    func asy(msg: LatLng, completion: @escaping (LatLng) -> Void) {
-        addTestMarker()
-    }
     
-    func sy(msg: LatLng) -> LatLng {
-      return LatLng(latitude: 0, longitude: 0)
-    }
     
     
     private let sdk: DGis.Container
@@ -24,11 +18,6 @@ class DgisHostApi : NSObject, PluginHostApi {
     
     private let settingsService: ISettingsService
     private let cameraMoveService: CameraMoveService
-    private var visibleRect: GeoRect?
-    private var initialRectCancellable: DGis.Cancellable?
-    
-    
-    static func register(with registrar: FlutterPluginRegistrar) {}
     
     init(
         sdk: DGis.Container,
@@ -46,14 +35,46 @@ class DgisHostApi : NSObject, PluginHostApi {
         self.cameraMoveService = cameraMoveService
     }
     
-    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        if let args = call.arguments as? Dictionary<String, Any> {
-            print(call.method, args)
-        } else {
-            result(FlutterError.init(code: "bad args", message: nil, details: nil))
-        }
+    
+    func getCameraPosition(completion: @escaping (CameraPosition) -> Void) {
+        let dgisPosition = mapFactory.map.camera.position
+        let position = CameraPosition(
+            bearing: dgisPosition.bearing.value,
+            target: LatLng(
+                latitude: dgisPosition.point.latitude.value,
+                longitude: dgisPosition.point.longitude.value
+            ),
+            tilt: Double(dgisPosition.tilt.value),
+            zoom: Double(dgisPosition.zoom.value)
+        )
+        completion(position)
     }
     
+    func moveCamera(
+        cameraPosition: CameraPosition,
+        duration: Int32?,
+        cameraAnimationType: CameraAnimationType,
+        completion: @escaping () -> Void
+    ) {
+        cameraMoveService.moveToLocation(
+            position: DGis.CameraPosition(
+                point: DGis.GeoPoint(
+                    latitude: cameraPosition.target.latitude,
+                    longitude: cameraPosition.target.longitude
+                ),
+                zoom: Zoom(floatLiteral: Float(cameraPosition.zoom)),
+                tilt: Tilt(floatLiteral: Float(cameraPosition.tilt)),
+                bearing: Bearing(floatLiteral: cameraPosition.bearing)
+            ),
+            time: Double(duration ?? 500) / 1000,
+            animationType: DGis.CameraAnimationType.default //TODO: add CameraAnimationType enum support
+        )
+        completion()
+    }
+    
+    func updateMarkers(markerUpdates: MarkerUpdates) {
+        
+    }
     
     func addTestMarker() {
         let flatPoint = mapFactory.map.camera.position.point
@@ -75,28 +96,6 @@ class DgisHostApi : NSObject, PluginHostApi {
             width: 4,
             color: DGis.Color.init(argb: 0x80FF0000)
         )
-    }
-    
-    func startVisibleRectTracking() {
-        let visibleRectChannel = mapFactory.map.camera.visibleRectChannel
-        self.initialRectCancellable = visibleRectChannel.sinkOnMainThread{ [weak self] rect in
-            self?.updateVisibleRect(rect)
-        }
-    }
-    
-    func stopVisibleRectTracking() {
-        self.initialRectCancellable?.cancel()
-        self.initialRectCancellable = nil
-    }
-    
-    
-    func onMapTap(point: CGPoint) -> Void {
-        cameraMoveService.moveToSelfPosition()
-    }
-    
-    private func updateVisibleRect(_ rect: GeoRect) {
-        visibleRect = rect
-        print(rect)
     }
     
 }

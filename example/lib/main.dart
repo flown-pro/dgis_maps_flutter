@@ -36,8 +36,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> onAsyPressed() async {
-    // final newPos = await controller.api.asy(LatLng(1, 1));
-    // // ignore: use_build_context_synchronously
+    // await controller.api.moveCamera(
+    //   CameraPosition(
+    //     target: LatLng(30, 60),
+    //     zoom: 12,
+    //     bearing: 0,
+    //     tilt: 0,
+    //   ),
+    //   1000,
+    //   CameraAnimationType.def,
+    // );
+    // ignore: use_build_context_synchronously
     // ScaffoldMessenger.of(context).showSnackBar(
     //   SnackBar(
     //     behavior: SnackBarBehavior.fixed,
