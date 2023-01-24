@@ -68,7 +68,14 @@ class DgisMapController internal constructor(
     }
 
     override fun getCameraPosition(callback: (DataCameraPosition) -> Unit) {
-        TODO("Not yet implemented")
+        return callback(
+            DataCameraPosition(
+            target = DataLatLng(map.camera.position.point.latitude.value,map.camera.position.point.longitude.value),
+zoom = map.camera.position.zoom.value.toDouble(),
+            bearing = map.camera.position.bearing.value,
+            tilt = map.camera.position.tilt.value.toDouble(),
+            )
+                );
     }
 
     override fun moveCamera(
