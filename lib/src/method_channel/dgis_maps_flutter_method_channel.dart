@@ -17,9 +17,6 @@ class DGisMapsFlutterMethodChannel {
     final creationParams = CreationParams(
       position: initialPosition.target,
       zoom: initialPosition.zoom,
-      // 'options': mapOptions,
-      // 'markersToAdd': serializeMarkerSet(mapObjects.markers),
-      // 'polylinesToAdd': serializePolylineSet(mapObjects.polylines),
     ).encode();
 
     if (defaultTargetPlatform == TargetPlatform.android) {
