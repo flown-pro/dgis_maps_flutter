@@ -1,18 +1,19 @@
 import 'package:dgis_maps_flutter/dgis_maps_flutter.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 class Polyline extends DataPolyline {
-  Polyline(
-      {required DataMapObjectId polylineId,
-      required List<DataLatLng> points,
-      required double width,
-      required int color,
-      required double erasedPart})
-      : super(
+  Polyline({
+    required DataMapObjectId polylineId,
+    required List<DataLatLng> points,
+    double width = 1.0,
+    Color color = Colors.black,
+    double erasedPart = 0.0,
+  }) : super(
             polylineId: polylineId,
             points: points,
             width: width,
-            color: color,
+            color: color.value,
             erasedPart: erasedPart);
 
   @override
