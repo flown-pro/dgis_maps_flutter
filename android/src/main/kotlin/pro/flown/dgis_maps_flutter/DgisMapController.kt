@@ -98,4 +98,13 @@ class DgisMapController internal constructor(
         )
     }
 
+    override fun updatePolylines(polylineUpdates: DataPolylineUpdates) {
+        objectManager.removeObjects(
+            polylineUpdates.toRemove.map { dataPolyline2Polyline(sdkContext,it!!) }
+        )
+        objectManager.addObjects(
+            polylineUpdates.toAdd.map { dataPolyline2Polyline(sdkContext,it!!) }
+        )
+    }
+
 }

@@ -3,6 +3,7 @@ package pro.flown.dgis_maps_flutter
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import ru.dgis.sdk.Context
+import ru.dgis.sdk.coordinates.GeoPoint
 import ru.dgis.sdk.geometry.GeoPointWithElevation
 import ru.dgis.sdk.map.*
 
@@ -28,6 +29,17 @@ fun dataMarker2Marker(context: Context, marker: DataMarker): Marker {
             ),
             icon = dataBitmap2Icon(context, marker.bitmap)?: imageFromResource(context,R.drawable.dgis_ic_road_event_marker_comment),
             text = marker.infoText ?: ""
+        )
+    )
+}
+
+fun dataPolyline2Polyline(context: Context, polyline: DataPolyline): Polyline {
+    return Polyline(
+        PolylineOptions(
+            points = polyline.points.map{ GeoPoint(it!!.latitude, it.longitude) }.toList(),
+            color = Color(polyline.color.toInt()),
+            erasedPart = polyline.erasedPart,
+            width = LogicalPixel(polyline.width.toFloat()),
         )
     )
 }
