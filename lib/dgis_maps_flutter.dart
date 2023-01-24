@@ -40,13 +40,24 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
   final _controller = Completer<DGisMapController>();
   late final PluginHostApi api;
 
+  Set<Marker> _markers = const {};
+
+  @override
+  void initState() {
+    _markers = widget.markers.toSet();
+    super.initState();
+  }
+
   @override
   void didUpdateWidget(DGisMap oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _updateMarkers(
-      toAdd: oldWidget.markers.difference(widget.markers),
-      toRemove: widget.markers.difference(oldWidget.markers),
-    );
+    if (_markers != widget.markers) {
+      _updateMarkers(
+        toAdd: _markers.difference(widget.markers),
+        toRemove: widget.markers.difference(_markers),
+      );
+      _markers = widget.markers.toSet();
+    }
   }
 
   void _updateMarkers({
