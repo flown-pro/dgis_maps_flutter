@@ -10,7 +10,7 @@ import 'package:flutter/services.dart';
 
 /// Состояние камеры
 /// https://docs.2gis.com/ru/android/sdk/reference/5.1/ru.dgis.sdk.map.CameraState
-enum CameraState {
+enum DataCameraState {
   /// Камера управляется пользователем.
   busy,
   /// Eсть активный перелёт.
@@ -23,7 +23,7 @@ enum CameraState {
 
 /// Тип анимации при перемещении камеры
 /// https://docs.2gis.com/ru/android/sdk/reference/5.1/ru.dgis.sdk.map.CameraAnimationType
-enum CameraAnimationType {
+enum DataCameraAnimationType {
   /// Тип перелёта выбирается в зависимости от расстояния между начальной и конечной позициями
   def,
   /// Линейное изменение параметров позиции камеры
@@ -33,13 +33,13 @@ enum CameraAnimationType {
   showBothPositions,
 }
 
-class CreationParams {
-  CreationParams({
+class DataCreationParams {
+  DataCreationParams({
     required this.position,
     required this.zoom,
   });
 
-  LatLng position;
+  DataLatLng position;
 
   double zoom;
 
@@ -50,17 +50,17 @@ class CreationParams {
     ];
   }
 
-  static CreationParams decode(Object result) {
+  static DataCreationParams decode(Object result) {
     result as List<Object?>;
-    return CreationParams(
-      position: LatLng.decode(result[0]! as List<Object?>),
+    return DataCreationParams(
+      position: DataLatLng.decode(result[0]! as List<Object?>),
       zoom: result[1]! as double,
     );
   }
 }
 
-class LatLng {
-  LatLng({
+class DataLatLng {
+  DataLatLng({
     required this.latitude,
     required this.longitude,
   });
@@ -76,17 +76,17 @@ class LatLng {
     ];
   }
 
-  static LatLng decode(Object result) {
+  static DataLatLng decode(Object result) {
     result as List<Object?>;
-    return LatLng(
+    return DataLatLng(
       latitude: result[0]! as double,
       longitude: result[1]! as double,
     );
   }
 }
 
-class MarkerBitmap {
-  MarkerBitmap({
+class DataMarkerBitmap {
+  DataMarkerBitmap({
     required this.bytes,
     this.width,
     this.height,
@@ -113,9 +113,9 @@ class MarkerBitmap {
     ];
   }
 
-  static MarkerBitmap decode(Object result) {
+  static DataMarkerBitmap decode(Object result) {
     result as List<Object?>;
-    return MarkerBitmap(
+    return DataMarkerBitmap(
       bytes: result[0]! as Uint8List,
       width: result[1] as double?,
       height: result[2] as double?,
@@ -123,8 +123,8 @@ class MarkerBitmap {
   }
 }
 
-class Marker {
-  Marker({
+class DataMarker {
+  DataMarker({
     required this.markerId,
     this.bitmap,
     required this.position,
@@ -132,15 +132,15 @@ class Marker {
   });
 
   /// Уникальный идентификатор маркера
-  MarkerId markerId;
+  DataMarkerId markerId;
 
   /// Изображение маркера
   /// Используется нативная реализация дефолтного маркера,
   /// если null
-  MarkerBitmap? bitmap;
+  DataMarkerBitmap? bitmap;
 
   /// Позиция маркера
-  LatLng position;
+  DataLatLng position;
 
   /// Текст под маркером
   String? infoText;
@@ -154,22 +154,22 @@ class Marker {
     ];
   }
 
-  static Marker decode(Object result) {
+  static DataMarker decode(Object result) {
     result as List<Object?>;
-    return Marker(
-      markerId: MarkerId.decode(result[0]! as List<Object?>),
+    return DataMarker(
+      markerId: DataMarkerId.decode(result[0]! as List<Object?>),
       bitmap: result[1] != null
-          ? MarkerBitmap.decode(result[1]! as List<Object?>)
+          ? DataMarkerBitmap.decode(result[1]! as List<Object?>)
           : null,
-      position: LatLng.decode(result[2]! as List<Object?>),
+      position: DataLatLng.decode(result[2]! as List<Object?>),
       infoText: result[3] as String?,
     );
   }
 }
 
 /// Позиция камеры
-class CameraPosition {
-  CameraPosition({
+class DataCameraPosition {
+  DataCameraPosition({
     required this.bearing,
     required this.target,
     required this.tilt,
@@ -180,7 +180,7 @@ class CameraPosition {
   double bearing;
 
   /// Центр камеры
-  LatLng target;
+  DataLatLng target;
 
   /// Угол наклона камеры (в градусах)
   double tilt;
@@ -197,19 +197,19 @@ class CameraPosition {
     ];
   }
 
-  static CameraPosition decode(Object result) {
+  static DataCameraPosition decode(Object result) {
     result as List<Object?>;
-    return CameraPosition(
+    return DataCameraPosition(
       bearing: result[0]! as double,
-      target: LatLng.decode(result[1]! as List<Object?>),
+      target: DataLatLng.decode(result[1]! as List<Object?>),
       tilt: result[2]! as double,
       zoom: result[3]! as double,
     );
   }
 }
 
-class MarkerId {
-  MarkerId({
+class DataMarkerId {
+  DataMarkerId({
     required this.value,
   });
 
@@ -221,23 +221,23 @@ class MarkerId {
     ];
   }
 
-  static MarkerId decode(Object result) {
+  static DataMarkerId decode(Object result) {
     result as List<Object?>;
-    return MarkerId(
+    return DataMarkerId(
       value: result[0]! as String,
     );
   }
 }
 
-class MarkerUpdates {
-  MarkerUpdates({
+class DataMarkerUpdates {
+  DataMarkerUpdates({
     required this.toRemove,
     required this.toAdd,
   });
 
-  List<Marker?> toRemove;
+  List<DataMarker?> toRemove;
 
-  List<Marker?> toAdd;
+  List<DataMarker?> toAdd;
 
   Object encode() {
     return <Object?>[
@@ -246,11 +246,11 @@ class MarkerUpdates {
     ];
   }
 
-  static MarkerUpdates decode(Object result) {
+  static DataMarkerUpdates decode(Object result) {
     result as List<Object?>;
-    return MarkerUpdates(
-      toRemove: (result[0] as List<Object?>?)!.cast<Marker?>(),
-      toAdd: (result[1] as List<Object?>?)!.cast<Marker?>(),
+    return DataMarkerUpdates(
+      toRemove: (result[0] as List<Object?>?)!.cast<DataMarker?>(),
+      toAdd: (result[1] as List<Object?>?)!.cast<DataMarker?>(),
     );
   }
 }
@@ -259,22 +259,22 @@ class _PluginHostApiCodec extends StandardMessageCodec {
   const _PluginHostApiCodec();
   @override
   void writeValue(WriteBuffer buffer, Object? value) {
-    if (value is CameraPosition) {
+    if (value is DataCameraPosition) {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
-    } else if (value is LatLng) {
+    } else if (value is DataLatLng) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is Marker) {
+    } else if (value is DataMarker) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is MarkerBitmap) {
+    } else if (value is DataMarkerBitmap) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is MarkerId) {
+    } else if (value is DataMarkerId) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is MarkerUpdates) {
+    } else if (value is DataMarkerUpdates) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
     } else {
@@ -286,22 +286,22 @@ class _PluginHostApiCodec extends StandardMessageCodec {
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
       case 128:       
-        return CameraPosition.decode(readValue(buffer)!);
+        return DataCameraPosition.decode(readValue(buffer)!);
       
       case 129:       
-        return LatLng.decode(readValue(buffer)!);
+        return DataLatLng.decode(readValue(buffer)!);
       
       case 130:       
-        return Marker.decode(readValue(buffer)!);
+        return DataMarker.decode(readValue(buffer)!);
       
       case 131:       
-        return MarkerBitmap.decode(readValue(buffer)!);
+        return DataMarkerBitmap.decode(readValue(buffer)!);
       
       case 132:       
-        return MarkerId.decode(readValue(buffer)!);
+        return DataMarkerId.decode(readValue(buffer)!);
       
       case 133:       
-        return MarkerUpdates.decode(readValue(buffer)!);
+        return DataMarkerUpdates.decode(readValue(buffer)!);
       
       default:
         return super.readValueOfType(type, buffer);
@@ -322,9 +322,9 @@ class PluginHostApi {
 
   /// Получение текущей позиции камеры
   ///
-  /// Возвращает [CameraPosition]
+  /// Возвращает [DataCameraPosition]
   /// Позицию камеры в текущий момент времени
-  Future<CameraPosition> getCameraPosition() async {
+  Future<DataCameraPosition> getCameraPosition() async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'pro.flown.PluginHostApi_$id.getCameraPosition', codec,
         binaryMessenger: _binaryMessenger);
@@ -347,7 +347,7 @@ class PluginHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (replyList[0] as CameraPosition?)!;
+      return (replyList[0] as DataCameraPosition?)!;
     }
   }
 
@@ -355,7 +355,7 @@ class PluginHostApi {
   /// [duration] - длительность анимации в миллисекундах,
   /// если не указана, используется нативное значение
   /// [cameraAnimationType] - тип анимации
-  Future<void> moveCamera(CameraPosition arg_cameraPosition, int? arg_duration, CameraAnimationType arg_cameraAnimationType) async {
+  Future<void> moveCamera(DataCameraPosition arg_cameraPosition, int? arg_duration, DataCameraAnimationType arg_cameraAnimationType) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'pro.flown.PluginHostApi_$id.moveCamera', codec,
         binaryMessenger: _binaryMessenger);
@@ -380,7 +380,7 @@ class PluginHostApi {
   /// Обновление маркеров
   ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров
-  Future<void> updateMarkers(MarkerUpdates arg_markerUpdates) async {
+  Future<void> updateMarkers(DataMarkerUpdates arg_markerUpdates) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'pro.flown.PluginHostApi_$id.updateMarkers', codec,
         binaryMessenger: _binaryMessenger);
@@ -408,7 +408,7 @@ abstract class PluginFlutterApi {
 
   /// Коллбэк на изменение состояния камеры
   /// [cameraState] - индекс в перечислении [CameraState]
-  void onCameraStateChanged(CameraState cameraState);
+  void onCameraStateChanged(DataCameraState cameraState);
 
   static void setup(PluginFlutterApi? api, {BinaryMessenger? binaryMessenger, required int id}) {
     {
@@ -422,9 +422,9 @@ abstract class PluginFlutterApi {
           assert(message != null,
           'Argument for pro.flown.PluginFlutterApi_$id.onCameraStateChanged was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final CameraState? arg_cameraState = args[0] == null ? null : CameraState.values[args[0] as int];
+          final DataCameraState? arg_cameraState = args[0] == null ? null : DataCameraState.values[args[0] as int];
           assert(arg_cameraState != null,
-              'Argument for pro.flown.PluginFlutterApi_$id.onCameraStateChanged was null, expected non-null CameraState.');
+              'Argument for pro.flown.PluginFlutterApi_$id.onCameraStateChanged was null, expected non-null DataCameraState.');
           api.onCameraStateChanged(arg_cameraState!);
           return;
         });

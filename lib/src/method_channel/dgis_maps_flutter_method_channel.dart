@@ -2,19 +2,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-import '../types/types.dart';
-import 'method_channel.g.dart' hide Marker, CameraPosition;
+import 'method_channel.g.dart';
 
 class DGisMapsFlutterMethodChannel {
   static const String kChannelName = 'pro.flown/dgis_maps';
 
   static Widget buildView(
     PlatformViewCreatedCallback onPlatformViewCreated, {
-    required CameraPosition initialPosition,
-    Set<Marker> markers = const {},
-    Map<String, dynamic> mapOptions = const <String, dynamic>{},
+    required DataCameraPosition initialPosition,
   }) {
-    final creationParams = CreationParams(
+    final creationParams = DataCreationParams(
       position: initialPosition.target,
       zoom: initialPosition.zoom,
     ).encode();

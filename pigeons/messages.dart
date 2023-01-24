@@ -8,23 +8,23 @@ import 'package:pigeon/pigeon.dart';
   swiftOut: 'ios/Classes/MethodChannel.swift',
   withId: true,
 ))
-class CreationParams {
-  const CreationParams({
+class DataCreationParams {
+  const DataCreationParams({
     required this.position,
     this.zoom = 0,
   });
-  final LatLng position;
+  final DataLatLng position;
   final double zoom;
 }
 
-class LatLng {
-  const LatLng(this.latitude, this.longitude);
+class DataLatLng {
+  const DataLatLng(this.latitude, this.longitude);
   final double latitude;
   final double longitude;
 }
 
-class MarkerBitmap {
-  const MarkerBitmap(
+class DataMarkerBitmap {
+  const DataMarkerBitmap(
     this.bytes, {
     this.width,
     this.height,
@@ -44,8 +44,8 @@ class MarkerBitmap {
   final double? height;
 }
 
-class Marker {
-  const Marker({
+class DataMarker {
+  const DataMarker({
     required this.markerId,
     required this.position,
     this.infoText,
@@ -53,15 +53,15 @@ class Marker {
   });
 
   /// Уникальный идентификатор маркера
-  final MarkerId markerId;
+  final DataMarkerId markerId;
 
   /// Изображение маркера
   /// Используется нативная реализация дефолтного маркера,
   /// если null
-  final MarkerBitmap? bitmap;
+  final DataMarkerBitmap? bitmap;
 
   /// Позиция маркера
-  final LatLng position;
+  final DataLatLng position;
 
   /// Текст под маркером
   final String? infoText;
@@ -69,7 +69,7 @@ class Marker {
 
 /// Состояние камеры
 /// https://docs.2gis.com/ru/android/sdk/reference/5.1/ru.dgis.sdk.map.CameraState
-enum CameraState {
+enum DataCameraState {
   /// Камера управляется пользователем.
   busy,
 
@@ -85,7 +85,7 @@ enum CameraState {
 
 /// Тип анимации при перемещении камеры
 /// https://docs.2gis.com/ru/android/sdk/reference/5.1/ru.dgis.sdk.map.CameraAnimationType
-enum CameraAnimationType {
+enum DataCameraAnimationType {
   /// Тип перелёта выбирается в зависимости от расстояния между начальной и конечной позициями
   def,
 
@@ -98,8 +98,8 @@ enum CameraAnimationType {
 }
 
 /// Позиция камеры
-class CameraPosition {
-  const CameraPosition({
+class DataCameraPosition {
+  const DataCameraPosition({
     required this.target,
     this.bearing = 0.0,
     this.tilt = 0.0,
@@ -110,7 +110,7 @@ class CameraPosition {
   final double bearing;
 
   /// Центр камеры
-  final LatLng target;
+  final DataLatLng target;
 
   /// Угол наклона камеры (в градусах)
   final double tilt;
@@ -119,28 +119,28 @@ class CameraPosition {
   final double zoom;
 }
 
-class MarkerId {
-  const MarkerId(this.value);
+class DataMarkerId {
+  const DataMarkerId(this.value);
   final String value;
 }
 
-class MarkerUpdates {
-  MarkerUpdates({
+class DataMarkerUpdates {
+  DataMarkerUpdates({
     this.toRemove = const [],
     this.toAdd = const [],
   });
-  final List<Marker?> toRemove;
-  final List<Marker?> toAdd;
+  final List<DataMarker?> toRemove;
+  final List<DataMarker?> toAdd;
 }
 
 @HostApi()
 abstract class PluginHostApi {
   /// Получение текущей позиции камеры
   ///
-  /// Возвращает [CameraPosition]
+  /// Возвращает [DataCameraPosition]
   /// Позицию камеры в текущий момент времени
   @async
-  CameraPosition getCameraPosition();
+  DataCameraPosition getCameraPosition();
 
   /// Перемещение камеры к заданной позиции [CameraPosition]
   /// [duration] - длительность анимации в миллисекундах,
@@ -148,27 +148,27 @@ abstract class PluginHostApi {
   /// [cameraAnimationType] - тип анимации
   @async
   void moveCamera(
-    CameraPosition cameraPosition,
+    DataCameraPosition cameraPosition,
     int? duration,
-    CameraAnimationType cameraAnimationType,
+    DataCameraAnimationType cameraAnimationType,
   );
 
   /// Обновление маркеров
   ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров
-  void updateMarkers(MarkerUpdates markerUpdates);
+  void updateMarkers(DataMarkerUpdates markerUpdates);
 }
 
 @FlutterApi()
 abstract class PluginFlutterApi {
   /// Коллбэк на изменение состояния камеры
   /// [cameraState] - индекс в перечислении [CameraState]
-  void onCameraStateChanged(CameraState cameraState);
+  void onCameraStateChanged(DataCameraState cameraState);
 }
 
 /// Класс, используемый для генерации моделей,
 /// которые не задекларированы в интерфейсе
 @FlutterApi()
 abstract class _Stub {
-  CreationParams c1();
+  DataCreationParams c1();
 }

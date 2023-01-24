@@ -27,7 +27,7 @@ private fun wrapError(exception: Throwable): List<Any> {
  * Состояние камеры
  * https://docs.2gis.com/ru/android/sdk/reference/5.1/ru.dgis.sdk.map.CameraState
  */
-enum class CameraState(val raw: Int) {
+enum class DataCameraState(val raw: Int) {
   /** Камера управляется пользователем. */
   BUSY(0),
   /** Eсть активный перелёт. */
@@ -38,7 +38,7 @@ enum class CameraState(val raw: Int) {
   FREE(3);
 
   companion object {
-    fun ofRaw(raw: Int): CameraState? {
+    fun ofRaw(raw: Int): DataCameraState? {
       return values().firstOrNull { it.raw == raw }
     }
   }
@@ -48,7 +48,7 @@ enum class CameraState(val raw: Int) {
  * Тип анимации при перемещении камеры
  * https://docs.2gis.com/ru/android/sdk/reference/5.1/ru.dgis.sdk.map.CameraAnimationType
  */
-enum class CameraAnimationType(val raw: Int) {
+enum class DataCameraAnimationType(val raw: Int) {
   /** Тип перелёта выбирается в зависимости от расстояния между начальной и конечной позициями */
   DEF(0),
   /** Линейное изменение параметров позиции камеры */
@@ -60,24 +60,24 @@ enum class CameraAnimationType(val raw: Int) {
   SHOWBOTHPOSITIONS(2);
 
   companion object {
-    fun ofRaw(raw: Int): CameraAnimationType? {
+    fun ofRaw(raw: Int): DataCameraAnimationType? {
       return values().firstOrNull { it.raw == raw }
     }
   }
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class CreationParams (
-  val position: LatLng,
+data class DataCreationParams (
+  val position: DataLatLng,
   val zoom: Double
 
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): CreationParams {
-      val position = LatLng.fromList(list[0] as List<Any?>)
+    fun fromList(list: List<Any?>): DataCreationParams {
+      val position = DataLatLng.fromList(list[0] as List<Any?>)
       val zoom = list[1] as Double
-      return CreationParams(position, zoom)
+      return DataCreationParams(position, zoom)
     }
   }
   fun toList(): List<Any?> {
@@ -89,17 +89,17 @@ data class CreationParams (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class LatLng (
+data class DataLatLng (
   val latitude: Double,
   val longitude: Double
 
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): LatLng {
+    fun fromList(list: List<Any?>): DataLatLng {
       val latitude = list[0] as Double
       val longitude = list[1] as Double
-      return LatLng(latitude, longitude)
+      return DataLatLng(latitude, longitude)
     }
   }
   fun toList(): List<Any?> {
@@ -111,7 +111,7 @@ data class LatLng (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class MarkerBitmap (
+data class DataMarkerBitmap (
   /** Байты изображения */
   val bytes: ByteArray,
   /**
@@ -130,11 +130,11 @@ data class MarkerBitmap (
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): MarkerBitmap {
+    fun fromList(list: List<Any?>): DataMarkerBitmap {
       val bytes = list[0] as ByteArray
       val width = list[1] as? Double
       val height = list[2] as? Double
-      return MarkerBitmap(bytes, width, height)
+      return DataMarkerBitmap(bytes, width, height)
     }
   }
   fun toList(): List<Any?> {
@@ -147,31 +147,31 @@ data class MarkerBitmap (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class Marker (
+data class DataMarker (
   /** Уникальный идентификатор маркера */
-  val markerId: MarkerId,
+  val markerId: DataMarkerId,
   /**
    * Изображение маркера
    * Используется нативная реализация дефолтного маркера,
    * если null
    */
-  val bitmap: MarkerBitmap? = null,
+  val bitmap: DataMarkerBitmap? = null,
   /** Позиция маркера */
-  val position: LatLng,
+  val position: DataLatLng,
   /** Текст под маркером */
   val infoText: String? = null
 
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): Marker {
-      val markerId = MarkerId.fromList(list[0] as List<Any?>)
-      val bitmap: MarkerBitmap? = (list[1] as? List<Any?>)?.let {
-        MarkerBitmap.fromList(it)
+    fun fromList(list: List<Any?>): DataMarker {
+      val markerId = DataMarkerId.fromList(list[0] as List<Any?>)
+      val bitmap: DataMarkerBitmap? = (list[1] as? List<Any?>)?.let {
+        DataMarkerBitmap.fromList(it)
       }
-      val position = LatLng.fromList(list[2] as List<Any?>)
+      val position = DataLatLng.fromList(list[2] as List<Any?>)
       val infoText = list[3] as? String
-      return Marker(markerId, bitmap, position, infoText)
+      return DataMarker(markerId, bitmap, position, infoText)
     }
   }
   fun toList(): List<Any?> {
@@ -189,11 +189,11 @@ data class Marker (
  *
  * Generated class from Pigeon that represents data sent in messages.
  */
-data class CameraPosition (
+data class DataCameraPosition (
   /** Азимут камеры в градусах */
   val bearing: Double,
   /** Центр камеры */
-  val target: LatLng,
+  val target: DataLatLng,
   /** Угол наклона камеры (в градусах) */
   val tilt: Double,
   /** Зум камеры */
@@ -202,12 +202,12 @@ data class CameraPosition (
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): CameraPosition {
+    fun fromList(list: List<Any?>): DataCameraPosition {
       val bearing = list[0] as Double
-      val target = LatLng.fromList(list[1] as List<Any?>)
+      val target = DataLatLng.fromList(list[1] as List<Any?>)
       val tilt = list[2] as Double
       val zoom = list[3] as Double
-      return CameraPosition(bearing, target, tilt, zoom)
+      return DataCameraPosition(bearing, target, tilt, zoom)
     }
   }
   fun toList(): List<Any?> {
@@ -221,15 +221,15 @@ data class CameraPosition (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class MarkerId (
+data class DataMarkerId (
   val value: String
 
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): MarkerId {
+    fun fromList(list: List<Any?>): DataMarkerId {
       val value = list[0] as String
-      return MarkerId(value)
+      return DataMarkerId(value)
     }
   }
   fun toList(): List<Any?> {
@@ -240,17 +240,17 @@ data class MarkerId (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class MarkerUpdates (
-  val toRemove: List<Marker?>,
-  val toAdd: List<Marker?>
+data class DataMarkerUpdates (
+  val toRemove: List<DataMarker?>,
+  val toAdd: List<DataMarker?>
 
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): MarkerUpdates {
-      val toRemove = list[0] as List<Marker?>
-      val toAdd = list[1] as List<Marker?>
-      return MarkerUpdates(toRemove, toAdd)
+    fun fromList(list: List<Any?>): DataMarkerUpdates {
+      val toRemove = list[0] as List<DataMarker?>
+      val toAdd = list[1] as List<DataMarker?>
+      return DataMarkerUpdates(toRemove, toAdd)
     }
   }
   fun toList(): List<Any?> {
@@ -267,32 +267,32 @@ private object PluginHostApiCodec : StandardMessageCodec() {
     return when (type) {
       128.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CameraPosition.fromList(it)
+          DataCameraPosition.fromList(it)
         }
       }
       129.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          LatLng.fromList(it)
+          DataLatLng.fromList(it)
         }
       }
       130.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          Marker.fromList(it)
+          DataMarker.fromList(it)
         }
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MarkerBitmap.fromList(it)
+          DataMarkerBitmap.fromList(it)
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MarkerId.fromList(it)
+          DataMarkerId.fromList(it)
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MarkerUpdates.fromList(it)
+          DataMarkerUpdates.fromList(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -300,27 +300,27 @@ private object PluginHostApiCodec : StandardMessageCodec() {
   }
   override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
     when (value) {
-      is CameraPosition -> {
+      is DataCameraPosition -> {
         stream.write(128)
         writeValue(stream, value.toList())
       }
-      is LatLng -> {
+      is DataLatLng -> {
         stream.write(129)
         writeValue(stream, value.toList())
       }
-      is Marker -> {
+      is DataMarker -> {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is MarkerBitmap -> {
+      is DataMarkerBitmap -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is MarkerId -> {
+      is DataMarkerId -> {
         stream.write(132)
         writeValue(stream, value.toList())
       }
-      is MarkerUpdates -> {
+      is DataMarkerUpdates -> {
         stream.write(133)
         writeValue(stream, value.toList())
       }
@@ -334,23 +334,23 @@ interface PluginHostApi {
   /**
    * Получение текущей позиции камеры
    *
-   * Возвращает [CameraPosition]
+   * Возвращает [DataCameraPosition]
    * Позицию камеры в текущий момент времени
    */
-  fun getCameraPosition(callback: (CameraPosition) -> Unit)
+  fun getCameraPosition(callback: (DataCameraPosition) -> Unit)
   /**
    * Перемещение камеры к заданной позиции [CameraPosition]
    * [duration] - длительность анимации в миллисекундах,
    * если не указана, используется нативное значение
    * [cameraAnimationType] - тип анимации
    */
-  fun moveCamera(cameraPosition: CameraPosition, duration: Long?, cameraAnimationType: CameraAnimationType, callback: () -> Unit)
+  fun moveCamera(cameraPosition: DataCameraPosition, duration: Long?, cameraAnimationType: DataCameraAnimationType, callback: () -> Unit)
   /**
    * Обновление маркеров
    *
    * [markerUpdates] - объект с информацией об обновлении маркеров
    */
-  fun updateMarkers(markerUpdates: MarkerUpdates)
+  fun updateMarkers(markerUpdates: DataMarkerUpdates)
 
   companion object {
     /** The codec used by PluginHostApi. */
@@ -385,9 +385,9 @@ interface PluginHostApi {
             var wrapped = listOf<Any?>()
             try {
               val args = message as List<Any?>
-              val cameraPositionArg = args[0] as CameraPosition
+              val cameraPositionArg = args[0] as DataCameraPosition
               val durationArg = args[1].let { if (it is Int) it.toLong() else it as? Long }
-              val cameraAnimationTypeArg = CameraAnimationType.ofRaw(args[2] as Int)!!
+              val cameraAnimationTypeArg = DataCameraAnimationType.ofRaw(args[2] as Int)!!
               api.moveCamera(cameraPositionArg, durationArg, cameraAnimationTypeArg) {
                 reply.reply(wrapResult(null))
               }
@@ -407,7 +407,7 @@ interface PluginHostApi {
             var wrapped = listOf<Any?>()
             try {
               val args = message as List<Any?>
-              val markerUpdatesArg = args[0] as MarkerUpdates
+              val markerUpdatesArg = args[0] as DataMarkerUpdates
               api.updateMarkers(markerUpdatesArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Error) {
@@ -435,7 +435,7 @@ class PluginFlutterApi(private val binaryMessenger: BinaryMessenger, private val
    * Коллбэк на изменение состояния камеры
    * [cameraState] - индекс в перечислении [CameraState]
    */
-  fun onCameraStateChanged(cameraStateArg: CameraState, callback: () -> Unit) {
+  fun onCameraStateChanged(cameraStateArg: DataCameraState, callback: () -> Unit) {
     val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginFlutterApi_$id.onCameraStateChanged", codec)
     channel.send(listOf(cameraStateArg)) {
       callback()

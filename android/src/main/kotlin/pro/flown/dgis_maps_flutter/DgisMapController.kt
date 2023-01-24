@@ -8,8 +8,8 @@ import ru.dgis.sdk.DGis
 import ru.dgis.sdk.Duration
 import ru.dgis.sdk.coordinates.Bearing
 import ru.dgis.sdk.coordinates.GeoPoint
+import ru.dgis.sdk.geometry.GeoPointWithElevation
 import ru.dgis.sdk.map.*
-import ru.dgis.sdk.map.CameraPosition
 import ru.dgis.sdk.map.Map
 
 class DgisMapController internal constructor(
@@ -25,7 +25,7 @@ class DgisMapController internal constructor(
 
     init {
         sdkContext = DGis.initialize(context.applicationContext)
-        val params = CreationParams.fromList(args as List<Any?>);
+        val params = DataCreationParams.fromList(args as List<Any?>);
         mapView = MapView(context, MapOptions().also {
             it.position = CameraPosition(
                 GeoPoint(params.position.latitude, params.position.longitude),
@@ -66,14 +66,14 @@ class DgisMapController internal constructor(
 //        }
     }
 
-    override fun getCameraPosition(callback: (pro.flown.dgis_maps_flutter.CameraPosition) -> Unit) {
+    override fun getCameraPosition(callback: (DataCameraPosition) -> Unit) {
         TODO("Not yet implemented")
     }
 
     override fun moveCamera(
-        cameraPosition: pro.flown.dgis_maps_flutter.CameraPosition,
+        cameraPosition: DataCameraPosition,
         duration: Long?,
-        cameraAnimationType: CameraAnimationType,
+        cameraAnimationType: DataCameraAnimationType,
         callback: () -> Unit
     ) {
         map.camera.move(
@@ -84,12 +84,28 @@ class DgisMapController internal constructor(
                 bearing = Bearing(cameraPosition.bearing),
             ),
             time = Duration.ofMilliseconds(duration!!),
-            animationType = ru.dgis.sdk.map.CameraAnimationType.valueOf(cameraAnimationType.name)
-        )
+            animationType = CameraAnimationType.valueOf(cameraAnimationType.name)
+        ).onResult { callback() }
     }
 
-    override fun updateMarkers(markerUpdates: MarkerUpdates) {
-       val source2 = GeometryMapObjectSourceBuilder(sdkContext).createSource()
-//        source2.removeAndAddObjects()
+    override fun updateMarkers(markerUpdates: DataMarkerUpdates) {
+//        val source = MapObjectManager(map)
+//
+//        source.removeObjects(
+//            markerUpdates.toRemove.map { toMarker(it!!) }
+//        )
     }
+
+//    private fun toMarker(marker: DataMarker): Marker {
+//
+//        return Marker(
+//            MarkerOptions(
+//                position = GeoPointWithElevation(
+//                    latitude = marker.position.latitude,
+//                    longitude = marker.position.longitude,
+//                ),
+//                icon = icon
+//            )
+//        )
+//    }
 }

@@ -1,8 +1,8 @@
-import '../method_channel/method_channel.g.dart' as data;
+import '../method_channel/method_channel.g.dart';
 
-class CameraPosition extends data.CameraPosition {
+class CameraPosition extends DataCameraPosition {
   CameraPosition({
-    required data.LatLng target,
+    required DataLatLng target,
     double bearing = 0.0,
     double tilt = 0.0,
     double zoom = 0.0,

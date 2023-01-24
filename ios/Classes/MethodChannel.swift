@@ -26,7 +26,7 @@ private func wrapError(_ error: FlutterError) -> [Any?] {
 
 /// Состояние камеры
 /// https://docs.2gis.com/ru/android/sdk/reference/5.1/ru.dgis.sdk.map.CameraState
-enum CameraState: Int {
+enum DataCameraState: Int {
   /// Камера управляется пользователем.
   case busy = 0
   /// Eсть активный перелёт.
@@ -39,7 +39,7 @@ enum CameraState: Int {
 
 /// Тип анимации при перемещении камеры
 /// https://docs.2gis.com/ru/android/sdk/reference/5.1/ru.dgis.sdk.map.CameraAnimationType
-enum CameraAnimationType: Int {
+enum DataCameraAnimationType: Int {
   /// Тип перелёта выбирается в зависимости от расстояния между начальной и конечной позициями
   case def = 0
   /// Линейное изменение параметров позиции камеры
@@ -50,15 +50,15 @@ enum CameraAnimationType: Int {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct CreationParams {
-  var position: LatLng
+struct DataCreationParams {
+  var position: DataLatLng
   var zoom: Double
 
-  static func fromList(_ list: [Any?]) -> CreationParams? {
-    let position = LatLng.fromList(list[0] as! [Any?])!
+  static func fromList(_ list: [Any?]) -> DataCreationParams? {
+    let position = DataLatLng.fromList(list[0] as! [Any?])!
     let zoom = list[1] as! Double
 
-    return CreationParams(
+    return DataCreationParams(
       position: position,
       zoom: zoom
     )
@@ -72,15 +72,15 @@ struct CreationParams {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct LatLng {
+struct DataLatLng {
   var latitude: Double
   var longitude: Double
 
-  static func fromList(_ list: [Any?]) -> LatLng? {
+  static func fromList(_ list: [Any?]) -> DataLatLng? {
     let latitude = list[0] as! Double
     let longitude = list[1] as! Double
 
-    return LatLng(
+    return DataLatLng(
       latitude: latitude,
       longitude: longitude
     )
@@ -94,7 +94,7 @@ struct LatLng {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct MarkerBitmap {
+struct DataMarkerBitmap {
   /// Байты изображения
   var bytes: FlutterStandardTypedData
   /// Ширина изображения,
@@ -106,12 +106,12 @@ struct MarkerBitmap {
   /// которое зависит от нативной реализации
   var height: Double? = nil
 
-  static func fromList(_ list: [Any?]) -> MarkerBitmap? {
+  static func fromList(_ list: [Any?]) -> DataMarkerBitmap? {
     let bytes = list[0] as! FlutterStandardTypedData
     let width = list[1] as? Double 
     let height = list[2] as? Double 
 
-    return MarkerBitmap(
+    return DataMarkerBitmap(
       bytes: bytes,
       width: width,
       height: height
@@ -127,28 +127,28 @@ struct MarkerBitmap {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct Marker {
+struct DataMarker {
   /// Уникальный идентификатор маркера
-  var markerId: MarkerId
+  var markerId: DataMarkerId
   /// Изображение маркера
   /// Используется нативная реализация дефолтного маркера,
   /// если null
-  var bitmap: MarkerBitmap? = nil
+  var bitmap: DataMarkerBitmap? = nil
   /// Позиция маркера
-  var position: LatLng
+  var position: DataLatLng
   /// Текст под маркером
   var infoText: String? = nil
 
-  static func fromList(_ list: [Any?]) -> Marker? {
-    let markerId = MarkerId.fromList(list[0] as! [Any?])!
-    var bitmap: MarkerBitmap? = nil
+  static func fromList(_ list: [Any?]) -> DataMarker? {
+    let markerId = DataMarkerId.fromList(list[0] as! [Any?])!
+    var bitmap: DataMarkerBitmap? = nil
     if let bitmapList = list[1] as? [Any?] {
-      bitmap = MarkerBitmap.fromList(bitmapList)
+      bitmap = DataMarkerBitmap.fromList(bitmapList)
     }
-    let position = LatLng.fromList(list[2] as! [Any?])!
+    let position = DataLatLng.fromList(list[2] as! [Any?])!
     let infoText = list[3] as? String 
 
-    return Marker(
+    return DataMarker(
       markerId: markerId,
       bitmap: bitmap,
       position: position,
@@ -168,23 +168,23 @@ struct Marker {
 /// Позиция камеры
 ///
 /// Generated class from Pigeon that represents data sent in messages.
-struct CameraPosition {
+struct DataCameraPosition {
   /// Азимут камеры в градусах
   var bearing: Double
   /// Центр камеры
-  var target: LatLng
+  var target: DataLatLng
   /// Угол наклона камеры (в градусах)
   var tilt: Double
   /// Зум камеры
   var zoom: Double
 
-  static func fromList(_ list: [Any?]) -> CameraPosition? {
+  static func fromList(_ list: [Any?]) -> DataCameraPosition? {
     let bearing = list[0] as! Double
-    let target = LatLng.fromList(list[1] as! [Any?])!
+    let target = DataLatLng.fromList(list[1] as! [Any?])!
     let tilt = list[2] as! Double
     let zoom = list[3] as! Double
 
-    return CameraPosition(
+    return DataCameraPosition(
       bearing: bearing,
       target: target,
       tilt: tilt,
@@ -202,13 +202,13 @@ struct CameraPosition {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct MarkerId {
+struct DataMarkerId {
   var value: String
 
-  static func fromList(_ list: [Any?]) -> MarkerId? {
+  static func fromList(_ list: [Any?]) -> DataMarkerId? {
     let value = list[0] as! String
 
-    return MarkerId(
+    return DataMarkerId(
       value: value
     )
   }
@@ -220,15 +220,15 @@ struct MarkerId {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct MarkerUpdates {
-  var toRemove: [Marker?]
-  var toAdd: [Marker?]
+struct DataMarkerUpdates {
+  var toRemove: [DataMarker?]
+  var toAdd: [DataMarker?]
 
-  static func fromList(_ list: [Any?]) -> MarkerUpdates? {
-    let toRemove = list[0] as! [Marker?]
-    let toAdd = list[1] as! [Marker?]
+  static func fromList(_ list: [Any?]) -> DataMarkerUpdates? {
+    let toRemove = list[0] as! [DataMarker?]
+    let toAdd = list[1] as! [DataMarker?]
 
-    return MarkerUpdates(
+    return DataMarkerUpdates(
       toRemove: toRemove,
       toAdd: toAdd
     )
@@ -245,17 +245,17 @@ private class PluginHostApiCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
       case 128:
-        return CameraPosition.fromList(self.readValue() as! [Any])
+        return DataCameraPosition.fromList(self.readValue() as! [Any])
       case 129:
-        return LatLng.fromList(self.readValue() as! [Any])
+        return DataLatLng.fromList(self.readValue() as! [Any])
       case 130:
-        return Marker.fromList(self.readValue() as! [Any])
+        return DataMarker.fromList(self.readValue() as! [Any])
       case 131:
-        return MarkerBitmap.fromList(self.readValue() as! [Any])
+        return DataMarkerBitmap.fromList(self.readValue() as! [Any])
       case 132:
-        return MarkerId.fromList(self.readValue() as! [Any])
+        return DataMarkerId.fromList(self.readValue() as! [Any])
       case 133:
-        return MarkerUpdates.fromList(self.readValue() as! [Any])
+        return DataMarkerUpdates.fromList(self.readValue() as! [Any])
       default:
         return super.readValue(ofType: type)
     }
@@ -264,22 +264,22 @@ private class PluginHostApiCodecReader: FlutterStandardReader {
 
 private class PluginHostApiCodecWriter: FlutterStandardWriter {
   override func writeValue(_ value: Any) {
-    if let value = value as? CameraPosition {
+    if let value = value as? DataCameraPosition {
       super.writeByte(128)
       super.writeValue(value.toList())
-    } else if let value = value as? LatLng {
+    } else if let value = value as? DataLatLng {
       super.writeByte(129)
       super.writeValue(value.toList())
-    } else if let value = value as? Marker {
+    } else if let value = value as? DataMarker {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? MarkerBitmap {
+    } else if let value = value as? DataMarkerBitmap {
       super.writeByte(131)
       super.writeValue(value.toList())
-    } else if let value = value as? MarkerId {
+    } else if let value = value as? DataMarkerId {
       super.writeByte(132)
       super.writeValue(value.toList())
-    } else if let value = value as? MarkerUpdates {
+    } else if let value = value as? DataMarkerUpdates {
       super.writeByte(133)
       super.writeValue(value.toList())
     } else {
@@ -306,18 +306,18 @@ class PluginHostApiCodec: FlutterStandardMessageCodec {
 protocol PluginHostApi {
   /// Получение текущей позиции камеры
   ///
-  /// Возвращает [CameraPosition]
+  /// Возвращает [DataCameraPosition]
   /// Позицию камеры в текущий момент времени
-  func getCameraPosition(completion: @escaping (CameraPosition) -> Void)
+  func getCameraPosition(completion: @escaping (DataCameraPosition) -> Void)
   /// Перемещение камеры к заданной позиции [CameraPosition]
   /// [duration] - длительность анимации в миллисекундах,
   /// если не указана, используется нативное значение
   /// [cameraAnimationType] - тип анимации
-  func moveCamera(cameraPosition: CameraPosition, duration: Int32?, cameraAnimationType: CameraAnimationType, completion: @escaping () -> Void)
+  func moveCamera(cameraPosition: DataCameraPosition, duration: Int32?, cameraAnimationType: DataCameraAnimationType, completion: @escaping () -> Void)
   /// Обновление маркеров
   ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров
-  func updateMarkers(markerUpdates: MarkerUpdates)
+  func updateMarkers(markerUpdates: DataMarkerUpdates)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -328,7 +328,7 @@ class PluginHostApiSetup {
   static func setUp(binaryMessenger: FlutterBinaryMessenger, id: Int64, api: PluginHostApi?) {
     /// Получение текущей позиции камеры
     ///
-    /// Возвращает [CameraPosition]
+    /// Возвращает [DataCameraPosition]
     /// Позицию камеры в текущий момент времени
     let getCameraPositionChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id).getCameraPosition", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
@@ -348,9 +348,9 @@ class PluginHostApiSetup {
     if let api = api {
       moveCameraChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let cameraPositionArg = args[0] as! CameraPosition
+        let cameraPositionArg = args[0] as! DataCameraPosition
         let durationArg = args[1] as? Int32
-        let cameraAnimationTypeArg = CameraAnimationType(rawValue: args[2] as! Int)!
+        let cameraAnimationTypeArg = DataCameraAnimationType(rawValue: args[2] as! Int)!
         api.moveCamera(cameraPosition: cameraPositionArg, duration: durationArg, cameraAnimationType: cameraAnimationTypeArg) {
           reply(wrapResult(nil))
         }
@@ -365,7 +365,7 @@ class PluginHostApiSetup {
     if let api = api {
       updateMarkersChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let markerUpdatesArg = args[0] as! MarkerUpdates
+        let markerUpdatesArg = args[0] as! DataMarkerUpdates
         api.updateMarkers(markerUpdates: markerUpdatesArg)
         reply(wrapResult(nil))
       }
@@ -384,7 +384,7 @@ class PluginFlutterApi {
   }
   /// Коллбэк на изменение состояния камеры
   /// [cameraState] - индекс в перечислении [CameraState]
-  func onCameraStateChanged(cameraState cameraStateArg: CameraState, completion: @escaping () -> Void) {
+  func onCameraStateChanged(cameraState cameraStateArg: DataCameraState, completion: @escaping () -> Void) {
     let channel = FlutterBasicMessageChannel(name: "pro.flown.PluginFlutterApi_\(id).onCameraStateChanged", binaryMessenger: binaryMessenger)
     channel.sendMessage([cameraStateArg] as [Any?]) { _ in
       completion()

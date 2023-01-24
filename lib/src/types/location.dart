@@ -5,10 +5,10 @@
 
 import 'package:flutter/foundation.dart' show immutable, objectRuntimeType;
 
-import '../method_channel/method_channel.g.dart' as data;
+import '../method_channel/method_channel.g.dart';
 
 /// A pair of latitude and longitude coordinates, stored as degrees.
-class LatLng extends data.LatLng {
+class LatLng extends DataLatLng {
   /// Creates a geographical location specified in degrees [latitude] and
   /// [longitude].
   ///

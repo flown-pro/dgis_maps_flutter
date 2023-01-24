@@ -1,12 +1,12 @@
-import '../method_channel/method_channel.g.dart' as data;
+import '../method_channel/method_channel.g.dart';
 import 'types.dart';
 
-class Marker extends data.Marker {
+class Marker extends DataMarker {
   Marker({
-    required data.MarkerId markerId,
-    required data.LatLng position,
+    required DataMarkerId markerId,
+    required DataLatLng position,
     String? infoText,
-    data.MarkerBitmap? bitmap,
+    DataMarkerBitmap? bitmap,
   }) : super(
           markerId: markerId,
           position: position,
@@ -17,7 +17,7 @@ class Marker extends data.Marker {
   Marker copyWith({
     LatLng? position,
     String? infoText,
-    data.MarkerBitmap? bitmap,
+    DataMarkerBitmap? bitmap,
   }) =>
       Marker(
         markerId: markerId,

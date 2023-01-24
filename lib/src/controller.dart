@@ -10,29 +10,29 @@ class DGisMapController {
   late final PluginHostApi api = PluginHostApi(id: mapId);
 
   /// Добавление маркеров [Marker] на карту
-  Future<void> addMarkers(List<Marker> markers) => api.updateMarkers(
-        MarkerUpdates(
+  Future<void> addMarkers(List<DataMarker> markers) => api.updateMarkers(
+        DataMarkerUpdates(
           toRemove: [],
           toAdd: markers,
         ),
       );
 
   /// Удаление маркеров [Marker] с карты
-  Future<void> removeMarkers(List<Marker> markers) => api.updateMarkers(
-        MarkerUpdates(
+  Future<void> removeMarkers(List<DataMarker> markers) => api.updateMarkers(
+        DataMarkerUpdates(
           toRemove: markers,
           toAdd: [],
         ),
       );
 
   /// Получение текущей позиции карты [CameraPosition]
-  Future<CameraPosition> getCameraPosition() => api.getCameraPosition();
+  Future<DataCameraPosition> getCameraPosition() => api.getCameraPosition();
 
   /// Переход камеры к выбранной точке [CameraPosition]
   Future<void> moveCamera({
-    required CameraPosition cameraPosition,
+    required DataCameraPosition cameraPosition,
     int? duration,
-    CameraAnimationType cameraAnimationType = CameraAnimationType.def,
+    DataCameraAnimationType cameraAnimationType = DataCameraAnimationType.def,
   }) =>
       api.moveCamera(cameraPosition, duration, cameraAnimationType);
 }
