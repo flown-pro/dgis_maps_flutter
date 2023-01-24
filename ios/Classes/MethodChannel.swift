@@ -116,7 +116,7 @@ class PluginHostApiSetup {
   static var codec: FlutterStandardMessageCodec { PluginHostApiCodec.shared }
   /// Sets up an instance of `PluginHostApi` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: PluginHostApi?, id: Int64?) {
-    let asyChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_$id.asy", binaryMessenger: binaryMessenger, codec: codec)
+    let asyChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id ?? 0).asy", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       asyChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -128,7 +128,7 @@ class PluginHostApiSetup {
     } else {
       asyChannel.setMessageHandler(nil)
     }
-    let syChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_$id.sy", binaryMessenger: binaryMessenger, codec: codec)
+    let syChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id ?? 0).sy", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       syChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -189,14 +189,14 @@ class PluginFlutterApi {
     return PluginFlutterApiCodec.shared
   }
   func asy(msg msgArg: LatLng, completion: @escaping (LatLng) -> Void) {
-    let channel = FlutterBasicMessageChannel(name: "pro.flown.PluginFlutterApi_$id.asy", binaryMessenger: binaryMessenger, codec: codec)
+    let channel = FlutterBasicMessageChannel(name: "pro.flown.PluginFlutterApi_\(id ?? 0).asy", binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([msgArg] as [Any?]) { response in
       let result = response as! LatLng
       completion(result)
     }
   }
   func sy(msg msgArg: LatLng, completion: @escaping (LatLng) -> Void) {
-    let channel = FlutterBasicMessageChannel(name: "pro.flown.PluginFlutterApi_$id.sy", binaryMessenger: binaryMessenger, codec: codec)
+    let channel = FlutterBasicMessageChannel(name: "pro.flown.PluginFlutterApi_\(id ?? 0).sy", binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([msgArg] as [Any?]) { response in
       let result = response as! LatLng
       completion(result)

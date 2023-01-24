@@ -45,7 +45,7 @@ class DgisNativeViewFactory: NSObject, FlutterPlatformViewFactory {
             map: map,
             sdkContext: dgisService.sdk.context
         )
-        let dgisChannelHandler = DgisFlutterHandlerService(
+        let dgisHostApi = DgisHostApi(
             sdk: dgisService.sdk,
             mapFactory: dgisService.mapFactory,
             mapFactoryProvider: dgisService.mapFactoryProvider,
@@ -53,12 +53,12 @@ class DgisNativeViewFactory: NSObject, FlutterPlatformViewFactory {
             settingsService: settingsService,
             cameraMoveService: cameraMoveService
         )
-        let  dgisMethodChannel = FlutterMethodChannel(
-            name: "dgis_maps_flutter_\(viewId)",
-            binaryMessenger: messenger
+        PluginHostApiSetup.setUp(
+            binaryMessenger: messenger,
+            api: dgisHostApi,
+            id: viewId
         )
-        dgisMethodChannel.setMethodCallHandler(dgisChannelHandler.handle)
-        
+
         return DGisNativeView(
             frame: frame,
             viewIdentifier: viewId,

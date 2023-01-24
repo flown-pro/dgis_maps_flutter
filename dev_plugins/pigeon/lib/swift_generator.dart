@@ -72,8 +72,7 @@ class SwiftGenerator extends StructuredGenerator<SwiftOptions> {
   void writeFileImports(
       SwiftOptions generatorOptions, Root root, Indent indent) {
     indent.writeln('import Foundation');
-    indent.format(
-        '''
+    indent.format('''
 #if os(iOS)
 import Flutter
 #elseif os(macOS)
@@ -286,10 +285,11 @@ import FlutterMacOS
     indent.addScoped('{', '}', () {
       indent.writeln('private let binaryMessenger: FlutterBinaryMessenger');
       indent.writeln('private let id: Int64?');
-      indent.write('init(binaryMessenger: FlutterBinaryMessenger${generatorOptions.withId?', id: Int64?':''})');
+      indent.write(
+          'init(binaryMessenger: FlutterBinaryMessenger${generatorOptions.withId ? ', id: Int64?' : ''})');
       indent.addScoped('{', '}', () {
         indent.writeln('self.binaryMessenger = binaryMessenger');
-        if(generatorOptions.withId) {
+        if (generatorOptions.withId) {
           indent.writeln('self.id = id');
         }
       });
@@ -304,7 +304,7 @@ import FlutterMacOS
       }
       for (final Method func in api.methods) {
         final String channelName =
-            makeChannelName(api, func, generatorOptions.withId);
+            makeIosChannelName(api, func, generatorOptions.withId);
         final String returnType = func.returnType.isVoid
             ? ''
             : _nullsafeSwiftTypeForDartType(func.returnType);
@@ -435,11 +435,11 @@ import FlutterMacOS
       indent.writeln(
           '$_docCommentPrefix Sets up an instance of `$apiName` to handle messages through the `binaryMessenger`.');
       indent.write(
-          'static func setUp(binaryMessenger: FlutterBinaryMessenger, api: $apiName?${generatorOptions.withId?', id: Int64?':''}) ');
+          'static func setUp(binaryMessenger: FlutterBinaryMessenger, api: $apiName?${generatorOptions.withId ? ', id: Int64?' : ''}) ');
       indent.addScoped('{', '}', () {
         for (final Method method in api.methods) {
           final String channelName =
-              makeChannelName(api, method, generatorOptions.withId);
+              makeIosChannelName(api, method, generatorOptions.withId);
           final String varChannelName = '${method.name}Channel';
           addDocumentationComments(
               indent, method.documentationComments, _docCommentSpec);

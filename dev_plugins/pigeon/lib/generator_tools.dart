@@ -159,6 +159,14 @@ String makeChannelName(Api api, Method func, bool withId) {
   return 'pro.flown.${api.name}.${func.name}';
 }
 
+/// Create the generated ios channel name for a [func] on a [api].
+String makeIosChannelName(Api api, Method func, bool withId) {
+  if (withId) {
+    return 'pro.flown.${api.name}_\\(id ?? 0).${func.name}';
+  }
+  return 'pro.flown.${api.name}.${func.name}';
+}
+
 /// Represents the mapping of a Dart datatype to a Host datatype.
 class HostDatatype {
   /// Parametric constructor for HostDatatype.

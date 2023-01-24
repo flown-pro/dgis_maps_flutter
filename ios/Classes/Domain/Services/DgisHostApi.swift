@@ -7,7 +7,14 @@
 
 import DGis
 
-class DgisFlutterHandlerService {
+class DgisHostApi : NSObject, PluginHostApi {
+    func asy(msg: LatLng, completion: @escaping (LatLng) -> Void) {
+        addTestMarker()
+    }
+    
+    func sy(msg: LatLng) -> LatLng {
+      return LatLng(latitude: 0, longitude: 0)
+    }
     
     
     private let sdk: DGis.Container
