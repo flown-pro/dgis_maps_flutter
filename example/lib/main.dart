@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:dgis_maps_flutter/dgis_maps_flutter.dart';
 import 'package:dgis_maps_flutter/src/controller.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late DGisMapController controller;
 
   Set<Marker> markers = {};
+  Set<Polyline> polylines = {};
 
   void onMapCreated(DGisMapController controller) {
     this.controller = controller;
@@ -61,6 +64,21 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {});
   }
 
+  Future<void> addPolyline() async {
+    polylines.add(
+      Polyline(
+        polylineId: DataMapObjectId(value: 'p${mId++}'),
+        color: Colors.primaries[Random().nextInt(Colors.primaries.length)],
+        points: List.generate(
+          10,
+          (index) => LatLng(60.0 + index + mId, 30.0 + index + mId),
+        ),
+        erasedPart: 0,
+      ),
+    );
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,6 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
               initialPosition: CameraPosition(target: LatLng(60, 30), zoom: 7),
               onMapCreated: onMapCreated,
               markers: markers,
+              polylines: polylines,
             ),
           ),
           Row(
@@ -88,6 +107,10 @@ class _MyHomePageState extends State<MyHomePage> {
               TextButton(
                 onPressed: addMarker,
                 child: const Text('addMarker'),
+              ),
+              TextButton(
+                onPressed: addPolyline,
+                child: const Text('addPolyline'),
               ),
             ],
           ),
