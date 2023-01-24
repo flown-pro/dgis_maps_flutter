@@ -4,10 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import ru.dgis.sdk.Context
 import ru.dgis.sdk.geometry.GeoPointWithElevation
-import ru.dgis.sdk.map.Image
-import ru.dgis.sdk.map.Marker
-import ru.dgis.sdk.map.MarkerOptions
-import ru.dgis.sdk.map.imageFromBitmap
+import ru.dgis.sdk.map.*
 
 
 private fun toBitmap(o: Any): Bitmap? {
@@ -29,7 +26,8 @@ fun dataMarker2Marker(context: Context, marker: DataMarker): Marker {
                 latitude = marker.position.latitude,
                 longitude = marker.position.longitude,
             ),
-            icon = dataBitmap2Icon(context, marker.bitmap)
+            icon = dataBitmap2Icon(context, marker.bitmap)?: imageFromResource(context,R.drawable.dgis_ic_road_event_marker_comment),
+            text = marker.infoText ?: ""
         )
     )
 }

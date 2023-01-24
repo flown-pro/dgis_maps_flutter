@@ -56,6 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
     markers.add(Marker(
       markerId: DataMarkerId(value: 'm${mId++}'),
       position: LatLng(60.0 + mId, 30.0 + mId),
+      infoText: 'm${mId++}',
     ));
     setState(() {});
   }
