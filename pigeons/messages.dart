@@ -165,8 +165,6 @@ abstract class PluginHostApi {
 abstract class PluginFlutterApi {
   /// Коллбэк на изменение состояния камеры
   /// [cameraState] - индекс в перечислении [CameraState]
-  /// TODO(kit): Изменить на enum после фикса
-  /// https://github.com/flutter/flutter/issues/87307
   void onCameraStateChanged(CameraState cameraState);
 }
 
