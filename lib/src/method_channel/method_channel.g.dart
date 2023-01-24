@@ -232,20 +232,16 @@ class MarkerId {
 class MarkerUpdates {
   MarkerUpdates({
     required this.toRemove,
-    required this.toChange,
     required this.toAdd,
   });
 
   List<Marker?> toRemove;
-
-  List<Marker?> toChange;
 
   List<Marker?> toAdd;
 
   Object encode() {
     return <Object?>[
       toRemove,
-      toChange,
       toAdd,
     ];
   }
@@ -254,8 +250,7 @@ class MarkerUpdates {
     result as List<Object?>;
     return MarkerUpdates(
       toRemove: (result[0] as List<Object?>?)!.cast<Marker?>(),
-      toChange: (result[1] as List<Object?>?)!.cast<Marker?>(),
-      toAdd: (result[2] as List<Object?>?)!.cast<Marker?>(),
+      toAdd: (result[1] as List<Object?>?)!.cast<Marker?>(),
     );
   }
 }

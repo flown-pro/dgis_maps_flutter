@@ -242,7 +242,6 @@ data class MarkerId (
 /** Generated class from Pigeon that represents data sent in messages. */
 data class MarkerUpdates (
   val toRemove: List<Marker?>,
-  val toChange: List<Marker?>,
   val toAdd: List<Marker?>
 
 ) {
@@ -250,15 +249,13 @@ data class MarkerUpdates (
     @Suppress("UNCHECKED_CAST")
     fun fromList(list: List<Any?>): MarkerUpdates {
       val toRemove = list[0] as List<Marker?>
-      val toChange = list[1] as List<Marker?>
-      val toAdd = list[2] as List<Marker?>
-      return MarkerUpdates(toRemove, toChange, toAdd)
+      val toAdd = list[1] as List<Marker?>
+      return MarkerUpdates(toRemove, toAdd)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
       toRemove,
-      toChange,
       toAdd,
     )
   }
