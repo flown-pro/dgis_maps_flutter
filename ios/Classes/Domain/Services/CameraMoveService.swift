@@ -37,8 +37,8 @@ final class CameraMoveService {
         }
         self.locationService?.getCurrentPosition { (coordinates) in
             self.moveToLocation(
-                position: CameraPosition(
-                    point: GeoPoint(
+                position: DGis.CameraPosition(
+                    point: DGis.GeoPoint(
                         latitude: .init(value: coordinates.latitude),
                         longitude: .init(value: coordinates.longitude)
                     ),
@@ -52,7 +52,7 @@ final class CameraMoveService {
         }
     }
     
-    func moveToLocation(position: CameraPosition, time: TimeInterval, animationType: CameraAnimationType) {
+    func moveToLocation(position: DGis.CameraPosition, time: TimeInterval, animationType: DGis.CameraAnimationType) {
         DispatchQueue.main.async {
             self.moveCameraCancellable?.cancel()
             self.moveCameraCancellable = self.map

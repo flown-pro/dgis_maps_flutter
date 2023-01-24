@@ -63,7 +63,7 @@ final class MapObjectService {
             icon: icon,
             text: text
         )
-        let marker = Marker(options: options)
+        let marker = DGis.Marker(options: options)
         self.mapObjectManager.addObject(item: marker)
     }
     

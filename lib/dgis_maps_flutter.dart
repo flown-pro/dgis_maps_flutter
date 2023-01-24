@@ -9,6 +9,8 @@ import 'src/method_channel/dgis_maps_flutter_method_channel.dart';
 import 'src/method_channel/method_channel.g.dart' as data;
 import 'src/types/types.dart';
 
+export 'src/method_channel/method_channel.g.dart'
+    hide CameraPosition, LatLng, Marker;
 export 'src/types/types.dart';
 
 typedef MapCreatedCallback = void Function(DGisMapController controller);

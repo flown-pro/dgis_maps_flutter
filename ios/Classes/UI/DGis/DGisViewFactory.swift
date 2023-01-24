@@ -55,8 +55,8 @@ class DgisNativeViewFactory: NSObject, FlutterPlatformViewFactory {
         )
         PluginHostApiSetup.setUp(
             binaryMessenger: messenger,
-            api: dgisHostApi,
-            id: viewId
+            id: viewId,
+            api: dgisHostApi
         )
 
         return DGisNativeView(
