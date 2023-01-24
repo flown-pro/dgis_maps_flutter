@@ -304,7 +304,7 @@ import FlutterMacOS
       }
       for (final Method func in api.methods) {
         final String channelName =
-            makeChannelName(api, func, generatorOptions.withId);
+            makeSwiftChannelName(api, func, generatorOptions.withId);
         final String returnType = func.returnType.isVoid
             ? ''
             : _nullsafeSwiftTypeForDartType(func.returnType);
@@ -439,7 +439,7 @@ import FlutterMacOS
       indent.addScoped('{', '}', () {
         for (final Method method in api.methods) {
           final String channelName =
-              makeChannelName(api, method, generatorOptions.withId);
+              makeSwiftChannelName(api, method, generatorOptions.withId);
           final String varChannelName = '${method.name}Channel';
           addDocumentationComments(
               indent, method.documentationComments, _docCommentSpec);

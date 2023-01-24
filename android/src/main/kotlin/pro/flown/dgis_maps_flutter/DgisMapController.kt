@@ -5,6 +5,7 @@ import android.view.View
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.platform.PlatformView
 import ru.dgis.sdk.DGis
+import ru.dgis.sdk.Duration
 import ru.dgis.sdk.coordinates.Bearing
 import ru.dgis.sdk.coordinates.GeoPoint
 import ru.dgis.sdk.map.*
@@ -81,11 +82,28 @@ class DgisMapController internal constructor(
                 zoom = Zoom(cameraPosition.zoom.toFloat()),
                 tilt = Tilt(cameraPosition.tilt.toFloat()),
                 bearing = Bearing(cameraPosition.bearing),
-            )
+            ),
+            time = Duration.ofMilliseconds(duration!!),
+            animationType = ru.dgis.sdk.map.CameraAnimationType.valueOf(cameraAnimationType.name)
         )
     }
 
     override fun updateMarkers(markerUpdates: MarkerUpdates) {
-        TODO("Not yet implemented")
+        var source = MyLocationMapObjectSource(
+            sdkContext,
+            MyLocationDirectionBehaviour.FOLLOW_SATELLITE_HEADING,
+            createSmoothMyLocationController()
+        )
+
+// Добавление источника данных на карту
+        map.addSource(source)
+
+       val source2 = GeometryMapObjectSource(sdkContext)
+//        source.removeAndAddObjects()
+//// Добавление источника данных на карту
+//        map.addSource(source)
+//
+        val mapObjectManager = MapObjectManager(map)
+        mapObjectManager.removeAndAddObjects()
     }
 }

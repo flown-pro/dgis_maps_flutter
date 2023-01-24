@@ -334,7 +334,7 @@ class PluginHostApiSetup {
     ///
     /// Возвращает [CameraPosition]
     /// Позицию камеры в текущий момент времени
-    let getCameraPositionChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_$id.getCameraPosition", binaryMessenger: binaryMessenger, codec: codec)
+    let getCameraPositionChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id).getCameraPosition", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       getCameraPositionChannel.setMessageHandler { _, reply in
         api.getCameraPosition() { result in
@@ -348,7 +348,7 @@ class PluginHostApiSetup {
     /// [duration] - длительность анимации в миллисекундах,
     /// если не указана, используется нативное значение
     /// [cameraAnimationType] - тип анимации
-    let moveCameraChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_$id.moveCamera", binaryMessenger: binaryMessenger, codec: codec)
+    let moveCameraChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id).moveCamera", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       moveCameraChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -365,7 +365,7 @@ class PluginHostApiSetup {
     /// Обновление маркеров
     ///
     /// [markerUpdates] - объект с информацией об обновлении маркеров
-    let updateMarkersChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_$id.updateMarkers", binaryMessenger: binaryMessenger, codec: codec)
+    let updateMarkersChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id).updateMarkers", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       updateMarkersChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -388,10 +388,8 @@ class PluginFlutterApi {
   }
   /// Коллбэк на изменение состояния камеры
   /// [cameraState] - индекс в перечислении [CameraState]
-  /// TODO(kit): Изменить на enum после фикса
-  /// https://github.com/flutter/flutter/issues/87307
   func onCameraStateChanged(cameraState cameraStateArg: CameraState, completion: @escaping () -> Void) {
-    let channel = FlutterBasicMessageChannel(name: "pro.flown.PluginFlutterApi_$id.onCameraStateChanged", binaryMessenger: binaryMessenger)
+    let channel = FlutterBasicMessageChannel(name: "pro.flown.PluginFlutterApi_\(id).onCameraStateChanged", binaryMessenger: binaryMessenger)
     channel.sendMessage([cameraStateArg] as [Any?]) { _ in
       completion()
     }
