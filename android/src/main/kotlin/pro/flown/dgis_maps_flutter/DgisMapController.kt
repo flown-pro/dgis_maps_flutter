@@ -85,8 +85,9 @@ class DgisMapController internal constructor(
 
     }
 
-    override fun sy(msg: LatLng): LatLng {
+     fun sy(msg: LatLng): LatLng {
 //        TODO("Not yet implemented")
         return LatLng(0.0, 0.0)
     }
+    override fun m(msg: Marker, callback: () -> Unit){}
 }

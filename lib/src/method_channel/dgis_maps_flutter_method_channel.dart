@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../types/types.dart';
-import 'method_channel.g.dart' hide Marker;
+import 'method_channel.g.dart' hide Marker, CameraPosition;
 
 class DGisMapsFlutterMethodChannel {
   static bool useAndroidViewSurface = false;

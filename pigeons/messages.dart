@@ -67,6 +67,58 @@ class Marker {
   final String? infoText;
 }
 
+/// Состояние камеры
+/// https://docs.2gis.com/ru/android/sdk/reference/5.1/ru.dgis.sdk.map.CameraState
+enum CameraState {
+  /// Камера управляется пользователем.
+  busy,
+
+  /// Eсть активный перелёт.
+  fly,
+
+  /// Камера в режиме слежения за позицией.
+  followPosition,
+
+  /// Камера не управляется пользователем и нет активных перелётов.
+  free
+}
+
+/// Тип анимации при перемещении камеры
+/// https://docs.2gis.com/ru/android/sdk/reference/5.1/ru.dgis.sdk.map.CameraAnimationType
+enum CameraAnimationType {
+  /// Тип перелёта выбирается в зависимости от расстояния между начальной и конечной позициями
+  def,
+
+  /// Линейное изменение параметров позиции камеры
+  linear,
+
+  /// Zoom изменяется таким образом, чтобы постараться в какой-то момент перелёта отобразить начальную и конечную позиции.
+  /// Позиции могут быть не отображены, если текущие ограничения (см. ICamera::zoom_restrictions()) не позволяют установить столь малый zoom.
+  showBothPositions
+}
+
+/// Позиция камеры
+class CameraPosition {
+  const CameraPosition({
+    required this.target,
+    this.bearing = 0.0,
+    this.tilt = 0.0,
+    this.zoom = 0.0,
+  });
+
+  /// Азимут камеры в градусах
+  final double bearing;
+
+  /// Центр камеры
+  final LatLng target;
+
+  /// Угол наклона камеры (в градусах)
+  final double tilt;
+
+  /// Зум камеры
+  final double zoom;
+}
+
 class MarkerId {
   const MarkerId(this.value);
   final String value;
@@ -90,14 +142,34 @@ abstract class PluginHostApi {
   LatLng asy(LatLng msg);
 
   @async
-  Marker m(Marker msg);
+  void m(Marker msg);
+
+  /// Получение текущей позиции камеры
+  ///
+  /// Возвращает [CameraPosition]
+  /// Позицию камеры в текущий момент времени
+  @async
+  CameraPosition getCameraPosition();
+
+  /// Перемещение камеры к заданной позиции [CameraPosition]
+  /// [duration] - длительность анимации в миллисекундах,
+  /// если не указана, используется нативное значение
+  /// [cameraAnimationType] - тип анимации
+  @async
+  void moveCamera(
+    CameraPosition cameraPosition,
+    int? duration,
+    CameraAnimationType cameraAnimationType,
+  );
 }
 
 @FlutterApi()
 abstract class PluginFlutterApi {
-  @async
-  LatLng asy(LatLng msg);
-  LatLng sy(LatLng msg);
+  /// Коллбэк на изменение состояния камеры
+  /// [cameraState] - индекс в перечислении [CameraState]
+  /// TODO(kit): Изменить на enum после фикса
+  /// https://github.com/flutter/flutter/issues/87307
+  void onCameraStateChanged(int cameraState);
 }
 
 @FlutterApi()

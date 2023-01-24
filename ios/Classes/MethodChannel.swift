@@ -24,6 +24,31 @@ private func wrapError(_ error: FlutterError) -> [Any?] {
   ]
 }
 
+/// Состояние камеры
+/// https://docs.2gis.com/ru/android/sdk/reference/5.1/ru.dgis.sdk.map.CameraState
+enum CameraState: Int {
+  /// Камера управляется пользователем.
+  case busy = 0
+  /// Eсть активный перелёт.
+  case fly = 1
+  /// Камера в режиме слежения за позицией.
+  case followPosition = 2
+  /// Камера не управляется пользователем и нет активных перелётов.
+  case free = 3
+}
+
+/// Тип анимации при перемещении камеры
+/// https://docs.2gis.com/ru/android/sdk/reference/5.1/ru.dgis.sdk.map.CameraAnimationType
+enum CameraAnimationType: Int {
+  /// Тип перелёта выбирается в зависимости от расстояния между начальной и конечной позициями
+  case def = 0
+  /// Линейное изменение параметров позиции камеры
+  case linear = 1
+  /// Zoom изменяется таким образом, чтобы постараться в какой-то момент перелёта отобразить начальную и конечную позиции.
+  /// Позиции могут быть не отображены, если текущие ограничения (см. ICamera::zoom_restrictions()) не позволяют установить столь малый zoom.
+  case showBothPositions = 2
+}
+
 /// Generated class from Pigeon that represents data sent in messages.
 struct CreationParams {
   var position: LatLng
@@ -140,6 +165,42 @@ struct Marker {
   }
 }
 
+/// Позиция камеры
+///
+/// Generated class from Pigeon that represents data sent in messages.
+struct CameraPosition {
+  /// Азимут камеры в градусах
+  var bearing: Double
+  /// Центр камеры
+  var target: LatLng
+  /// Угол наклона камеры (в градусах)
+  var tilt: Double
+  /// Зум камеры
+  var zoom: Double
+
+  static func fromList(_ list: [Any?]) -> CameraPosition? {
+    let bearing = list[0] as! Double
+    let target = LatLng.fromList(list[1] as! [Any?])!
+    let tilt = list[2] as! Double
+    let zoom = list[3] as! Double
+
+    return CameraPosition(
+      bearing: bearing,
+      target: target,
+      tilt: tilt,
+      zoom: zoom
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      bearing,
+      target.toList(),
+      tilt,
+      zoom,
+    ]
+  }
+}
+
 /// Generated class from Pigeon that represents data sent in messages.
 struct MarkerId {
   var value: String
@@ -162,12 +223,14 @@ private class PluginHostApiCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
       case 128:
-        return LatLng.fromList(self.readValue() as! [Any])
+        return CameraPosition.fromList(self.readValue() as! [Any])
       case 129:
-        return Marker.fromList(self.readValue() as! [Any])
+        return LatLng.fromList(self.readValue() as! [Any])
       case 130:
-        return MarkerBitmap.fromList(self.readValue() as! [Any])
+        return Marker.fromList(self.readValue() as! [Any])
       case 131:
+        return MarkerBitmap.fromList(self.readValue() as! [Any])
+      case 132:
         return MarkerId.fromList(self.readValue() as! [Any])
       default:
         return super.readValue(ofType: type)
@@ -177,17 +240,20 @@ private class PluginHostApiCodecReader: FlutterStandardReader {
 
 private class PluginHostApiCodecWriter: FlutterStandardWriter {
   override func writeValue(_ value: Any) {
-    if let value = value as? LatLng {
+    if let value = value as? CameraPosition {
       super.writeByte(128)
       super.writeValue(value.toList())
-    } else if let value = value as? Marker {
+    } else if let value = value as? LatLng {
       super.writeByte(129)
       super.writeValue(value.toList())
-    } else if let value = value as? MarkerBitmap {
+    } else if let value = value as? Marker {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? MarkerId {
+    } else if let value = value as? MarkerBitmap {
       super.writeByte(131)
+      super.writeValue(value.toList())
+    } else if let value = value as? MarkerId {
+      super.writeByte(132)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -212,7 +278,17 @@ class PluginHostApiCodec: FlutterStandardMessageCodec {
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol PluginHostApi {
   func asy(msg: LatLng, completion: @escaping (LatLng) -> Void)
-  func m(msg: Marker, completion: @escaping (Marker) -> Void)
+  func m(msg: Marker, completion: @escaping () -> Void)
+  /// Получение текущей позиции камеры
+  ///
+  /// Возвращает [CameraPosition]
+  /// Позицию камеры в текущий момент времени
+  func getCameraPosition(completion: @escaping (CameraPosition) -> Void)
+  /// Перемещение камеры к заданной позиции [CameraPosition]
+  /// [duration] - длительность анимации в миллисекундах,
+  /// если не указана, используется нативное значение
+  /// [cameraAnimationType] - тип анимации
+  func moveCamera(cameraPosition: CameraPosition, duration: Int32?, cameraAnimationType: CameraAnimationType, completion: @escaping () -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -233,56 +309,52 @@ class PluginHostApiSetup {
     } else {
       asyChannel.setMessageHandler(nil)
     }
-    let syChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id ?? 0).m", binaryMessenger: binaryMessenger, codec: codec)
+    let mChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id ?? 0).m", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       mChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let msgArg = args[0] as! Marker
-        api.m(msg: msgArg) { result in
-          reply(wrapResult(result))
+        api.m(msg: msgArg) {
+          reply(wrapResult(nil))
         }
       }
     } else {
       mChannel.setMessageHandler(nil)
     }
-  }
-}
-private class PluginFlutterApiCodecReader: FlutterStandardReader {
-  override func readValue(ofType type: UInt8) -> Any? {
-    switch type {
-      case 128:
-        return LatLng.fromList(self.readValue() as! [Any])
-      default:
-        return super.readValue(ofType: type)
-    }
-  }
-}
-
-private class PluginFlutterApiCodecWriter: FlutterStandardWriter {
-  override func writeValue(_ value: Any) {
-    if let value = value as? LatLng {
-      super.writeByte(128)
-      super.writeValue(value.toList())
+    /// Получение текущей позиции камеры
+    ///
+    /// Возвращает [CameraPosition]
+    /// Позицию камеры в текущий момент времени
+    let getCameraPositionChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id ?? 0).getCameraPosition", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getCameraPositionChannel.setMessageHandler { _, reply in
+        api.getCameraPosition() { result in
+          reply(wrapResult(result))
+        }
+      }
     } else {
-      super.writeValue(value)
+      getCameraPositionChannel.setMessageHandler(nil)
+    }
+    /// Перемещение камеры к заданной позиции [CameraPosition]
+    /// [duration] - длительность анимации в миллисекундах,
+    /// если не указана, используется нативное значение
+    /// [cameraAnimationType] - тип анимации
+    let moveCameraChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id ?? 0).moveCamera", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      moveCameraChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let cameraPositionArg = args[0] as! CameraPosition
+        let durationArg = args[1] as? Int32
+        let cameraAnimationTypeArg = CameraAnimationType(rawValue: args[2] as! Int)!
+        api.moveCamera(cameraPosition: cameraPositionArg, duration: durationArg, cameraAnimationType: cameraAnimationTypeArg) {
+          reply(wrapResult(nil))
+        }
+      }
+    } else {
+      moveCameraChannel.setMessageHandler(nil)
     }
   }
 }
-
-private class PluginFlutterApiCodecReaderWriter: FlutterStandardReaderWriter {
-  override func reader(with data: Data) -> FlutterStandardReader {
-    return PluginFlutterApiCodecReader(data: data)
-  }
-
-  override func writer(with data: NSMutableData) -> FlutterStandardWriter {
-    return PluginFlutterApiCodecWriter(data: data)
-  }
-}
-
-class PluginFlutterApiCodec: FlutterStandardMessageCodec {
-  static let shared = PluginFlutterApiCodec(readerWriter: PluginFlutterApiCodecReaderWriter())
-}
-
 /// Generated class from Pigeon that represents Flutter messages that can be called from Swift.
 class PluginFlutterApi {
   private let binaryMessenger: FlutterBinaryMessenger
@@ -291,21 +363,14 @@ class PluginFlutterApi {
     self.binaryMessenger = binaryMessenger
     self.id = id
   }
-  var codec: FlutterStandardMessageCodec {
-    return PluginFlutterApiCodec.shared
-  }
-  func asy(msg msgArg: LatLng, completion: @escaping (LatLng) -> Void) {
-    let channel = FlutterBasicMessageChannel(name: "pro.flown.PluginFlutterApi_\(id ?? 0).asy", binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([msgArg] as [Any?]) { response in
-      let result = response as! LatLng
-      completion(result)
-    }
-  }
-  func sy(msg msgArg: LatLng, completion: @escaping (LatLng) -> Void) {
-    let channel = FlutterBasicMessageChannel(name: "pro.flown.PluginFlutterApi_\(id ?? 0).sy", binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([msgArg] as [Any?]) { response in
-      let result = response as! LatLng
-      completion(result)
+  /// Коллбэк на изменение состояния камеры
+  /// [cameraState] - индекс в перечислении [CameraState]
+  /// TODO(kit): Изменить на enum после фикса
+  /// https://github.com/flutter/flutter/issues/87307
+  func onCameraStateChanged(cameraState cameraStateArg: Int32, completion: @escaping () -> Void) {
+    let channel = FlutterBasicMessageChannel(name: "pro.flown.PluginFlutterApi_\(id ?? 0).onCameraStateChanged", binaryMessenger: binaryMessenger)
+    channel.sendMessage([cameraStateArg] as [Any?]) { _ in
+      completion()
     }
   }
 }

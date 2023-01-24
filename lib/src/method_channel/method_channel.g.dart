@@ -8,6 +8,31 @@ import 'dart:typed_data' show Float64List, Int32List, Int64List, Uint8List;
 import 'package:flutter/foundation.dart' show ReadBuffer, WriteBuffer;
 import 'package:flutter/services.dart';
 
+/// Состояние камеры
+/// https://docs.2gis.com/ru/android/sdk/reference/5.1/ru.dgis.sdk.map.CameraState
+enum CameraState {
+  /// Камера управляется пользователем.
+  busy,
+  /// Eсть активный перелёт.
+  fly,
+  /// Камера в режиме слежения за позицией.
+  followPosition,
+  /// Камера не управляется пользователем и нет активных перелётов.
+  free,
+}
+
+/// Тип анимации при перемещении камеры
+/// https://docs.2gis.com/ru/android/sdk/reference/5.1/ru.dgis.sdk.map.CameraAnimationType
+enum CameraAnimationType {
+  /// Тип перелёта выбирается в зависимости от расстояния между начальной и конечной позициями
+  def,
+  /// Линейное изменение параметров позиции камеры
+  linear,
+  /// Zoom изменяется таким образом, чтобы постараться в какой-то момент перелёта отобразить начальную и конечную позиции.
+  /// Позиции могут быть не отображены, если текущие ограничения (см. ICamera::zoom_restrictions()) не позволяют установить столь малый zoom.
+  showBothPositions,
+}
+
 class CreationParams {
   CreationParams({
     required this.position,
@@ -142,6 +167,47 @@ class Marker {
   }
 }
 
+/// Позиция камеры
+class CameraPosition {
+  CameraPosition({
+    required this.bearing,
+    required this.target,
+    required this.tilt,
+    required this.zoom,
+  });
+
+  /// Азимут камеры в градусах
+  double bearing;
+
+  /// Центр камеры
+  LatLng target;
+
+  /// Угол наклона камеры (в градусах)
+  double tilt;
+
+  /// Зум камеры
+  double zoom;
+
+  Object encode() {
+    return <Object?>[
+      bearing,
+      target.encode(),
+      tilt,
+      zoom,
+    ];
+  }
+
+  static CameraPosition decode(Object result) {
+    result as List<Object?>;
+    return CameraPosition(
+      bearing: result[0]! as double,
+      target: LatLng.decode(result[1]! as List<Object?>),
+      tilt: result[2]! as double,
+      zoom: result[3]! as double,
+    );
+  }
+}
+
 class MarkerId {
   MarkerId({
     required this.value,
@@ -167,17 +233,20 @@ class _PluginHostApiCodec extends StandardMessageCodec {
   const _PluginHostApiCodec();
   @override
   void writeValue(WriteBuffer buffer, Object? value) {
-    if (value is LatLng) {
+    if (value is CameraPosition) {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
-    } else if (value is Marker) {
+    } else if (value is LatLng) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is MarkerBitmap) {
+    } else if (value is Marker) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is MarkerId) {
+    } else if (value is MarkerBitmap) {
       buffer.putUint8(131);
+      writeValue(buffer, value.encode());
+    } else if (value is MarkerId) {
+      buffer.putUint8(132);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -188,15 +257,18 @@ class _PluginHostApiCodec extends StandardMessageCodec {
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
       case 128:       
-        return LatLng.decode(readValue(buffer)!);
+        return CameraPosition.decode(readValue(buffer)!);
       
       case 129:       
-        return Marker.decode(readValue(buffer)!);
+        return LatLng.decode(readValue(buffer)!);
       
       case 130:       
-        return MarkerBitmap.decode(readValue(buffer)!);
+        return Marker.decode(readValue(buffer)!);
       
       case 131:       
+        return MarkerBitmap.decode(readValue(buffer)!);
+      
+      case 132:       
         return MarkerId.decode(readValue(buffer)!);
       
       default:
@@ -243,12 +315,38 @@ class PluginHostApi {
     }
   }
 
-  Future<Marker> m(Marker arg_msg) async {
+  Future<void> m(Marker arg_msg) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'pro.flown.PluginHostApi_$id.m', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_msg]) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  /// Получение текущей позиции камеры
+  ///
+  /// Возвращает [CameraPosition]
+  /// Позицию камеры в текущий момент времени
+  Future<CameraPosition> getCameraPosition() async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'pro.flown.PluginHostApi_$id.getCameraPosition', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(null) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',
@@ -266,78 +364,63 @@ class PluginHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (replyList[0] as Marker?)!;
+      return (replyList[0] as CameraPosition?)!;
     }
   }
-}
 
-class _PluginFlutterApiCodec extends StandardMessageCodec {
-  const _PluginFlutterApiCodec();
-  @override
-  void writeValue(WriteBuffer buffer, Object? value) {
-    if (value is LatLng) {
-      buffer.putUint8(128);
-      writeValue(buffer, value.encode());
+  /// Перемещение камеры к заданной позиции [CameraPosition]
+  /// [duration] - длительность анимации в миллисекундах,
+  /// если не указана, используется нативное значение
+  /// [cameraAnimationType] - тип анимации
+  Future<void> moveCamera(CameraPosition arg_cameraPosition, int? arg_duration, CameraAnimationType arg_cameraAnimationType) async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'pro.flown.PluginHostApi_$id.moveCamera', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(<Object?>[arg_cameraPosition, arg_duration, arg_cameraAnimationType.index]) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
     } else {
-      super.writeValue(buffer, value);
-    }
-  }
-
-  @override
-  Object? readValueOfType(int type, ReadBuffer buffer) {
-    switch (type) {
-      case 128:       
-        return LatLng.decode(readValue(buffer)!);
-      
-      default:
-        return super.readValueOfType(type, buffer);
+      return;
     }
   }
 }
 
 abstract class PluginFlutterApi {
-  static const MessageCodec<Object?> codec = _PluginFlutterApiCodec();
+  static const MessageCodec<Object?> codec = StandardMessageCodec();
 
-  Future<LatLng> asy(LatLng msg);
-
-  LatLng sy(LatLng msg);
+  /// Коллбэк на изменение состояния камеры
+  /// [cameraState] - индекс в перечислении [CameraState]
+  /// TODO(kit): Изменить на enum после фикса
+  /// https://github.com/flutter/flutter/issues/87307
+  void onCameraStateChanged(int cameraState);
 
   static void setup(PluginFlutterApi? api, {BinaryMessenger? binaryMessenger, int? id}) {
     {
       final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-          'pro.flown.PluginFlutterApi_$id.asy', codec,
+          'pro.flown.PluginFlutterApi_$id.onCameraStateChanged', codec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         channel.setMessageHandler(null);
       } else {
         channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for pro.flown.PluginFlutterApi_$id.asy was null.');
+          'Argument for pro.flown.PluginFlutterApi_$id.onCameraStateChanged was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final LatLng? arg_msg = (args[0] as LatLng?);
-          assert(arg_msg != null,
-              'Argument for pro.flown.PluginFlutterApi_$id.asy was null, expected non-null LatLng.');
-          final LatLng output = await api.asy(arg_msg!);
-          return output;
-        });
-      }
-    }
-    {
-      final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-          'pro.flown.PluginFlutterApi_$id.sy', codec,
-          binaryMessenger: binaryMessenger);
-      if (api == null) {
-        channel.setMessageHandler(null);
-      } else {
-        channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for pro.flown.PluginFlutterApi_$id.sy was null.');
-          final List<Object?> args = (message as List<Object?>?)!;
-          final LatLng? arg_msg = (args[0] as LatLng?);
-          assert(arg_msg != null,
-              'Argument for pro.flown.PluginFlutterApi_$id.sy was null, expected non-null LatLng.');
-          final LatLng output = api.sy(arg_msg!);
-          return output;
+          final int? arg_cameraState = (args[0] as int?);
+          assert(arg_cameraState != null,
+              'Argument for pro.flown.PluginFlutterApi_$id.onCameraStateChanged was null, expected non-null int.');
+          api.onCameraStateChanged(arg_cameraState!);
+          return;
         });
       }
     }

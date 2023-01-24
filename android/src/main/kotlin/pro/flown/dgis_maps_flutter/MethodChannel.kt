@@ -23,6 +23,49 @@ private fun wrapError(exception: Throwable): List<Any> {
   )
 }
 
+/**
+ * Состояние камеры
+ * https://docs.2gis.com/ru/android/sdk/reference/5.1/ru.dgis.sdk.map.CameraState
+ */
+enum class CameraState(val raw: Int) {
+  /** Камера управляется пользователем. */
+  BUSY(0),
+  /** Eсть активный перелёт. */
+  FLY(1),
+  /** Камера в режиме слежения за позицией. */
+  FOLLOWPOSITION(2),
+  /** Камера не управляется пользователем и нет активных перелётов. */
+  FREE(3);
+
+  companion object {
+    fun ofRaw(raw: Int): CameraState? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
+/**
+ * Тип анимации при перемещении камеры
+ * https://docs.2gis.com/ru/android/sdk/reference/5.1/ru.dgis.sdk.map.CameraAnimationType
+ */
+enum class CameraAnimationType(val raw: Int) {
+  /** Тип перелёта выбирается в зависимости от расстояния между начальной и конечной позициями */
+  DEF(0),
+  /** Линейное изменение параметров позиции камеры */
+  LINEAR(1),
+  /**
+   * Zoom изменяется таким образом, чтобы постараться в какой-то момент перелёта отобразить начальную и конечную позиции.
+   * Позиции могут быть не отображены, если текущие ограничения (см. ICamera::zoom_restrictions()) не позволяют установить столь малый zoom.
+   */
+  SHOWBOTHPOSITIONS(2);
+
+  companion object {
+    fun ofRaw(raw: Int): CameraAnimationType? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 /** Generated class from Pigeon that represents data sent in messages. */
 data class CreationParams (
   val position: LatLng,
@@ -141,6 +184,42 @@ data class Marker (
   }
 }
 
+/**
+ * Позиция камеры
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class CameraPosition (
+  /** Азимут камеры в градусах */
+  val bearing: Double,
+  /** Центр камеры */
+  val target: LatLng,
+  /** Угол наклона камеры (в градусах) */
+  val tilt: Double,
+  /** Зум камеры */
+  val zoom: Double
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): CameraPosition {
+      val bearing = list[0] as Double
+      val target = LatLng.fromList(list[1] as List<Any?>)
+      val tilt = list[2] as Double
+      val zoom = list[3] as Double
+      return CameraPosition(bearing, target, tilt, zoom)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      bearing,
+      target?.toList(),
+      tilt,
+      zoom,
+    )
+  }
+}
+
 /** Generated class from Pigeon that represents data sent in messages. */
 data class MarkerId (
   val value: String
@@ -166,20 +245,25 @@ private object PluginHostApiCodec : StandardMessageCodec() {
     return when (type) {
       128.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          LatLng.fromList(it)
+          CameraPosition.fromList(it)
         }
       }
       129.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          Marker.fromList(it)
+          LatLng.fromList(it)
         }
       }
       130.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MarkerBitmap.fromList(it)
+          Marker.fromList(it)
         }
       }
       131.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MarkerBitmap.fromList(it)
+        }
+      }
+      132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           MarkerId.fromList(it)
         }
@@ -189,20 +273,24 @@ private object PluginHostApiCodec : StandardMessageCodec() {
   }
   override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
     when (value) {
-      is LatLng -> {
+      is CameraPosition -> {
         stream.write(128)
         writeValue(stream, value.toList())
       }
-      is Marker -> {
+      is LatLng -> {
         stream.write(129)
         writeValue(stream, value.toList())
       }
-      is MarkerBitmap -> {
+      is Marker -> {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is MarkerId -> {
+      is MarkerBitmap -> {
         stream.write(131)
+        writeValue(stream, value.toList())
+      }
+      is MarkerId -> {
+        stream.write(132)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -213,7 +301,21 @@ private object PluginHostApiCodec : StandardMessageCodec() {
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface PluginHostApi {
   fun asy(msg: LatLng, callback: (LatLng) -> Unit)
-  fun m(msg: Marker, callback: (Marker) -> Unit)
+  fun m(msg: Marker, callback: () -> Unit)
+  /**
+   * Получение текущей позиции камеры
+   *
+   * Возвращает [CameraPosition]
+   * Позицию камеры в текущий момент времени
+   */
+  fun getCameraPosition(callback: (CameraPosition) -> Unit)
+  /**
+   * Перемещение камеры к заданной позиции [CameraPosition]
+   * [duration] - длительность анимации в миллисекундах,
+   * если не указана, используется нативное значение
+   * [cameraAnimationType] - тип анимации
+   */
+  fun moveCamera(cameraPosition: CameraPosition, duration: Long?, cameraAnimationType: CameraAnimationType, callback: () -> Unit)
 
   companion object {
     /** The codec used by PluginHostApi. */
@@ -252,7 +354,47 @@ interface PluginHostApi {
               val args = message as List<Any?>
               val msgArg = args[0] as Marker
               api.m(msgArg) {
+                reply.reply(wrapResult(null))
+              }
+            } catch (exception: Error) {
+              wrapped = wrapError(exception)
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginHostApi_$id.getCameraPosition", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            var wrapped = listOf<Any?>()
+            try {
+              api.getCameraPosition() {
                 reply.reply(wrapResult(it))
+              }
+            } catch (exception: Error) {
+              wrapped = wrapError(exception)
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginHostApi_$id.moveCamera", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            var wrapped = listOf<Any?>()
+            try {
+              val args = message as List<Any?>
+              val cameraPositionArg = args[0] as CameraPosition
+              val durationArg = args[1].let { if (it is Int) it.toLong() else it as? Long }
+              val cameraAnimationTypeArg = CameraAnimationType.ofRaw(args[2] as Int)!!
+              api.moveCamera(cameraPositionArg, durationArg, cameraAnimationTypeArg) {
+                reply.reply(wrapResult(null))
               }
             } catch (exception: Error) {
               wrapped = wrapError(exception)
@@ -266,50 +408,25 @@ interface PluginHostApi {
     }
   }
 }
-@Suppress("UNCHECKED_CAST")
-private object PluginFlutterApiCodec : StandardMessageCodec() {
-  override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
-    return when (type) {
-      128.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          LatLng.fromList(it)
-        }
-      }
-      else -> super.readValueOfType(type, buffer)
-    }
-  }
-  override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
-    when (value) {
-      is LatLng -> {
-        stream.write(128)
-        writeValue(stream, value.toList())
-      }
-      else -> super.writeValue(stream, value)
-    }
-  }
-}
-
 /** Generated class from Pigeon that represents Flutter messages that can be called from Kotlin. */
 @Suppress("UNCHECKED_CAST")
 class PluginFlutterApi(private val binaryMessenger: BinaryMessenger, private val id: Int?) {
   companion object {
     /** The codec used by PluginFlutterApi. */
     private val codec: MessageCodec<Any?> by lazy {
-      PluginFlutterApiCodec
+      StandardMessageCodec()
     }
   }
-  fun asy(msgArg: LatLng, callback: (LatLng) -> Unit) {
-    val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginFlutterApi_$id.asy", codec)
-    channel.send(listOf(msgArg)) {
-      val result = it as LatLng
-      callback(result)
-    }
-  }
-  fun sy(msgArg: LatLng, callback: (LatLng) -> Unit) {
-    val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginFlutterApi_$id.sy", codec)
-    channel.send(listOf(msgArg)) {
-      val result = it as LatLng
-      callback(result)
+  /**
+   * Коллбэк на изменение состояния камеры
+   * [cameraState] - индекс в перечислении [CameraState]
+   * TODO(kit): Изменить на enum после фикса
+   * https://github.com/flutter/flutter/issues/87307
+   */
+  fun onCameraStateChanged(cameraStateArg: Long, callback: () -> Unit) {
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginFlutterApi_$id.onCameraStateChanged", codec)
+    channel.send(listOf(cameraStateArg)) {
+      callback()
     }
   }
 }

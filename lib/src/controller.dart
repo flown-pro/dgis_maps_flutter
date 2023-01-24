@@ -32,4 +32,10 @@ class DGisMapController implements PluginFlutterApi {
     // TODO: implement sy
     throw UnimplementedError();
   }
+  
+  @override
+  void onCameraStateChanged(int cameraState) {
+    // TODO: implement onCameraStateChanged
+    throw UnimplementedError();
+  }
 }
