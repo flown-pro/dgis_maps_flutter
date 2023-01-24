@@ -127,11 +127,9 @@ class MarkerId {
 class MarkerUpdates {
   MarkerUpdates({
     this.toRemove = const [],
-    this.toChange = const [],
     this.toAdd = const [],
   });
   final List<Marker?> toRemove;
-  final List<Marker?> toChange;
   final List<Marker?> toAdd;
 }
 

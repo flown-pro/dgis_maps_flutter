@@ -222,24 +222,20 @@ struct MarkerId {
 /// Generated class from Pigeon that represents data sent in messages.
 struct MarkerUpdates {
   var toRemove: [Marker?]
-  var toChange: [Marker?]
   var toAdd: [Marker?]
 
   static func fromList(_ list: [Any?]) -> MarkerUpdates? {
     let toRemove = list[0] as! [Marker?]
-    let toChange = list[1] as! [Marker?]
-    let toAdd = list[2] as! [Marker?]
+    let toAdd = list[1] as! [Marker?]
 
     return MarkerUpdates(
       toRemove: toRemove,
-      toChange: toChange,
       toAdd: toAdd
     )
   }
   func toList() -> [Any?] {
     return [
       toRemove,
-      toChange,
       toAdd,
     ]
   }

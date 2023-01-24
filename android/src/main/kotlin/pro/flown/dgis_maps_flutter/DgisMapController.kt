@@ -89,21 +89,7 @@ class DgisMapController internal constructor(
     }
 
     override fun updateMarkers(markerUpdates: MarkerUpdates) {
-        var source = MyLocationMapObjectSource(
-            sdkContext,
-            MyLocationDirectionBehaviour.FOLLOW_SATELLITE_HEADING,
-            createSmoothMyLocationController()
-        )
-
-// Добавление источника данных на карту
-        map.addSource(source)
-
-       val source2 = GeometryMapObjectSource(sdkContext)
-//        source.removeAndAddObjects()
-//// Добавление источника данных на карту
-//        map.addSource(source)
-//
-        val mapObjectManager = MapObjectManager(map)
-        mapObjectManager.removeAndAddObjects()
+       val source2 = GeometryMapObjectSourceBuilder(sdkContext).createSource()
+//        source2.removeAndAddObjects()
     }
 }
