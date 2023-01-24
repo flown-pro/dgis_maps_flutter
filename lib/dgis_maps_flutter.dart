@@ -68,6 +68,7 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
         toAdd: widget.polylines.difference(_polylines),
         toRemove: _polylines.difference(widget.polylines),
       );
+      _polylines = widget.polylines.toSet();
     }
   }
 
