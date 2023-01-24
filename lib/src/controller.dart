@@ -1,4 +1,4 @@
-import 'method_channel/method_channel.g.dart';
+import 'package:dgis_maps_flutter/dgis_maps_flutter.dart';
 
 /// Controller for a single DGis instance running on the host platform.
 class DGisMapController {
@@ -11,11 +11,22 @@ class DGisMapController {
   final PluginHostApi _api;
 
   /// Получение текущей позиции карты [CameraPosition]
-  Future<DataCameraPosition> getCameraPosition() => _api.getCameraPosition();
+  Future<CameraPosition> getCameraPosition() async {
+    final dataCameraPosition = await _api.getCameraPosition();
+    return CameraPosition(
+      target: LatLng(
+        dataCameraPosition.target.latitude,
+        dataCameraPosition.target.longitude,
+      ),
+      bearing: dataCameraPosition.bearing,
+      tilt: dataCameraPosition.tilt,
+      zoom: dataCameraPosition.zoom,
+    );
+  }
 
   /// Переход камеры к выбранной точке [CameraPosition]
   Future<void> moveCamera({
-    required DataCameraPosition cameraPosition,
+    required CameraPosition cameraPosition,
     int? duration,
     DataCameraAnimationType cameraAnimationType = DataCameraAnimationType.def,
   }) =>
