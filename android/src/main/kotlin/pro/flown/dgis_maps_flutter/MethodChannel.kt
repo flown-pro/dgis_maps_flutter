@@ -67,6 +67,99 @@ data class LatLng (
   }
 }
 
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MarkerBitmap (
+  /** Байты изображения */
+  val bytes: ByteArray,
+  /**
+   * Ширина изображения,
+   * если null, используется значение по умолчанию,
+   * которое зависит от нативной реализации
+   */
+  val width: Double? = null,
+  /**
+   * Высота изображения,
+   * если null, используется значение по умолчанию,
+   * которое зависит от нативной реализации
+   */
+  val height: Double? = null
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): MarkerBitmap {
+      val bytes = list[0] as ByteArray
+      val width = list[1] as? Double
+      val height = list[2] as? Double
+      return MarkerBitmap(bytes, width, height)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      bytes,
+      width,
+      height,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class Marker (
+  /** Уникальный идентификатор маркера */
+  val markerId: MarkerId,
+  /**
+   * Изображение маркера
+   * Используется нативная реализация дефолтного маркера,
+   * если null
+   */
+  val bitmap: MarkerBitmap? = null,
+  /** Позиция маркера */
+  val position: LatLng,
+  /** Текст под маркером */
+  val infoText: String? = null
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): Marker {
+      val markerId = MarkerId.fromList(list[0] as List<Any?>)
+      val bitmap: MarkerBitmap? = (list[1] as? List<Any?>)?.let {
+        MarkerBitmap.fromList(it)
+      }
+      val position = LatLng.fromList(list[2] as List<Any?>)
+      val infoText = list[3] as? String
+      return Marker(markerId, bitmap, position, infoText)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      markerId?.toList(),
+      bitmap?.toList(),
+      position?.toList(),
+      infoText,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MarkerId (
+  val value: String
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): MarkerId {
+      val value = list[0] as String
+      return MarkerId(value)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      value,
+    )
+  }
+}
+
 @Suppress("UNCHECKED_CAST")
 private object PluginHostApiCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
@@ -74,6 +167,21 @@ private object PluginHostApiCodec : StandardMessageCodec() {
       128.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           LatLng.fromList(it)
+        }
+      }
+      129.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          Marker.fromList(it)
+        }
+      }
+      130.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MarkerBitmap.fromList(it)
+        }
+      }
+      131.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MarkerId.fromList(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -85,6 +193,18 @@ private object PluginHostApiCodec : StandardMessageCodec() {
         stream.write(128)
         writeValue(stream, value.toList())
       }
+      is Marker -> {
+        stream.write(129)
+        writeValue(stream, value.toList())
+      }
+      is MarkerBitmap -> {
+        stream.write(130)
+        writeValue(stream, value.toList())
+      }
+      is MarkerId -> {
+        stream.write(131)
+        writeValue(stream, value.toList())
+      }
       else -> super.writeValue(stream, value)
     }
   }
@@ -93,7 +213,7 @@ private object PluginHostApiCodec : StandardMessageCodec() {
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface PluginHostApi {
   fun asy(msg: LatLng, callback: (LatLng) -> Unit)
-  fun sy(msg: LatLng): LatLng
+  fun m(msg: Marker, callback: (Marker) -> Unit)
 
   companion object {
     /** The codec used by PluginHostApi. */
@@ -124,18 +244,20 @@ interface PluginHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginHostApi_$id.sy", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginHostApi_$id.m", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             var wrapped = listOf<Any?>()
             try {
               val args = message as List<Any?>
-              val msgArg = args[0] as LatLng
-              wrapped = listOf<Any?>(api.sy(msgArg))
+              val msgArg = args[0] as Marker
+              api.m(msgArg) {
+                reply.reply(wrapResult(it))
+              }
             } catch (exception: Error) {
               wrapped = wrapError(exception)
+              reply.reply(wrapped)
             }
-            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)

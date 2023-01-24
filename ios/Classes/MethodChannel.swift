@@ -68,11 +68,107 @@ struct LatLng {
   }
 }
 
+/// Generated class from Pigeon that represents data sent in messages.
+struct MarkerBitmap {
+  /// Байты изображения
+  var bytes: FlutterStandardTypedData
+  /// Ширина изображения,
+  /// если null, используется значение по умолчанию,
+  /// которое зависит от нативной реализации
+  var width: Double? = nil
+  /// Высота изображения,
+  /// если null, используется значение по умолчанию,
+  /// которое зависит от нативной реализации
+  var height: Double? = nil
+
+  static func fromList(_ list: [Any?]) -> MarkerBitmap? {
+    let bytes = list[0] as! FlutterStandardTypedData
+    let width = list[1] as? Double 
+    let height = list[2] as? Double 
+
+    return MarkerBitmap(
+      bytes: bytes,
+      width: width,
+      height: height
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      bytes,
+      width,
+      height,
+    ]
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct Marker {
+  /// Уникальный идентификатор маркера
+  var markerId: MarkerId
+  /// Изображение маркера
+  /// Используется нативная реализация дефолтного маркера,
+  /// если null
+  var bitmap: MarkerBitmap? = nil
+  /// Позиция маркера
+  var position: LatLng
+  /// Текст под маркером
+  var infoText: String? = nil
+
+  static func fromList(_ list: [Any?]) -> Marker? {
+    let markerId = MarkerId.fromList(list[0] as! [Any?])!
+    var bitmap: MarkerBitmap? = nil
+    if let bitmapList = list[1] as? [Any?] {
+      bitmap = MarkerBitmap.fromList(bitmapList)
+    }
+    let position = LatLng.fromList(list[2] as! [Any?])!
+    let infoText = list[3] as? String 
+
+    return Marker(
+      markerId: markerId,
+      bitmap: bitmap,
+      position: position,
+      infoText: infoText
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      markerId.toList(),
+      bitmap?.toList(),
+      position.toList(),
+      infoText,
+    ]
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MarkerId {
+  var value: String
+
+  static func fromList(_ list: [Any?]) -> MarkerId? {
+    let value = list[0] as! String
+
+    return MarkerId(
+      value: value
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      value,
+    ]
+  }
+}
+
 private class PluginHostApiCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
       case 128:
         return LatLng.fromList(self.readValue() as! [Any])
+      case 129:
+        return Marker.fromList(self.readValue() as! [Any])
+      case 130:
+        return MarkerBitmap.fromList(self.readValue() as! [Any])
+      case 131:
+        return MarkerId.fromList(self.readValue() as! [Any])
       default:
         return super.readValue(ofType: type)
     }
@@ -83,6 +179,15 @@ private class PluginHostApiCodecWriter: FlutterStandardWriter {
   override func writeValue(_ value: Any) {
     if let value = value as? LatLng {
       super.writeByte(128)
+      super.writeValue(value.toList())
+    } else if let value = value as? Marker {
+      super.writeByte(129)
+      super.writeValue(value.toList())
+    } else if let value = value as? MarkerBitmap {
+      super.writeByte(130)
+      super.writeValue(value.toList())
+    } else if let value = value as? MarkerId {
+      super.writeByte(131)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -107,7 +212,7 @@ class PluginHostApiCodec: FlutterStandardMessageCodec {
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol PluginHostApi {
   func asy(msg: LatLng, completion: @escaping (LatLng) -> Void)
-  func sy(msg: LatLng) -> LatLng
+  func m(msg: Marker, completion: @escaping (Marker) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -128,16 +233,17 @@ class PluginHostApiSetup {
     } else {
       asyChannel.setMessageHandler(nil)
     }
-    let syChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_$id.sy", binaryMessenger: binaryMessenger, codec: codec)
+    let mChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_$id.m", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      syChannel.setMessageHandler { message, reply in
+      mChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let msgArg = args[0] as! LatLng
-        let result = api.sy(msg: msgArg)
-        reply(wrapResult(result))
+        let msgArg = args[0] as! Marker
+        api.m(msg: msgArg) { result in
+          reply(wrapResult(result))
+        }
       }
     } else {
-      syChannel.setMessageHandler(nil)
+      mChannel.setMessageHandler(nil)
     }
   }
 }
