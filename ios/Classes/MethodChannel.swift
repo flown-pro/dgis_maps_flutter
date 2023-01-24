@@ -390,7 +390,7 @@ class PluginFlutterApi {
   /// [cameraState] - индекс в перечислении [CameraState]
   /// TODO(kit): Изменить на enum после фикса
   /// https://github.com/flutter/flutter/issues/87307
-  func onCameraStateChanged(cameraState cameraStateArg: Int32, completion: @escaping () -> Void) {
+  func onCameraStateChanged(cameraState cameraStateArg: CameraState, completion: @escaping () -> Void) {
     let channel = FlutterBasicMessageChannel(name: "pro.flown.PluginFlutterApi_\(id ?? 0).onCameraStateChanged", binaryMessenger: binaryMessenger)
     channel.sendMessage([cameraStateArg] as [Any?]) { _ in
       completion()

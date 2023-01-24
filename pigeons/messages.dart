@@ -167,7 +167,7 @@ abstract class PluginFlutterApi {
   /// [cameraState] - индекс в перечислении [CameraState]
   /// TODO(kit): Изменить на enum после фикса
   /// https://github.com/flutter/flutter/issues/87307
-  void onCameraStateChanged(int cameraState);
+  void onCameraStateChanged(CameraState cameraState);
 }
 
 /// Класс, используемый для генерации моделей,

@@ -415,7 +415,7 @@ abstract class PluginFlutterApi {
   /// [cameraState] - индекс в перечислении [CameraState]
   /// TODO(kit): Изменить на enum после фикса
   /// https://github.com/flutter/flutter/issues/87307
-  void onCameraStateChanged(int cameraState);
+  void onCameraStateChanged(CameraState cameraState);
 
   static void setup(PluginFlutterApi? api, {BinaryMessenger? binaryMessenger, int? id}) {
     {
@@ -429,9 +429,9 @@ abstract class PluginFlutterApi {
           assert(message != null,
           'Argument for pro.flown.PluginFlutterApi_$id.onCameraStateChanged was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final int? arg_cameraState = (args[0] as int?);
+          final CameraState? arg_cameraState = args[0] == null ? null : CameraState.values[args[0] as int];
           assert(arg_cameraState != null,
-              'Argument for pro.flown.PluginFlutterApi_$id.onCameraStateChanged was null, expected non-null int.');
+              'Argument for pro.flown.PluginFlutterApi_$id.onCameraStateChanged was null, expected non-null CameraState.');
           api.onCameraStateChanged(arg_cameraState!);
           return;
         });

@@ -440,7 +440,7 @@ class PluginFlutterApi(private val binaryMessenger: BinaryMessenger, private val
    * TODO(kit): Изменить на enum после фикса
    * https://github.com/flutter/flutter/issues/87307
    */
-  fun onCameraStateChanged(cameraStateArg: Long, callback: () -> Unit) {
+  fun onCameraStateChanged(cameraStateArg: CameraState, callback: () -> Unit) {
     val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginFlutterApi_$id.onCameraStateChanged", codec)
     channel.send(listOf(cameraStateArg)) {
       callback()
