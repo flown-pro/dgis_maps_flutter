@@ -54,6 +54,13 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Future<void> getCameraPosition() async {
+    final cameraPosition = await controller.getCameraPosition();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(cameraPosition.toString())));
+  }
+
   Future<void> addMarker() async {
     markers.add(Marker(
       markerId: MapObjectId('m${mId++}'),
@@ -99,21 +106,31 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Row(
             children: [
-              TextButton(
-                onPressed: moveCamera,
-                child: const Text('moveCamera'),
+              Expanded(
+                child: Wrap(
+                  children: [
+                    TextButton(
+                      onPressed: moveCamera,
+                      child: const Text('moveCamera'),
+                    ),
+                    TextButton(
+                      onPressed: getCameraPosition,
+                      child: const Text('getCameraPosition'),
+                    ),
+                    TextButton(
+                      onPressed: addMarker,
+                      child: const Text('addMarker'),
+                    ),
+                    TextButton(
+                      onPressed: addPolyline,
+                      child: const Text('addPolyline'),
+                    ),
+                  ],
+                ),
               ),
-              TextButton(
-                onPressed: addMarker,
-                child: const Text('addMarker'),
-              ),
-              TextButton(
-                onPressed: addPolyline,
-                child: const Text('addPolyline'),
-              ),
+              const SizedBox(width: 100),
             ],
           ),
-          const SizedBox(height: 52),
         ],
       ),
     );
