@@ -20,6 +20,7 @@ class DgisMapController internal constructor(
     private val sdkContext: ru.dgis.sdk.Context
     private val mapView: MapView
     private lateinit var map: Map
+    private lateinit var objectManager: MapObjectManager
     private val flutterApi = PluginFlutterApi(binaryMessenger, id)
 
     init {
@@ -45,6 +46,7 @@ class DgisMapController internal constructor(
 
     private fun init(map: Map) {
         this.map = map
+        objectManager = MapObjectManager(map)
 //
 //        imageFromAsset(sdkContext, "")
 //
@@ -88,23 +90,12 @@ class DgisMapController internal constructor(
     }
 
     override fun updateMarkers(markerUpdates: DataMarkerUpdates) {
-//        val source = MapObjectManager(map)
-//
-//        source.removeObjects(
-//            markerUpdates.toRemove.map { toMarker(it!!) }
-//        )
+        objectManager.removeObjects(
+            markerUpdates.toRemove.map { dataMarker2Marker(sdkContext, it!!) }
+        )
+        objectManager.addObjects(
+            markerUpdates.toAdd.map { dataMarker2Marker(sdkContext, it!!) }
+        )
     }
 
-//    private fun toMarker(marker: DataMarker): Marker {
-//
-//        return Marker(
-//            MarkerOptions(
-//                position = GeoPointWithElevation(
-//                    latitude = marker.position.latitude,
-//                    longitude = marker.position.longitude,
-//                ),
-//                icon = icon
-//            )
-//        )
-//    }
 }

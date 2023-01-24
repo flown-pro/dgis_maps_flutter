@@ -30,7 +30,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int i = 0;
+  int mId = 0;
   late DGisMapController controller;
+
+  Set<Marker> markers = {};
+
   void onMapCreated(DGisMapController controller) {
     this.controller = controller;
   }
@@ -48,6 +52,14 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Future<void> addMarker() async {
+    markers.add(Marker(
+      markerId: DataMarkerId(value: 'm${mId++}'),
+      position: LatLng(60.0 + mId, 30.0 + mId),
+    ));
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
               key: ValueKey(i),
               initialPosition: CameraPosition(target: LatLng(60, 30), zoom: 7),
               onMapCreated: onMapCreated,
-              // onCameraStateChanged:
+              markers: markers,
             ),
           ),
           Row(
@@ -71,7 +83,11 @@ class _MyHomePageState extends State<MyHomePage> {
               TextButton(
                 onPressed: moveCamera,
                 child: const Text('moveCamera'),
-              )
+              ),
+              TextButton(
+                onPressed: addMarker,
+                child: const Text('addMarker'),
+              ),
             ],
           ),
           const SizedBox(height: 52),

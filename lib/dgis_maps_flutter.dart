@@ -42,13 +42,11 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
 
   @override
   void didUpdateWidget(DGisMap oldWidget) {
-    if (oldWidget.markers != widget.markers) {
-      _updateMarkers(
-        toAdd: oldWidget.markers.difference(widget.markers),
-        toRemove: widget.markers.difference(oldWidget.markers),
-      );
-    }
     super.didUpdateWidget(oldWidget);
+    _updateMarkers(
+      toAdd: oldWidget.markers.difference(widget.markers),
+      toRemove: widget.markers.difference(oldWidget.markers),
+    );
   }
 
   void _updateMarkers({
