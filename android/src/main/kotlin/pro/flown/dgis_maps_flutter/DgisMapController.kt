@@ -5,6 +5,7 @@ import android.view.View
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.platform.PlatformView
 import ru.dgis.sdk.DGis
+import ru.dgis.sdk.coordinates.Bearing
 import ru.dgis.sdk.coordinates.GeoPoint
 import ru.dgis.sdk.map.*
 import ru.dgis.sdk.map.CameraPosition
@@ -64,32 +65,27 @@ class DgisMapController internal constructor(
 //        }
     }
 
-    override fun asy(msg: LatLng, callback: (LatLng) -> Unit) {
-        val newPos = LatLng(
-            map.camera.position.point.latitude.value + msg.latitude,
-            map.camera.position.point.longitude.value + msg.longitude
-        )
+    override fun getCameraPosition(callback: (pro.flown.dgis_maps_flutter.CameraPosition) -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun moveCamera(
+        cameraPosition: pro.flown.dgis_maps_flutter.CameraPosition,
+        duration: Long?,
+        cameraAnimationType: CameraAnimationType,
+        callback: () -> Unit
+    ) {
         map.camera.move(
-            map.camera.position.copy(
-                point = GeoPoint(
-                    newPos.latitude,
-                    newPos.longitude
-                )
+            CameraPosition(
+                point = GeoPoint(cameraPosition.target.latitude, cameraPosition.target.longitude),
+                zoom = Zoom(cameraPosition.zoom.toFloat()),
+                tilt = Tilt(cameraPosition.tilt.toFloat()),
+                bearing = Bearing(cameraPosition.bearing),
             )
-        ).onResult {
-            val pos = LatLng(
-                map.camera.position.point.latitude.value,
-                map.camera.position.point.longitude.value
-            )
-            callback(pos)
-        }
-
+        )
     }
 
-    fun sy(msg: LatLng): LatLng {
-//        TODO("Not yet implemented")
-        return LatLng(0.0, 0.0)
+    override fun updateMarkers(markerUpdates: MarkerUpdates) {
+        TODO("Not yet implemented")
     }
-
-    override fun m(msg: Marker, callback: () -> Unit) {}
 }

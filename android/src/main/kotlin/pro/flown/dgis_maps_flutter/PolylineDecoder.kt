@@ -1,3 +1,5 @@
+package pro.flown.dgis_maps_flutter
+
 import ru.dgis.sdk.coordinates.GeoPoint
 
 /**
@@ -22,8 +24,7 @@ class PolylineDecoder {
      * @return
      */
     fun decode(encoded: String, precision: Double): List<GeoPoint> {
-        val track: MutableList<GeoPoint> =
-            ArrayList<_root_ide_package_.ru.dgis.sdk.coordinates.GeoPoint>()
+        val track: MutableList<GeoPoint> = ArrayList()
         var index = 0
         var lat = 0
         var lng = 0

@@ -38,7 +38,7 @@ class _DGisMapState extends State<DGisMap> implements data.PluginFlutterApi {
   Future<void> onViewCreated(int id) async {
     final DGisMapController controller = await DGisMapController.init(id);
     data.PluginFlutterApi.setup(this, id: id);
-    _controller.complete(controller);
+    if (!_controller.isCompleted) _controller.complete(controller);
     final MapCreatedCallback? onMapCreated = widget.onMapCreated;
     if (onMapCreated != null) {
       onMapCreated(controller);
