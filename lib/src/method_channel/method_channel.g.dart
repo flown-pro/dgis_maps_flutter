@@ -60,12 +60,124 @@ class LatLng {
   }
 }
 
+class MarkerBitmap {
+  MarkerBitmap({
+    required this.bytes,
+    this.width,
+    this.height,
+  });
+
+  /// Байты изображения
+  Uint8List bytes;
+
+  /// Ширина изображения,
+  /// если null, используется значение по умолчанию,
+  /// которое зависит от нативной реализации
+  double? width;
+
+  /// Высота изображения,
+  /// если null, используется значение по умолчанию,
+  /// которое зависит от нативной реализации
+  double? height;
+
+  Object encode() {
+    return <Object?>[
+      bytes,
+      width,
+      height,
+    ];
+  }
+
+  static MarkerBitmap decode(Object result) {
+    result as List<Object?>;
+    return MarkerBitmap(
+      bytes: result[0]! as Uint8List,
+      width: result[1] as double?,
+      height: result[2] as double?,
+    );
+  }
+}
+
+class Marker {
+  Marker({
+    required this.markerId,
+    this.bitmap,
+    required this.position,
+    this.infoText,
+  });
+
+  /// Уникальный идентификатор маркера
+  MarkerId markerId;
+
+  /// Изображение маркера
+  /// Используется нативная реализация дефолтного маркера,
+  /// если null
+  MarkerBitmap? bitmap;
+
+  /// Позиция маркера
+  LatLng position;
+
+  /// Текст под маркером
+  String? infoText;
+
+  Object encode() {
+    return <Object?>[
+      markerId.encode(),
+      bitmap?.encode(),
+      position.encode(),
+      infoText,
+    ];
+  }
+
+  static Marker decode(Object result) {
+    result as List<Object?>;
+    return Marker(
+      markerId: MarkerId.decode(result[0]! as List<Object?>),
+      bitmap: result[1] != null
+          ? MarkerBitmap.decode(result[1]! as List<Object?>)
+          : null,
+      position: LatLng.decode(result[2]! as List<Object?>),
+      infoText: result[3] as String?,
+    );
+  }
+}
+
+class MarkerId {
+  MarkerId({
+    required this.value,
+  });
+
+  String value;
+
+  Object encode() {
+    return <Object?>[
+      value,
+    ];
+  }
+
+  static MarkerId decode(Object result) {
+    result as List<Object?>;
+    return MarkerId(
+      value: result[0]! as String,
+    );
+  }
+}
+
 class _PluginHostApiCodec extends StandardMessageCodec {
   const _PluginHostApiCodec();
   @override
   void writeValue(WriteBuffer buffer, Object? value) {
     if (value is LatLng) {
       buffer.putUint8(128);
+      writeValue(buffer, value.encode());
+    } else if (value is Marker) {
+      buffer.putUint8(129);
+      writeValue(buffer, value.encode());
+    } else if (value is MarkerBitmap) {
+      buffer.putUint8(130);
+      writeValue(buffer, value.encode());
+    } else if (value is MarkerId) {
+      buffer.putUint8(131);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -77,6 +189,15 @@ class _PluginHostApiCodec extends StandardMessageCodec {
     switch (type) {
       case 128:       
         return LatLng.decode(readValue(buffer)!);
+      
+      case 129:       
+        return Marker.decode(readValue(buffer)!);
+      
+      case 130:       
+        return MarkerBitmap.decode(readValue(buffer)!);
+      
+      case 131:       
+        return MarkerId.decode(readValue(buffer)!);
       
       default:
         return super.readValueOfType(type, buffer);
@@ -122,9 +243,9 @@ class PluginHostApi {
     }
   }
 
-  Future<LatLng> sy(LatLng arg_msg) async {
+  Future<Marker> m(Marker arg_msg) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'pro.flown.PluginHostApi_$id.sy', codec,
+        'pro.flown.PluginHostApi_$id.m', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_msg]) as List<Object?>?;
@@ -145,7 +266,7 @@ class PluginHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (replyList[0] as LatLng?)!;
+      return (replyList[0] as Marker?)!;
     }
   }
 }

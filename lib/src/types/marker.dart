@@ -1,41 +1,23 @@
-import 'package:flutter/foundation.dart';
+import '../method_channel/method_channel.g.dart' as data;
+import 'types.dart';
 
-import 'bitmap.dart';
-import 'location.dart';
-import 'maps_object.dart';
-
-/// Уникальный идентификатор маркера
-@immutable
-class MarkerId extends MapsObjectId<Marker> {
-  /// Creates an immutable identifier for a [Marker].
-  const MarkerId(String value) : super(value);
-}
-
-@immutable
-class Marker implements MapsObject<Marker> {
-  const Marker({
-    required this.markerId,
-    required this.position,
-    this.infoText,
-    this.bitmap = BitmapDescriptor.defaultMarker,
-  });
-
-  /// Уникальный идентификатор маркера
-  final MarkerId markerId;
-
-  /// Изображение маркера
-  final BitmapDescriptor bitmap;
-
-  /// Позиция маркера
-  final LatLng position;
-
-  /// Текст под маркером
-  final String? infoText;
+class Marker extends data.Marker {
+  Marker({
+    required data.MarkerId markerId,
+    required data.LatLng position,
+    String? infoText,
+    data.MarkerBitmap? bitmap,
+  }) : super(
+          markerId: markerId,
+          position: position,
+          infoText: infoText,
+          bitmap: bitmap,
+        );
 
   Marker copyWith({
     LatLng? position,
     String? infoText,
-    BitmapDescriptor? bitmap,
+    data.MarkerBitmap? bitmap,
   }) =>
       Marker(
         markerId: markerId,
@@ -43,27 +25,4 @@ class Marker implements MapsObject<Marker> {
         infoText: infoText ?? this.infoText,
         bitmap: bitmap ?? this.bitmap,
       );
-
-  @override
-  Marker clone() => copyWith();
-
-  @override
-  MapsObjectId<Marker> get mapsId => markerId;
-
-  @override
-  Object toJson() {
-    final Map<String, Object> json = <String, Object>{};
-
-    // void addIfPresent(String fieldName, Object? value) {
-    //   if (value != null) {
-    //     json[fieldName] = value;
-    //   }
-    // }
-
-    // addIfPresent('markerId', markerId);
-    // addIfPresent('bitmap', bitmap.toJson());
-    // addIfPresent('position', position.toJson());
-    // addIfPresent('infoText', infoText);
-    return json;
-  }
 }

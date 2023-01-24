@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../types/types.dart';
-import 'method_channel.g.dart';
+import 'method_channel.g.dart' hide Marker;
 
 class DGisMapsFlutterMethodChannel {
   static bool useAndroidViewSurface = false;
@@ -13,7 +13,7 @@ class DGisMapsFlutterMethodChannel {
   static Widget buildView(
     PlatformViewCreatedCallback onPlatformViewCreated, {
     required CameraPosition initialPosition,
-    MapObjects mapObjects = const MapObjects(),
+    Set<Marker> markers = const {},
     Map<String, dynamic> mapOptions = const <String, dynamic>{},
   }) {
     final creationParams = CreationParams(

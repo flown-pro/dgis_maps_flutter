@@ -1,5 +1,3 @@
-// ignore_for_file: unused_element
-
 import 'package:pigeon/pigeon.dart';
 
 @ConfigurePigeon(PigeonOptions(
@@ -25,12 +23,74 @@ class LatLng {
   final double longitude;
 }
 
+class MarkerBitmap {
+  const MarkerBitmap(
+    this.bytes, {
+    this.width,
+    this.height,
+  });
+
+  /// Байты изображения
+  final Uint8List bytes;
+
+  /// Ширина изображения,
+  /// если null, используется значение по умолчанию,
+  /// которое зависит от нативной реализации
+  final double? width;
+
+  /// Высота изображения,
+  /// если null, используется значение по умолчанию,
+  /// которое зависит от нативной реализации
+  final double? height;
+}
+
+class Marker {
+  const Marker({
+    required this.markerId,
+    required this.position,
+    this.infoText,
+    this.bitmap,
+  });
+
+  /// Уникальный идентификатор маркера
+  final MarkerId markerId;
+
+  /// Изображение маркера
+  /// Используется нативная реализация дефолтного маркера,
+  /// если null
+  final MarkerBitmap? bitmap;
+
+  /// Позиция маркера
+  final LatLng position;
+
+  /// Текст под маркером
+  final String? infoText;
+}
+
+class MarkerId {
+  const MarkerId(this.value);
+  final String value;
+}
+
+class MarkerUpdates {
+  MarkerUpdates({
+    this.toRemove = const {},
+    this.toChange = const {},
+    this.toAdd = const {},
+  });
+  final Set<Marker> toRemove;
+  final Set<Marker> toChange;
+  final Set<Marker> toAdd;
+}
+
 @HostApi()
 abstract class PluginHostApi {
   void _stub(CreationParams p1);
   @async
   LatLng asy(LatLng msg);
-  LatLng sy(LatLng msg);
+
+  @async
+  Marker m(Marker msg);
 }
 
 @FlutterApi()
