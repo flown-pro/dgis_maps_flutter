@@ -170,6 +170,8 @@ abstract class PluginFlutterApi {
   void onCameraStateChanged(int cameraState);
 }
 
+/// Класс, используемый для генерации моделей,
+/// которые не задекларированы в интерфейсе
 @FlutterApi()
 abstract class _Stub {
   CreationParams c1();
