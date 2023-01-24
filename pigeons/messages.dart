@@ -137,13 +137,6 @@ class MarkerUpdates {
 
 @HostApi()
 abstract class PluginHostApi {
-  void _stub(CreationParams p1);
-  @async
-  LatLng asy(LatLng msg);
-
-  @async
-  void m(Marker msg);
-
   /// Получение текущей позиции камеры
   ///
   /// Возвращает [CameraPosition]
@@ -161,6 +154,11 @@ abstract class PluginHostApi {
     int? duration,
     CameraAnimationType cameraAnimationType,
   );
+
+  /// Обновление маркеров
+  /// 
+  /// [markerUpdates] - объект с информацией об обновлении маркеров
+  void updateMarkers(MarkerUpdates markerUpdates);
 }
 
 @FlutterApi()
