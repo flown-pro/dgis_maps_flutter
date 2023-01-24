@@ -12,17 +12,21 @@ import 'src/types/types.dart';
 export 'src/types/types.dart';
 
 typedef MapCreatedCallback = void Function(DGisMapController controller);
+typedef CameraStateChangedCallback = void Function(
+    data.CameraState cameraState);
 
 class DGisMap extends StatefulWidget {
   const DGisMap({
     Key? key,
     this.onMapCreated,
+    this.onCameraStateChanged,
     required this.initialPosition,
   }) : super(key: key);
 
   final CameraPosition initialPosition;
 
   final MapCreatedCallback? onMapCreated;
+  final CameraStateChangedCallback? onCameraStateChanged;
 
   @override
   State<DGisMap> createState() => _DGisMapState();
@@ -50,7 +54,6 @@ class _DGisMapState extends State<DGisMap> implements data.PluginFlutterApi {
   }
 
   @override
-  void onCameraStateChanged(int cameraState) {
-    // widget.onCameraStateChanged(cameraState);
-  }
+  void onCameraStateChanged(data.CameraState cameraState) =>
+      widget.onCameraStateChanged?.call(cameraState);
 }
