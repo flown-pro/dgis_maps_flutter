@@ -132,7 +132,7 @@ class DataMarker {
   });
 
   /// Уникальный идентификатор маркера
-  DataMarkerId markerId;
+  DataMapObjectId markerId;
 
   /// Изображение маркера
   /// Используется нативная реализация дефолтного маркера,
@@ -157,7 +157,7 @@ class DataMarker {
   static DataMarker decode(Object result) {
     result as List<Object?>;
     return DataMarker(
-      markerId: DataMarkerId.decode(result[0]! as List<Object?>),
+      markerId: DataMapObjectId.decode(result[0]! as List<Object?>),
       bitmap: result[1] != null
           ? DataMarkerBitmap.decode(result[1]! as List<Object?>)
           : null,
@@ -208,8 +208,8 @@ class DataCameraPosition {
   }
 }
 
-class DataMarkerId {
-  DataMarkerId({
+class DataMapObjectId {
+  DataMapObjectId({
     required this.value,
   });
 
@@ -221,9 +221,9 @@ class DataMarkerId {
     ];
   }
 
-  static DataMarkerId decode(Object result) {
+  static DataMapObjectId decode(Object result) {
     result as List<Object?>;
-    return DataMarkerId(
+    return DataMapObjectId(
       value: result[0]! as String,
     );
   }
@@ -255,6 +255,74 @@ class DataMarkerUpdates {
   }
 }
 
+class DataPolylineUpdates {
+  DataPolylineUpdates({
+    required this.toRemove,
+    required this.toAdd,
+  });
+
+  List<DataPolyline?> toRemove;
+
+  List<DataPolyline?> toAdd;
+
+  Object encode() {
+    return <Object?>[
+      toRemove,
+      toAdd,
+    ];
+  }
+
+  static DataPolylineUpdates decode(Object result) {
+    result as List<Object?>;
+    return DataPolylineUpdates(
+      toRemove: (result[0] as List<Object?>?)!.cast<DataPolyline?>(),
+      toAdd: (result[1] as List<Object?>?)!.cast<DataPolyline?>(),
+    );
+  }
+}
+
+class DataPolyline {
+  DataPolyline({
+    required this.polylineId,
+    required this.points,
+    required this.width,
+    required this.color,
+    required this.erasedPart,
+  });
+
+  /// Уникальный идентификатор маркера
+  DataMapObjectId polylineId;
+
+  List<DataLatLng?> points;
+
+  double width;
+
+  int color;
+
+  double erasedPart;
+
+  Object encode() {
+    return <Object?>[
+      polylineId.encode(),
+      points,
+      width,
+      color,
+      erasedPart,
+    ];
+  }
+
+  static DataPolyline decode(Object result) {
+    result as List<Object?>;
+    return DataPolyline(
+      polylineId: DataMapObjectId.decode(result[0]! as List<Object?>),
+      points: (result[1] as List<Object?>?)!.cast<DataLatLng?>(),
+      width: result[2]! as double,
+      color: result[3]! as int,
+      erasedPart: result[4]! as double,
+    );
+  }
+}
+
 class _PluginHostApiCodec extends StandardMessageCodec {
   const _PluginHostApiCodec();
   @override
@@ -265,17 +333,26 @@ class _PluginHostApiCodec extends StandardMessageCodec {
     } else if (value is DataLatLng) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is DataMarker) {
+    } else if (value is DataLatLng) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is DataMarkerBitmap) {
+    } else if (value is DataMapObjectId) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is DataMarkerId) {
+    } else if (value is DataMarker) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is DataMarkerUpdates) {
+    } else if (value is DataMarkerBitmap) {
       buffer.putUint8(133);
+      writeValue(buffer, value.encode());
+    } else if (value is DataMarkerUpdates) {
+      buffer.putUint8(134);
+      writeValue(buffer, value.encode());
+    } else if (value is DataPolyline) {
+      buffer.putUint8(135);
+      writeValue(buffer, value.encode());
+    } else if (value is DataPolylineUpdates) {
+      buffer.putUint8(136);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -292,16 +369,25 @@ class _PluginHostApiCodec extends StandardMessageCodec {
         return DataLatLng.decode(readValue(buffer)!);
       
       case 130:       
-        return DataMarker.decode(readValue(buffer)!);
+        return DataLatLng.decode(readValue(buffer)!);
       
       case 131:       
-        return DataMarkerBitmap.decode(readValue(buffer)!);
+        return DataMapObjectId.decode(readValue(buffer)!);
       
       case 132:       
-        return DataMarkerId.decode(readValue(buffer)!);
+        return DataMarker.decode(readValue(buffer)!);
       
       case 133:       
+        return DataMarkerBitmap.decode(readValue(buffer)!);
+      
+      case 134:       
         return DataMarkerUpdates.decode(readValue(buffer)!);
+      
+      case 135:       
+        return DataPolyline.decode(readValue(buffer)!);
+      
+      case 136:       
+        return DataPolylineUpdates.decode(readValue(buffer)!);
       
       default:
         return super.readValueOfType(type, buffer);
@@ -386,6 +472,31 @@ class PluginHostApi {
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_markerUpdates]) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  /// Обновление полилайнов
+  ///
+  /// [polylineUpdates] - объект с информацией об обновлении полилайнов
+  Future<void> updatePolylines(DataPolylineUpdates arg_polylineUpdates) async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'pro.flown.PluginHostApi_$id.updatePolylines', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(<Object?>[arg_polylineUpdates]) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',

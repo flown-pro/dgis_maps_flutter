@@ -129,7 +129,7 @@ struct DataMarkerBitmap {
 /// Generated class from Pigeon that represents data sent in messages.
 struct DataMarker {
   /// Уникальный идентификатор маркера
-  var markerId: DataMarkerId
+  var markerId: DataMapObjectId
   /// Изображение маркера
   /// Используется нативная реализация дефолтного маркера,
   /// если null
@@ -140,7 +140,7 @@ struct DataMarker {
   var infoText: String? = nil
 
   static func fromList(_ list: [Any?]) -> DataMarker? {
-    let markerId = DataMarkerId.fromList(list[0] as! [Any?])!
+    let markerId = DataMapObjectId.fromList(list[0] as! [Any?])!
     var bitmap: DataMarkerBitmap? = nil
     if let bitmapList = list[1] as? [Any?] {
       bitmap = DataMarkerBitmap.fromList(bitmapList)
@@ -202,13 +202,13 @@ struct DataCameraPosition {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct DataMarkerId {
+struct DataMapObjectId {
   var value: String
 
-  static func fromList(_ list: [Any?]) -> DataMarkerId? {
+  static func fromList(_ list: [Any?]) -> DataMapObjectId? {
     let value = list[0] as! String
 
-    return DataMarkerId(
+    return DataMapObjectId(
       value: value
     )
   }
@@ -241,6 +241,63 @@ struct DataMarkerUpdates {
   }
 }
 
+/// Generated class from Pigeon that represents data sent in messages.
+struct DataPolylineUpdates {
+  var toRemove: [DataPolyline?]
+  var toAdd: [DataPolyline?]
+
+  static func fromList(_ list: [Any?]) -> DataPolylineUpdates? {
+    let toRemove = list[0] as! [DataPolyline?]
+    let toAdd = list[1] as! [DataPolyline?]
+
+    return DataPolylineUpdates(
+      toRemove: toRemove,
+      toAdd: toAdd
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      toRemove,
+      toAdd,
+    ]
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct DataPolyline {
+  /// Уникальный идентификатор маркера
+  var polylineId: DataMapObjectId
+  var points: [DataLatLng?]
+  var width: Double
+  var color: Int32
+  var erasedPart: Double
+
+  static func fromList(_ list: [Any?]) -> DataPolyline? {
+    let polylineId = DataMapObjectId.fromList(list[0] as! [Any?])!
+    let points = list[1] as! [DataLatLng?]
+    let width = list[2] as! Double
+    let color = list[3] as! Int32
+    let erasedPart = list[4] as! Double
+
+    return DataPolyline(
+      polylineId: polylineId,
+      points: points,
+      width: width,
+      color: color,
+      erasedPart: erasedPart
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      polylineId.toList(),
+      points,
+      width,
+      color,
+      erasedPart,
+    ]
+  }
+}
+
 private class PluginHostApiCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
@@ -249,13 +306,19 @@ private class PluginHostApiCodecReader: FlutterStandardReader {
       case 129:
         return DataLatLng.fromList(self.readValue() as! [Any])
       case 130:
-        return DataMarker.fromList(self.readValue() as! [Any])
+        return DataLatLng.fromList(self.readValue() as! [Any])
       case 131:
-        return DataMarkerBitmap.fromList(self.readValue() as! [Any])
+        return DataMapObjectId.fromList(self.readValue() as! [Any])
       case 132:
-        return DataMarkerId.fromList(self.readValue() as! [Any])
+        return DataMarker.fromList(self.readValue() as! [Any])
       case 133:
+        return DataMarkerBitmap.fromList(self.readValue() as! [Any])
+      case 134:
         return DataMarkerUpdates.fromList(self.readValue() as! [Any])
+      case 135:
+        return DataPolyline.fromList(self.readValue() as! [Any])
+      case 136:
+        return DataPolylineUpdates.fromList(self.readValue() as! [Any])
       default:
         return super.readValue(ofType: type)
     }
@@ -270,17 +333,26 @@ private class PluginHostApiCodecWriter: FlutterStandardWriter {
     } else if let value = value as? DataLatLng {
       super.writeByte(129)
       super.writeValue(value.toList())
-    } else if let value = value as? DataMarker {
+    } else if let value = value as? DataLatLng {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? DataMarkerBitmap {
+    } else if let value = value as? DataMapObjectId {
       super.writeByte(131)
       super.writeValue(value.toList())
-    } else if let value = value as? DataMarkerId {
+    } else if let value = value as? DataMarker {
       super.writeByte(132)
       super.writeValue(value.toList())
-    } else if let value = value as? DataMarkerUpdates {
+    } else if let value = value as? DataMarkerBitmap {
       super.writeByte(133)
+      super.writeValue(value.toList())
+    } else if let value = value as? DataMarkerUpdates {
+      super.writeByte(134)
+      super.writeValue(value.toList())
+    } else if let value = value as? DataPolyline {
+      super.writeByte(135)
+      super.writeValue(value.toList())
+    } else if let value = value as? DataPolylineUpdates {
+      super.writeByte(136)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -318,6 +390,10 @@ protocol PluginHostApi {
   ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров
   func updateMarkers(markerUpdates: DataMarkerUpdates)
+  /// Обновление полилайнов
+  ///
+  /// [polylineUpdates] - объект с информацией об обновлении полилайнов
+  func updatePolylines(polylineUpdates: DataPolylineUpdates)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -371,6 +447,20 @@ class PluginHostApiSetup {
       }
     } else {
       updateMarkersChannel.setMessageHandler(nil)
+    }
+    /// Обновление полилайнов
+    ///
+    /// [polylineUpdates] - объект с информацией об обновлении полилайнов
+    let updatePolylinesChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id).updatePolylines", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      updatePolylinesChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let polylineUpdatesArg = args[0] as! DataPolylineUpdates
+        api.updatePolylines(polylineUpdates: polylineUpdatesArg)
+        reply(wrapResult(nil))
+      }
+    } else {
+      updatePolylinesChannel.setMessageHandler(nil)
     }
   }
 }

@@ -3,7 +3,7 @@ import 'types.dart';
 
 class Marker extends DataMarker {
   Marker({
-    required DataMarkerId markerId,
+    required DataMapObjectId markerId,
     required DataLatLng position,
     String? infoText,
     DataMarkerBitmap? bitmap,

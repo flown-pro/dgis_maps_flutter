@@ -17,12 +17,14 @@ class DataCreationParams {
   final double zoom;
 }
 
+// TODO(kit): Documentation
 class DataLatLng {
   const DataLatLng(this.latitude, this.longitude);
   final double latitude;
   final double longitude;
 }
 
+// TODO(kit): Documentation
 class DataMarkerBitmap {
   const DataMarkerBitmap(
     this.bytes, {
@@ -44,6 +46,7 @@ class DataMarkerBitmap {
   final double? height;
 }
 
+// TODO(kit): Documentation
 class DataMarker {
   const DataMarker({
     required this.markerId,
@@ -53,7 +56,7 @@ class DataMarker {
   });
 
   /// Уникальный идентификатор маркера
-  final DataMarkerId markerId;
+  final DataMapObjectId markerId;
 
   /// Изображение маркера
   /// Используется нативная реализация дефолтного маркера,
@@ -119,11 +122,13 @@ class DataCameraPosition {
   final double zoom;
 }
 
-class DataMarkerId {
-  const DataMarkerId(this.value);
+// TODO(kit): Documentation
+class DataMapObjectId {
+  const DataMapObjectId(this.value);
   final String value;
 }
 
+// TODO(kit): Documentation
 class DataMarkerUpdates {
   DataMarkerUpdates({
     this.toRemove = const [],
@@ -131,6 +136,29 @@ class DataMarkerUpdates {
   });
   final List<DataMarker?> toRemove;
   final List<DataMarker?> toAdd;
+}
+
+// TODO(kit): Documentation
+class DataPolylineUpdates {
+  DataPolylineUpdates({
+    this.toRemove = const [],
+    this.toAdd = const [],
+  });
+  final List<DataPolyline?> toRemove;
+  final List<DataPolyline?> toAdd;
+}
+
+// TODO(kit): Documentation
+class DataPolyline {
+  DataPolyline(
+      this.points, this.width, this.color, this.erasedPart, this.polylineId);
+
+  /// Уникальный идентификатор маркера
+  final DataMapObjectId polylineId;
+  final List<DataLatLng?> points;
+  final double width;
+  final int color;
+  final double erasedPart;
 }
 
 @HostApi()
@@ -157,6 +185,11 @@ abstract class PluginHostApi {
   ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров
   void updateMarkers(DataMarkerUpdates markerUpdates);
+
+  /// Обновление полилайнов
+  ///
+  /// [polylineUpdates] - объект с информацией об обновлении полилайнов
+  void updatePolylines(DataPolylineUpdates polylineUpdates);
 }
 
 @FlutterApi()

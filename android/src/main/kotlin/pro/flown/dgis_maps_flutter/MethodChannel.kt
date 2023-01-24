@@ -149,7 +149,7 @@ data class DataMarkerBitmap (
 /** Generated class from Pigeon that represents data sent in messages. */
 data class DataMarker (
   /** Уникальный идентификатор маркера */
-  val markerId: DataMarkerId,
+  val markerId: DataMapObjectId,
   /**
    * Изображение маркера
    * Используется нативная реализация дефолтного маркера,
@@ -165,7 +165,7 @@ data class DataMarker (
   companion object {
     @Suppress("UNCHECKED_CAST")
     fun fromList(list: List<Any?>): DataMarker {
-      val markerId = DataMarkerId.fromList(list[0] as List<Any?>)
+      val markerId = DataMapObjectId.fromList(list[0] as List<Any?>)
       val bitmap: DataMarkerBitmap? = (list[1] as? List<Any?>)?.let {
         DataMarkerBitmap.fromList(it)
       }
@@ -221,15 +221,15 @@ data class DataCameraPosition (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class DataMarkerId (
+data class DataMapObjectId (
   val value: String
 
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): DataMarkerId {
+    fun fromList(list: List<Any?>): DataMapObjectId {
       val value = list[0] as String
-      return DataMarkerId(value)
+      return DataMapObjectId(value)
     }
   }
   fun toList(): List<Any?> {
@@ -261,6 +261,60 @@ data class DataMarkerUpdates (
   }
 }
 
+/** Generated class from Pigeon that represents data sent in messages. */
+data class DataPolylineUpdates (
+  val toRemove: List<DataPolyline?>,
+  val toAdd: List<DataPolyline?>
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): DataPolylineUpdates {
+      val toRemove = list[0] as List<DataPolyline?>
+      val toAdd = list[1] as List<DataPolyline?>
+      return DataPolylineUpdates(toRemove, toAdd)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      toRemove,
+      toAdd,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class DataPolyline (
+  /** Уникальный идентификатор маркера */
+  val polylineId: DataMapObjectId,
+  val points: List<DataLatLng?>,
+  val width: Double,
+  val color: Long,
+  val erasedPart: Double
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): DataPolyline {
+      val polylineId = DataMapObjectId.fromList(list[0] as List<Any?>)
+      val points = list[1] as List<DataLatLng?>
+      val width = list[2] as Double
+      val color = list[3].let { if (it is Int) it.toLong() else it as Long }
+      val erasedPart = list[4] as Double
+      return DataPolyline(polylineId, points, width, color, erasedPart)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      polylineId?.toList(),
+      points,
+      width,
+      color,
+      erasedPart,
+    )
+  }
+}
+
 @Suppress("UNCHECKED_CAST")
 private object PluginHostApiCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
@@ -277,22 +331,37 @@ private object PluginHostApiCodec : StandardMessageCodec() {
       }
       130.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataMarker.fromList(it)
+          DataLatLng.fromList(it)
         }
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataMarkerBitmap.fromList(it)
+          DataMapObjectId.fromList(it)
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataMarkerId.fromList(it)
+          DataMarker.fromList(it)
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
+          DataMarkerBitmap.fromList(it)
+        }
+      }
+      134.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
           DataMarkerUpdates.fromList(it)
+        }
+      }
+      135.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          DataPolyline.fromList(it)
+        }
+      }
+      136.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          DataPolylineUpdates.fromList(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -308,20 +377,32 @@ private object PluginHostApiCodec : StandardMessageCodec() {
         stream.write(129)
         writeValue(stream, value.toList())
       }
-      is DataMarker -> {
+      is DataLatLng -> {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is DataMarkerBitmap -> {
+      is DataMapObjectId -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is DataMarkerId -> {
+      is DataMarker -> {
         stream.write(132)
         writeValue(stream, value.toList())
       }
-      is DataMarkerUpdates -> {
+      is DataMarkerBitmap -> {
         stream.write(133)
+        writeValue(stream, value.toList())
+      }
+      is DataMarkerUpdates -> {
+        stream.write(134)
+        writeValue(stream, value.toList())
+      }
+      is DataPolyline -> {
+        stream.write(135)
+        writeValue(stream, value.toList())
+      }
+      is DataPolylineUpdates -> {
+        stream.write(136)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -351,6 +432,12 @@ interface PluginHostApi {
    * [markerUpdates] - объект с информацией об обновлении маркеров
    */
   fun updateMarkers(markerUpdates: DataMarkerUpdates)
+  /**
+   * Обновление полилайнов
+   *
+   * [polylineUpdates] - объект с информацией об обновлении полилайнов
+   */
+  fun updatePolylines(polylineUpdates: DataPolylineUpdates)
 
   companion object {
     /** The codec used by PluginHostApi. */
@@ -409,6 +496,25 @@ interface PluginHostApi {
               val args = message as List<Any?>
               val markerUpdatesArg = args[0] as DataMarkerUpdates
               api.updateMarkers(markerUpdatesArg)
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Error) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginHostApi_$id.updatePolylines", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            var wrapped = listOf<Any?>()
+            try {
+              val args = message as List<Any?>
+              val polylineUpdatesArg = args[0] as DataPolylineUpdates
+              api.updatePolylines(polylineUpdatesArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Error) {
               wrapped = wrapError(exception)
