@@ -2,31 +2,16 @@ import 'method_channel/method_channel.g.dart';
 
 /// Controller for a single DGis instance running on the host platform.
 class DGisMapController {
-  DGisMapController({
+  DGisMapController(
+    this._api, {
     required this.mapId,
   });
 
   final int mapId;
-  late final PluginHostApi api = PluginHostApi(id: mapId);
-
-  /// Добавление маркеров [Marker] на карту
-  Future<void> addMarkers(List<Marker> markers) => api.updateMarkers(
-        MarkerUpdates(
-          toRemove: [],
-          toAdd: markers,
-        ),
-      );
-
-  /// Удаление маркеров [Marker] с карты
-  Future<void> removeMarkers(List<Marker> markers) => api.updateMarkers(
-        MarkerUpdates(
-          toRemove: markers,
-          toAdd: [],
-        ),
-      );
+  final PluginHostApi _api;
 
   /// Получение текущей позиции карты [CameraPosition]
-  Future<CameraPosition> getCameraPosition() => api.getCameraPosition();
+  Future<CameraPosition> getCameraPosition() => _api.getCameraPosition();
 
   /// Переход камеры к выбранной точке [CameraPosition]
   Future<void> moveCamera({
@@ -34,5 +19,5 @@ class DGisMapController {
     int? duration,
     CameraAnimationType cameraAnimationType = CameraAnimationType.def,
   }) =>
-      api.moveCamera(cameraPosition, duration, cameraAnimationType);
+      _api.moveCamera(cameraPosition, duration, cameraAnimationType);
 }

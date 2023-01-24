@@ -21,6 +21,7 @@ class DGisMap extends StatefulWidget {
   const DGisMap({
     Key? key,
     this.onMapCreated,
+    this.markers = const {},
     this.onCameraStateChanged,
     required this.initialPosition,
   }) : super(key: key);
@@ -28,6 +29,9 @@ class DGisMap extends StatefulWidget {
   final CameraPosition initialPosition;
 
   final MapCreatedCallback? onMapCreated;
+
+  final Set<Marker> markers;
+
   final CameraStateChangedCallback? onCameraStateChanged;
 
   @override
@@ -36,9 +40,33 @@ class DGisMap extends StatefulWidget {
 
 class _DGisMapState extends State<DGisMap> implements data.PluginFlutterApi {
   final _controller = Completer<DGisMapController>();
+  late final data.PluginHostApi api;
+
+  @override
+  void didUpdateWidget(DGisMap oldWidget) {
+    if (oldWidget.markers != widget.markers) {
+      _updateMarkers(
+        toAdd: oldWidget.markers.difference(widget.markers),
+        toRemove: widget.markers.difference(oldWidget.markers),
+      );
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  void _updateMarkers({
+    required Set<Marker> toAdd,
+    required Set<Marker> toRemove,
+  }) =>
+      api.updateMarkers(
+        data.MarkerUpdates(
+          toRemove: toRemove.toList(),
+          toAdd: toAdd.toList(),
+        ),
+      );
 
   Future<void> onViewCreated(int id) async {
-    final controller = DGisMapController(mapId: id);
+    api = data.PluginHostApi(id: id);
+    final controller = DGisMapController(api, mapId: id);
     data.PluginFlutterApi.setup(this, id: id);
     if (!_controller.isCompleted) _controller.complete(controller);
     final MapCreatedCallback? onMapCreated = widget.onMapCreated;
