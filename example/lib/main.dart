@@ -54,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> addMarker() async {
     markers.add(Marker(
-      markerId: DataMarkerId(value: 'm${mId++}'),
+      markerId: DataMapObjectId(value: 'm${mId++}'),
       position: LatLng(60.0 + mId, 30.0 + mId),
       infoText: 'm${mId++}',
     ));

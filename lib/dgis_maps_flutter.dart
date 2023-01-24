@@ -2,6 +2,7 @@ library dgis_maps_flutter;
 
 import 'dart:async';
 
+import 'package:dgis_maps_flutter/src/types/polyline.dart';
 import 'package:flutter/widgets.dart';
 
 import 'src/controller.dart';
@@ -20,6 +21,7 @@ class DGisMap extends StatefulWidget {
     Key? key,
     this.onMapCreated,
     this.markers = const {},
+    this.polylines = const {},
     this.onCameraStateChanged,
     required this.initialPosition,
   }) : super(key: key);
@@ -29,6 +31,7 @@ class DGisMap extends StatefulWidget {
   final MapCreatedCallback? onMapCreated;
 
   final Set<Marker> markers;
+  final Set<Polyline> polylines;
 
   final CameraStateChangedCallback? onCameraStateChanged;
 
@@ -41,10 +44,12 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
   late final PluginHostApi api;
 
   Set<Marker> _markers = const {};
+  Set<Polyline> _polylines = const {};
 
   @override
   void initState() {
     _markers = widget.markers.toSet();
+    _polylines = widget.polylines.toSet();
     super.initState();
   }
 
@@ -58,6 +63,12 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
       );
       _markers = widget.markers.toSet();
     }
+    if (_polylines != widget.polylines) {
+      _updatePolylines(
+        toAdd: widget.polylines.difference(_polylines),
+        toRemove: _polylines.difference(widget.polylines),
+      );
+    }
   }
 
   void _updateMarkers({
@@ -66,6 +77,17 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
   }) =>
       api.updateMarkers(
         DataMarkerUpdates(
+          toRemove: toRemove.toList(),
+          toAdd: toAdd.toList(),
+        ),
+      );
+
+  void _updatePolylines({
+    required Set<Polyline> toAdd,
+    required Set<Polyline> toRemove,
+  }) =>
+      api.updatePolylines(
+        DataPolylineUpdates(
           toRemove: toRemove.toList(),
           toAdd: toAdd.toList(),
         ),
