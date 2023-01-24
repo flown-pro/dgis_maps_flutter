@@ -36,18 +36,18 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> onAsyPressed() async {
-    final newPos = await controller.api.asy(LatLng(1, 1));
-    // ignore: use_build_context_synchronously
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.fixed,
-        duration: const Duration(seconds: 1),
-        dismissDirection: DismissDirection.horizontal,
-        content: Text(
-          newPos.encode().toString(),
-        ),
-      ),
-    );
+    // final newPos = await controller.api.asy(LatLng(1, 1));
+    // // ignore: use_build_context_synchronously
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(
+    //     behavior: SnackBarBehavior.fixed,
+    //     duration: const Duration(seconds: 1),
+    //     dismissDirection: DismissDirection.horizontal,
+    //     content: Text(
+    //       newPos.encode().toString(),
+    //     ),
+    //   ),
+    // );
   }
 
   @override
@@ -65,6 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
               key: ValueKey(i),
               initialPosition: CameraPosition(target: LatLng(60, 30), zoom: 7),
               onMapCreated: onMapCreated,
+              // onCameraStateChanged:
             ),
           ),
           Row(

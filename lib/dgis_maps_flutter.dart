@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 
 import 'src/controller.dart';
 import 'src/method_channel/dgis_maps_flutter_method_channel.dart';
+import 'src/method_channel/method_channel.g.dart' as data;
 import 'src/types/types.dart';
 
 export 'src/types/types.dart';
@@ -27,14 +28,12 @@ class DGisMap extends StatefulWidget {
   State<DGisMap> createState() => _DGisMapState();
 }
 
-class _DGisMapState extends State<DGisMap> {
+class _DGisMapState extends State<DGisMap> implements data.PluginFlutterApi {
   final _controller = Completer<DGisMapController>();
 
   Future<void> onViewCreated(int id) async {
-    final DGisMapController controller = await DGisMapController.init(
-      id,
-      // this,
-    );
+    final DGisMapController controller = await DGisMapController.init(id);
+    data.PluginFlutterApi.setup(this, id: id);
     _controller.complete(controller);
     final MapCreatedCallback? onMapCreated = widget.onMapCreated;
     if (onMapCreated != null) {
@@ -48,5 +47,10 @@ class _DGisMapState extends State<DGisMap> {
       onViewCreated,
       initialPosition: widget.initialPosition,
     );
+  }
+
+  @override
+  void onCameraStateChanged(int cameraState) {
+    // widget.onCameraStateChanged(cameraState);
   }
 }

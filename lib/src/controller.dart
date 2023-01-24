@@ -1,7 +1,7 @@
 import 'method_channel/method_channel.g.dart';
 
 /// Controller for a single GoogleMap instance running on the host platform.
-class DGisMapController implements PluginFlutterApi {
+class DGisMapController {
   DGisMapController._(
       // this._googleMapState,
       {
@@ -9,7 +9,6 @@ class DGisMapController implements PluginFlutterApi {
   });
 
   final int mapId;
-
   late final PluginHostApi api = PluginHostApi(id: mapId);
 
   static Future<DGisMapController> init(
@@ -19,23 +18,5 @@ class DGisMapController implements PluginFlutterApi {
     return DGisMapController._(
       mapId: id,
     );
-  }
-
-  @override
-  Future<LatLng> asy(LatLng msg) {
-    // TODO: implement asy
-    throw UnimplementedError();
-  }
-
-  @override
-  LatLng sy(LatLng msg) {
-    // TODO: implement sy
-    throw UnimplementedError();
-  }
-  
-  @override
-  void onCameraStateChanged(int cameraState) {
-    // TODO: implement onCameraStateChanged
-    throw UnimplementedError();
   }
 }

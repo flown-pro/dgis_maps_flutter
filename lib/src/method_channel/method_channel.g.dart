@@ -229,6 +229,37 @@ class MarkerId {
   }
 }
 
+class MarkerUpdates {
+  MarkerUpdates({
+    required this.toRemove,
+    required this.toChange,
+    required this.toAdd,
+  });
+
+  List<Marker?> toRemove;
+
+  List<Marker?> toChange;
+
+  List<Marker?> toAdd;
+
+  Object encode() {
+    return <Object?>[
+      toRemove,
+      toChange,
+      toAdd,
+    ];
+  }
+
+  static MarkerUpdates decode(Object result) {
+    result as List<Object?>;
+    return MarkerUpdates(
+      toRemove: (result[0] as List<Object?>?)!.cast<Marker?>(),
+      toChange: (result[1] as List<Object?>?)!.cast<Marker?>(),
+      toAdd: (result[2] as List<Object?>?)!.cast<Marker?>(),
+    );
+  }
+}
+
 class _PluginHostApiCodec extends StandardMessageCodec {
   const _PluginHostApiCodec();
   @override
@@ -247,6 +278,9 @@ class _PluginHostApiCodec extends StandardMessageCodec {
       writeValue(buffer, value.encode());
     } else if (value is MarkerId) {
       buffer.putUint8(132);
+      writeValue(buffer, value.encode());
+    } else if (value is MarkerUpdates) {
+      buffer.putUint8(133);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -271,6 +305,9 @@ class _PluginHostApiCodec extends StandardMessageCodec {
       case 132:       
         return MarkerId.decode(readValue(buffer)!);
       
+      case 133:       
+        return MarkerUpdates.decode(readValue(buffer)!);
+      
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -287,55 +324,6 @@ class PluginHostApi {
   final int? id;
 
   static const MessageCodec<Object?> codec = _PluginHostApiCodec();
-
-  Future<LatLng> asy(LatLng arg_msg) async {
-    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'pro.flown.PluginHostApi_$id.asy', codec,
-        binaryMessenger: _binaryMessenger);
-    final List<Object?>? replyList =
-        await channel.send(<Object?>[arg_msg]) as List<Object?>?;
-    if (replyList == null) {
-      throw PlatformException(
-        code: 'channel-error',
-        message: 'Unable to establish connection on channel.',
-      );
-    } else if (replyList.length > 1) {
-      throw PlatformException(
-        code: replyList[0]! as String,
-        message: replyList[1] as String?,
-        details: replyList[2],
-      );
-    } else if (replyList[0] == null) {
-      throw PlatformException(
-        code: 'null-error',
-        message: 'Host platform returned null value for non-null return value.',
-      );
-    } else {
-      return (replyList[0] as LatLng?)!;
-    }
-  }
-
-  Future<void> m(Marker arg_msg) async {
-    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'pro.flown.PluginHostApi_$id.m', codec,
-        binaryMessenger: _binaryMessenger);
-    final List<Object?>? replyList =
-        await channel.send(<Object?>[arg_msg]) as List<Object?>?;
-    if (replyList == null) {
-      throw PlatformException(
-        code: 'channel-error',
-        message: 'Unable to establish connection on channel.',
-      );
-    } else if (replyList.length > 1) {
-      throw PlatformException(
-        code: replyList[0]! as String,
-        message: replyList[1] as String?,
-        details: replyList[2],
-      );
-    } else {
-      return;
-    }
-  }
 
   /// Получение текущей позиции камеры
   ///
@@ -378,6 +366,31 @@ class PluginHostApi {
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_cameraPosition, arg_duration, arg_cameraAnimationType.index]) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  /// Обновление маркеров
+  ///
+  /// [markerUpdates] - объект с информацией об обновлении маркеров
+  Future<void> updateMarkers(MarkerUpdates arg_markerUpdates) async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'pro.flown.PluginHostApi_$id.updateMarkers', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(<Object?>[arg_markerUpdates]) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',

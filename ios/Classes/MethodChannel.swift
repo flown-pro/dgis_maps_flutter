@@ -219,6 +219,32 @@ struct MarkerId {
   }
 }
 
+/// Generated class from Pigeon that represents data sent in messages.
+struct MarkerUpdates {
+  var toRemove: [Marker?]
+  var toChange: [Marker?]
+  var toAdd: [Marker?]
+
+  static func fromList(_ list: [Any?]) -> MarkerUpdates? {
+    let toRemove = list[0] as! [Marker?]
+    let toChange = list[1] as! [Marker?]
+    let toAdd = list[2] as! [Marker?]
+
+    return MarkerUpdates(
+      toRemove: toRemove,
+      toChange: toChange,
+      toAdd: toAdd
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      toRemove,
+      toChange,
+      toAdd,
+    ]
+  }
+}
+
 private class PluginHostApiCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
@@ -232,6 +258,8 @@ private class PluginHostApiCodecReader: FlutterStandardReader {
         return MarkerBitmap.fromList(self.readValue() as! [Any])
       case 132:
         return MarkerId.fromList(self.readValue() as! [Any])
+      case 133:
+        return MarkerUpdates.fromList(self.readValue() as! [Any])
       default:
         return super.readValue(ofType: type)
     }
@@ -255,6 +283,9 @@ private class PluginHostApiCodecWriter: FlutterStandardWriter {
     } else if let value = value as? MarkerId {
       super.writeByte(132)
       super.writeValue(value.toList())
+    } else if let value = value as? MarkerUpdates {
+      super.writeByte(133)
+      super.writeValue(value.toList())
     } else {
       super.writeValue(value)
     }
@@ -277,8 +308,6 @@ class PluginHostApiCodec: FlutterStandardMessageCodec {
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol PluginHostApi {
-  func asy(msg: LatLng, completion: @escaping (LatLng) -> Void)
-  func m(msg: Marker, completion: @escaping () -> Void)
   /// Получение текущей позиции камеры
   ///
   /// Возвращает [CameraPosition]
@@ -289,6 +318,10 @@ protocol PluginHostApi {
   /// если не указана, используется нативное значение
   /// [cameraAnimationType] - тип анимации
   func moveCamera(cameraPosition: CameraPosition, duration: Int32?, cameraAnimationType: CameraAnimationType, completion: @escaping () -> Void)
+  /// Обновление маркеров
+  ///
+  /// [markerUpdates] - объект с информацией об обновлении маркеров
+  func updateMarkers(markerUpdates: MarkerUpdates)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -297,30 +330,6 @@ class PluginHostApiSetup {
   static var codec: FlutterStandardMessageCodec { PluginHostApiCodec.shared }
   /// Sets up an instance of `PluginHostApi` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: PluginHostApi?, id: Int64?) {
-    let asyChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id ?? 0).asy", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      asyChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let msgArg = args[0] as! LatLng
-        api.asy(msg: msgArg) { result in
-          reply(wrapResult(result))
-        }
-      }
-    } else {
-      asyChannel.setMessageHandler(nil)
-    }
-    let mChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id ?? 0).m", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      mChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let msgArg = args[0] as! Marker
-        api.m(msg: msgArg) {
-          reply(wrapResult(nil))
-        }
-      }
-    } else {
-      mChannel.setMessageHandler(nil)
-    }
     /// Получение текущей позиции камеры
     ///
     /// Возвращает [CameraPosition]
@@ -352,6 +361,20 @@ class PluginHostApiSetup {
       }
     } else {
       moveCameraChannel.setMessageHandler(nil)
+    }
+    /// Обновление маркеров
+    ///
+    /// [markerUpdates] - объект с информацией об обновлении маркеров
+    let updateMarkersChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id ?? 0).updateMarkers", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      updateMarkersChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let markerUpdatesArg = args[0] as! MarkerUpdates
+        api.updateMarkers(markerUpdates: markerUpdatesArg)
+        reply(wrapResult(nil))
+      }
+    } else {
+      updateMarkersChannel.setMessageHandler(nil)
     }
   }
 }

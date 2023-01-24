@@ -239,6 +239,31 @@ data class MarkerId (
   }
 }
 
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MarkerUpdates (
+  val toRemove: List<Marker?>,
+  val toChange: List<Marker?>,
+  val toAdd: List<Marker?>
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): MarkerUpdates {
+      val toRemove = list[0] as List<Marker?>
+      val toChange = list[1] as List<Marker?>
+      val toAdd = list[2] as List<Marker?>
+      return MarkerUpdates(toRemove, toChange, toAdd)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      toRemove,
+      toChange,
+      toAdd,
+    )
+  }
+}
+
 @Suppress("UNCHECKED_CAST")
 private object PluginHostApiCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
@@ -268,6 +293,11 @@ private object PluginHostApiCodec : StandardMessageCodec() {
           MarkerId.fromList(it)
         }
       }
+      133.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MarkerUpdates.fromList(it)
+        }
+      }
       else -> super.readValueOfType(type, buffer)
     }
   }
@@ -293,6 +323,10 @@ private object PluginHostApiCodec : StandardMessageCodec() {
         stream.write(132)
         writeValue(stream, value.toList())
       }
+      is MarkerUpdates -> {
+        stream.write(133)
+        writeValue(stream, value.toList())
+      }
       else -> super.writeValue(stream, value)
     }
   }
@@ -300,8 +334,6 @@ private object PluginHostApiCodec : StandardMessageCodec() {
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface PluginHostApi {
-  fun asy(msg: LatLng, callback: (LatLng) -> Unit)
-  fun m(msg: Marker, callback: () -> Unit)
   /**
    * Получение текущей позиции камеры
    *
@@ -316,6 +348,12 @@ interface PluginHostApi {
    * [cameraAnimationType] - тип анимации
    */
   fun moveCamera(cameraPosition: CameraPosition, duration: Long?, cameraAnimationType: CameraAnimationType, callback: () -> Unit)
+  /**
+   * Обновление маркеров
+   *
+   * [markerUpdates] - объект с информацией об обновлении маркеров
+   */
+  fun updateMarkers(markerUpdates: MarkerUpdates)
 
   companion object {
     /** The codec used by PluginHostApi. */
@@ -325,46 +363,6 @@ interface PluginHostApi {
     /** Sets up an instance of `PluginHostApi` to handle messages through the `binaryMessenger`. */
     @Suppress("UNCHECKED_CAST")
     fun setUp(binaryMessenger: BinaryMessenger, api: PluginHostApi?, id: Int?) {
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginHostApi_$id.asy", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            var wrapped = listOf<Any?>()
-            try {
-              val args = message as List<Any?>
-              val msgArg = args[0] as LatLng
-              api.asy(msgArg) {
-                reply.reply(wrapResult(it))
-              }
-            } catch (exception: Error) {
-              wrapped = wrapError(exception)
-              reply.reply(wrapped)
-            }
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginHostApi_$id.m", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            var wrapped = listOf<Any?>()
-            try {
-              val args = message as List<Any?>
-              val msgArg = args[0] as Marker
-              api.m(msgArg) {
-                reply.reply(wrapResult(null))
-              }
-            } catch (exception: Error) {
-              wrapped = wrapError(exception)
-              reply.reply(wrapped)
-            }
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
       run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginHostApi_$id.getCameraPosition", codec)
         if (api != null) {
@@ -400,6 +398,25 @@ interface PluginHostApi {
               wrapped = wrapError(exception)
               reply.reply(wrapped)
             }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginHostApi_$id.updateMarkers", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            var wrapped = listOf<Any?>()
+            try {
+              val args = message as List<Any?>
+              val markerUpdatesArg = args[0] as MarkerUpdates
+              api.updateMarkers(markerUpdatesArg)
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Error) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)

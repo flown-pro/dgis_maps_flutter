@@ -126,13 +126,13 @@ class MarkerId {
 
 class MarkerUpdates {
   MarkerUpdates({
-    this.toRemove = const {},
-    this.toChange = const {},
-    this.toAdd = const {},
+    this.toRemove = const [],
+    this.toChange = const [],
+    this.toAdd = const [],
   });
-  final Set<Marker> toRemove;
-  final Set<Marker> toChange;
-  final Set<Marker> toAdd;
+  final List<Marker?> toRemove;
+  final List<Marker?> toChange;
+  final List<Marker?> toAdd;
 }
 
 @HostApi()
@@ -156,7 +156,7 @@ abstract class PluginHostApi {
   );
 
   /// Обновление маркеров
-  /// 
+  ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров
   void updateMarkers(MarkerUpdates markerUpdates);
 }
