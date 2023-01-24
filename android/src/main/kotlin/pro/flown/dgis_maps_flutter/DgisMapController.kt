@@ -8,7 +8,6 @@ import ru.dgis.sdk.DGis
 import ru.dgis.sdk.Duration
 import ru.dgis.sdk.coordinates.Bearing
 import ru.dgis.sdk.coordinates.GeoPoint
-import ru.dgis.sdk.geometry.GeoPointWithElevation
 import ru.dgis.sdk.map.*
 import ru.dgis.sdk.map.Map
 

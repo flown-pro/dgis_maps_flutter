@@ -35,28 +35,17 @@ class _MyHomePageState extends State<MyHomePage> {
     this.controller = controller;
   }
 
-  Future<void> onAsyPressed() async {
-    // await controller.api.moveCamera(
-    //   CameraPosition(
-    //     target: LatLng(30, 60),
-    //     zoom: 12,
-    //     bearing: 0,
-    //     tilt: 0,
-    //   ),
-    //   1000,
-    //   CameraAnimationType.def,
-    // );
-    // ignore: use_build_context_synchronously
-    // ScaffoldMessenger.of(context).showSnackBar(
-    //   SnackBar(
-    //     behavior: SnackBarBehavior.fixed,
-    //     duration: const Duration(seconds: 1),
-    //     dismissDirection: DismissDirection.horizontal,
-    //     content: Text(
-    //       newPos.encode().toString(),
-    //     ),
-    //   ),
-    // );
+  Future<void> moveCamera() async {
+    await controller.moveCamera(
+      cameraPosition: CameraPosition(
+        target: LatLng(60, 30),
+        zoom: 7,
+        bearing: 0,
+        tilt: 0,
+      ),
+      duration: 1000,
+      cameraAnimationType: DataCameraAnimationType.linear,
+    );
   }
 
   @override
@@ -80,8 +69,8 @@ class _MyHomePageState extends State<MyHomePage> {
           Row(
             children: [
               TextButton(
-                onPressed: onAsyPressed,
-                child: const Text('moveMap'),
+                onPressed: moveCamera,
+                child: const Text('moveCamera'),
               )
             ],
           ),
