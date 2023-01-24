@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class Polyline extends DataPolyline {
   Polyline({
-    required DataMapObjectId polylineId,
+    required MapObjectId polylineId,
     required List<DataLatLng> points,
     double width = 1.0,
     Color color = Colors.black,

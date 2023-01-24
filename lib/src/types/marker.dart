@@ -3,10 +3,10 @@ import 'types.dart';
 
 class Marker extends DataMarker {
   Marker({
-    required DataMapObjectId markerId,
-    required DataLatLng position,
+    required MapObjectId markerId,
+    required LatLng position,
     String? infoText,
-    DataMarkerBitmap? bitmap,
+    MarkerBitmap? bitmap,
   }) : super(
           markerId: markerId,
           position: position,
@@ -17,12 +17,18 @@ class Marker extends DataMarker {
   Marker copyWith({
     LatLng? position,
     String? infoText,
-    DataMarkerBitmap? bitmap,
+    MarkerBitmap? bitmap,
   }) =>
       Marker(
-        markerId: markerId,
-        position: position ?? this.position,
+        markerId: MapObjectId(markerId.value),
+        position:
+            position ?? LatLng(this.position.latitude, this.position.longitude),
         infoText: infoText ?? this.infoText,
-        bitmap: bitmap ?? this.bitmap,
+        bitmap: bitmap ??
+            MarkerBitmap(
+              bytes: this.bitmap!.bytes,
+              width: this.bitmap?.width,
+              height: this.bitmap?.height,
+            ),
       );
 }

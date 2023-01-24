@@ -2,7 +2,6 @@ library dgis_maps_flutter;
 
 import 'dart:async';
 
-import 'package:dgis_maps_flutter/src/types/polyline.dart';
 import 'package:flutter/widgets.dart';
 
 import 'src/controller.dart';
@@ -12,6 +11,7 @@ import 'src/types/types.dart';
 
 export 'src/method_channel/method_channel.g.dart';
 export 'src/types/types.dart';
+export 'src/controller.dart';
 
 typedef MapCreatedCallback = void Function(DGisMapController controller);
 typedef CameraStateChangedCallback = void Function(DataCameraState cameraState);

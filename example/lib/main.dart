@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:dgis_maps_flutter/dgis_maps_flutter.dart';
-import 'package:dgis_maps_flutter/src/controller.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -57,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> addMarker() async {
     markers.add(Marker(
-      markerId: DataMapObjectId(value: 'm${mId++}'),
+      markerId: MapObjectId('m${mId++}'),
       position: LatLng(60.0 + mId, 30.0 + mId),
       infoText: 'm${mId++}',
     ));
@@ -67,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> addPolyline() async {
     polylines.add(
       Polyline(
-        polylineId: DataMapObjectId(value: 'p${mId++}'),
+        polylineId: MapObjectId('p${mId++}'),
         color: Colors.primaries[Random().nextInt(Colors.primaries.length)],
         points: List.generate(
           10,

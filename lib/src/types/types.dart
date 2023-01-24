@@ -7,3 +7,5 @@ export 'camera.dart';
 export 'location.dart';
 export 'marker.dart';
 export 'polyline.dart';
+export 'map_object_id.dart';
+export 'bitmap.dart';
