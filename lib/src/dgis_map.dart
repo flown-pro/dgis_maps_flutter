@@ -47,17 +47,21 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
 
   Set<Marker> _markers = const {};
   Set<Polyline> _polylines = const {};
+  bool _myLocationEnabled = false;
 
   @override
   void initState() {
-    _markers = widget.markers.toSet();
-    _polylines = widget.polylines.toSet();
+    updateWidgetFields();
     super.initState();
   }
 
   @override
   void didUpdateWidget(DGisMap oldWidget) {
     super.didUpdateWidget(oldWidget);
+    updateWidgetFields();
+  }
+
+  updateWidgetFields() {
     if (_markers != widget.markers) {
       _updateMarkers(
         toAdd: widget.markers.difference(_markers),
@@ -72,8 +76,9 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
       );
       _polylines = widget.polylines.toSet();
     }
-    if (oldWidget.myLocationEnabled != widget.myLocationEnabled) {
+    if (_myLocationEnabled != widget.myLocationEnabled) {
       api.changeMyLocationLayerState(widget.myLocationEnabled);
+      _myLocationEnabled = widget.myLocationEnabled;
     }
   }
 
@@ -105,7 +110,7 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
 
   Future<void> onViewCreated(int id) async {
     api = PluginHostApi(id: id);
-    final controller = DGisMapController(api, mapId: id);
+    final controller = DGisMapController(api, _apiReady, mapId: id);
     PluginFlutterApi.setup(this, id: id);
     await _apiReady.future;
     final MapCreatedCallback? onMapCreated = widget.onMapCreated;

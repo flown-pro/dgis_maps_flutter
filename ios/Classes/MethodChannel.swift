@@ -183,6 +183,38 @@ struct DataCameraStateValue {
   }
 }
 
+/// Отступ камеры от краев экрана в пикселях
+///
+/// Generated class from Pigeon that represents data sent in messages.
+struct DataPadding {
+  var left: Int
+  var top: Int
+  var right: Int
+  var bottom: Int
+
+  static func fromList(_ list: [Any?]) -> DataPadding? {
+    let left = list[0] as! Int
+    let top = list[1] as! Int
+    let right = list[2] as! Int
+    let bottom = list[3] as! Int
+
+    return DataPadding(
+      left: left,
+      top: top,
+      right: right,
+      bottom: bottom
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      left,
+      top,
+      right,
+      bottom,
+    ]
+  }
+}
+
 /// Позиция камеры
 ///
 /// Generated class from Pigeon that represents data sent in messages.
@@ -332,8 +364,10 @@ private class PluginHostApiCodecReader: FlutterStandardReader {
       case 133:
         return DataMarkerUpdates.fromList(self.readValue() as! [Any])
       case 134:
-        return DataPolyline.fromList(self.readValue() as! [Any])
+        return DataPadding.fromList(self.readValue() as! [Any])
       case 135:
+        return DataPolyline.fromList(self.readValue() as! [Any])
+      case 136:
         return DataPolylineUpdates.fromList(self.readValue() as! [Any])
       default:
         return super.readValue(ofType: type)
@@ -361,11 +395,14 @@ private class PluginHostApiCodecWriter: FlutterStandardWriter {
     } else if let value = value as? DataMarkerUpdates {
       super.writeByte(133)
       super.writeValue(value.toList())
-    } else if let value = value as? DataPolyline {
+    } else if let value = value as? DataPadding {
       super.writeByte(134)
       super.writeValue(value.toList())
-    } else if let value = value as? DataPolylineUpdates {
+    } else if let value = value as? DataPolyline {
       super.writeByte(135)
+      super.writeValue(value.toList())
+    } else if let value = value as? DataPolylineUpdates {
+      super.writeByte(136)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -400,7 +437,7 @@ protocol PluginHostApi {
   /// [cameraAnimationType] - тип анимации
   func moveCamera(cameraPosition: DataCameraPosition, duration: Int?, cameraAnimationType: DataCameraAnimationType, completion: @escaping () -> Void)
   /// Перемещение камеры к области из двух точек
-  func moveCameraToBounds(firstPoint: DataLatLng, secondPoint: DataLatLng, padding: Double, duration: Int?, cameraAnimationType: DataCameraAnimationType, completion: @escaping () -> Void)
+  func moveCameraToBounds(firstPoint: DataLatLng, secondPoint: DataLatLng, padding: DataPadding, duration: Int?, cameraAnimationType: DataCameraAnimationType, completion: @escaping () -> Void)
   /// Обновление маркеров
   ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров
@@ -460,7 +497,7 @@ class PluginHostApiSetup {
         let args = message as! [Any?]
         let firstPointArg = args[0] as! DataLatLng
         let secondPointArg = args[1] as! DataLatLng
-        let paddingArg = args[2] as! Double
+        let paddingArg = args[2] as! DataPadding
         let durationArg = args[3] as? Int
         let cameraAnimationTypeArg = DataCameraAnimationType(rawValue: args[4] as! Int)!
         api.moveCameraToBounds(firstPoint: firstPointArg, secondPoint: secondPointArg, padding: paddingArg, duration: durationArg, cameraAnimationType: cameraAnimationTypeArg) {

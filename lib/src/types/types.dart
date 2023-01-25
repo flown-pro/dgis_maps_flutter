@@ -8,4 +8,5 @@ export 'enums.dart';
 export 'location.dart';
 export 'map_object_id.dart';
 export 'marker.dart';
+export 'padding.dart';
 export 'polyline.dart';

@@ -105,6 +105,21 @@ enum DataCameraAnimationType {
   showBothPositions
 }
 
+/// Отступ камеры от краев экрана в пикселях
+class DataPadding {
+  const DataPadding({
+    this.left = 0,
+    this.top = 0,
+    this.right = 0,
+    this.bottom = 0,
+  });
+
+  final int left;
+  final int top;
+  final int right;
+  final int bottom;
+}
+
 /// Позиция камеры
 class DataCameraPosition {
   const DataCameraPosition({
@@ -190,7 +205,7 @@ abstract class PluginHostApi {
   void moveCameraToBounds(
     DataLatLng firstPoint,
     DataLatLng secondPoint,
-    double padding,
+    DataPadding padding,
     int? duration,
     DataCameraAnimationType cameraAnimationType,
   );
