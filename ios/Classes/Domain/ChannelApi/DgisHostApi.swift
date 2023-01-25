@@ -68,7 +68,7 @@ class DgisHostApi : NSObject, PluginHostApi {
     func moveCameraToBounds(
         firstPoint: DataLatLng,
         secondPoint: DataLatLng,
-        padding: Double,
+        padding: DataPadding,
         duration: Int?,
         cameraAnimationType: DataCameraAnimationType,
         completion: @escaping () -> Void
@@ -93,7 +93,12 @@ class DgisHostApi : NSObject, PluginHostApi {
         let position = calcPosition(
             camera: mapFactory.map.camera,
             geometry: geometry,
-            padding: Padding(bottom: UInt32(padding))
+            padding: Padding(
+                left: UInt32(padding.left),
+                top: UInt32(padding.top),
+                right: UInt32(padding.right),
+                bottom: UInt32(padding.bottom)
+            )
         )
         cameraMoveService.moveToLocation(
             position: position,

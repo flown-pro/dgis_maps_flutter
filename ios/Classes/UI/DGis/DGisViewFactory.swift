@@ -23,8 +23,11 @@ class DgisNativeViewFactory: NSObject, FlutterPlatformViewFactory {
         viewIdentifier viewId: Int64,
         arguments args: Any?
     ) -> FlutterPlatformView {
-        
-        let dgisService = DGisSdkService()
+        var initParams : DataCreationParams?
+        if (args != nil) {
+            initParams = DataCreationParams.fromList(args as! [Any?])
+        }
+        let dgisService = DGisSdkService(params: initParams)
         let settingsStorage = UserDefaults.standard
         let settingsService = SettingsService(
             storage: settingsStorage

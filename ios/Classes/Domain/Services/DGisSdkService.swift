@@ -14,22 +14,23 @@ class DGisSdkService {
     
     lazy var mapFactoryProvider = MapFactoryProvider(container: self.sdk, mapGesturesType: .default(.event))
     
-    init() {
+    init(params: DataCreationParams?) {
         sdk = DGis.Container()
         var mapOptions = MapOptions.default
         mapOptions.deviceDensity = DeviceDensity(value: Float(UIScreen.main.nativeScale))
-//        if (flutterArgs != nil) {
-//            let args = flutterArgs!
-//            let coordinate = GeoPoint(
-//                latitude: DGis.Latitude(value: args.initLatitude),
-//                longitude: DGis.Longitude(value: args.initLongitude)
-//            )
-//            let cameraPosition = CameraPosition(
-//                point: coordinate,
-//                zoom: Zoom(value: args.initZoom)
-//            )
-//            mapOptions.position = cameraPosition
-//        }
+        if (params != nil) {
+            let coordinate = GeoPoint(
+                latitude: DGis.Latitude(value: params!.position.latitude),
+                longitude: DGis.Longitude(value: params!.position.longitude)
+            )
+            let cameraPosition = CameraPosition(
+                point: coordinate,
+                zoom: Zoom(value: Float(params!.zoom))
+            )
+            mapOptions.position = cameraPosition
+            
+        }
+        
         mapFactory = try! sdk.makeMapFactory(options: mapOptions)
     }
     
