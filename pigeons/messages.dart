@@ -167,7 +167,6 @@ abstract class PluginHostApi {
   ///
   /// Возвращает [DataCameraPosition]
   /// Позицию камеры в текущий момент времени
-  @async
   DataCameraPosition getCameraPosition();
 
   /// Перемещение камеры к заданной позиции [CameraPosition]

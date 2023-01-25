@@ -14,7 +14,15 @@ class DGisMapController {
   /// Получение текущей позиции карты [CameraPosition]
   Future<CameraPosition> getCameraPosition() async {
     final dataCameraPosition = await _api.getCameraPosition();
-    return dataCameraPosition as CameraPosition;
+    return CameraPosition(
+      target: LatLng(
+        dataCameraPosition.target.latitude,
+        dataCameraPosition.target.longitude,
+      ),
+      bearing: dataCameraPosition.bearing,
+      tilt: dataCameraPosition.tilt,
+      zoom: dataCameraPosition.zoom,
+    );
   }
 
   /// Переход камеры к выбранной точке [CameraPosition]

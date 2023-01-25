@@ -418,7 +418,7 @@ interface PluginHostApi {
    * Возвращает [DataCameraPosition]
    * Позицию камеры в текущий момент времени
    */
-  fun getCameraPosition(callback: (DataCameraPosition) -> Unit)
+  fun getCameraPosition(): DataCameraPosition
   /**
    * Перемещение камеры к заданной позиции [CameraPosition]
    * [duration] - длительность анимации в миллисекундах,
@@ -460,13 +460,11 @@ interface PluginHostApi {
           channel.setMessageHandler { _, reply ->
             var wrapped = listOf<Any?>()
             try {
-              api.getCameraPosition() {
-                reply.reply(wrapResult(it))
-              }
+              wrapped = listOf<Any?>(api.getCameraPosition())
             } catch (exception: Error) {
               wrapped = wrapError(exception)
-              reply.reply(wrapped)
             }
+            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)

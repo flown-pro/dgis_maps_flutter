@@ -380,7 +380,7 @@ protocol PluginHostApi {
   ///
   /// Возвращает [DataCameraPosition]
   /// Позицию камеры в текущий момент времени
-  func getCameraPosition(completion: @escaping (DataCameraPosition) -> Void)
+  func getCameraPosition() -> DataCameraPosition
   /// Перемещение камеры к заданной позиции [CameraPosition]
   /// [duration] - длительность анимации в миллисекундах,
   /// если не указана, используется нативное значение
@@ -414,9 +414,8 @@ class PluginHostApiSetup {
     let getCameraPositionChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id).getCameraPosition", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       getCameraPositionChannel.setMessageHandler { _, reply in
-        api.getCameraPosition() { result in
-          reply(wrapResult(result))
-        }
+        let result = api.getCameraPosition()
+        reply(wrapResult(result))
       }
     } else {
       getCameraPositionChannel.setMessageHandler(nil)

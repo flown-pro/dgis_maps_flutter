@@ -1,7 +1,6 @@
 package pro.flown.dgis_maps_flutter
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.platform.PlatformView
@@ -9,8 +8,12 @@ import ru.dgis.sdk.DGis
 import ru.dgis.sdk.Duration
 import ru.dgis.sdk.coordinates.Bearing
 import ru.dgis.sdk.coordinates.GeoPoint
+import ru.dgis.sdk.demo.CustomCompassManager
+import ru.dgis.sdk.demo.CustomLocationManager
 import ru.dgis.sdk.map.*
 import ru.dgis.sdk.map.Map
+import ru.dgis.sdk.positioning.registerPlatformLocationSource
+import ru.dgis.sdk.positioning.registerPlatformMagneticSource
 
 class DgisMapController internal constructor(
     id: Int,
@@ -27,6 +30,11 @@ class DgisMapController internal constructor(
 
     init {
         sdkContext = DGis.initialize(context.applicationContext)
+        val compassSource = CustomCompassManager(context.applicationContext)
+        registerPlatformMagneticSource(sdkContext, compassSource)
+        val locationSource = CustomLocationManager(context.applicationContext)
+        registerPlatformLocationSource(sdkContext, locationSource)
+
         val params = DataCreationParams.fromList(args as List<Any?>);
         mapView = MapView(context, MapOptions().also {
             it.position = CameraPosition(
@@ -50,23 +58,8 @@ class DgisMapController internal constructor(
         this.map = map
         objectManager = MapObjectManager(map)
         initLocationSource()
-//
-//        imageFromAsset(sdkContext, "")
-//
-//        methodChannel.setMethodCallHandler(this)
 //        map.camera.stateChannel.connect {
-//            methodChannel.invokeMethod("cameraState", it.name.lowercase())
-//        }
-//        map.camera.positionChannel.connect {
-//            methodChannel.invokeMethod(
-//                "cameraPosition", listOf(
-//                    it.point.latitude.value,
-//                    it.point.longitude.value,
-//                    it.zoom.value,
-//                    it.tilt.value,
-//                    it.bearing.value
-//                )
-//            )
+//            flutterApi.onCameraStateChanged(cameraStateArg = toDataCameraState(it)) {}
 //        }
     }
 
@@ -80,8 +73,7 @@ class DgisMapController internal constructor(
     }
 
     override fun changeMyLocationLayerState(isVisible: Boolean) {
-        var isMyLocationVisible =
-            map.sources.contains(myLocationSource);
+        val isMyLocationVisible = map.sources.contains(myLocationSource);
         if (isVisible && !isMyLocationVisible) {
             map.addSource(myLocationSource);
         } else if (!isVisible && isMyLocationVisible) {
@@ -89,18 +81,16 @@ class DgisMapController internal constructor(
         }
     }
 
-    override fun getCameraPosition(callback: (DataCameraPosition) -> Unit) {
-        return callback(
-            DataCameraPosition(
-                target = DataLatLng(
-                    map.camera.position.point.latitude.value,
-                    map.camera.position.point.longitude.value
-                ),
-                zoom = map.camera.position.zoom.value.toDouble(),
-                bearing = map.camera.position.bearing.value,
-                tilt = map.camera.position.tilt.value.toDouble(),
-            )
-        );
+    override fun getCameraPosition(): DataCameraPosition {
+        return DataCameraPosition(
+            target = DataLatLng(
+                map.camera.position.point.latitude.value,
+                map.camera.position.point.longitude.value
+            ),
+            zoom = map.camera.position.zoom.value.toDouble(),
+            bearing = map.camera.position.bearing.value,
+            tilt = map.camera.position.tilt.value.toDouble(),
+        )
     }
 
     override fun moveCamera(
@@ -117,26 +107,33 @@ class DgisMapController internal constructor(
                 bearing = Bearing(cameraPosition.bearing),
             ),
             time = Duration.ofMilliseconds(duration!!),
-            animationType = CameraAnimationType.valueOf(cameraAnimationType.name)
+            animationType = toAnimationType(cameraAnimationType)
         ).onResult { callback() }
     }
 
     override fun updateMarkers(markerUpdates: DataMarkerUpdates) {
-        objectManager.removeObjects(
-            markerUpdates.toRemove.map { dataMarker2Marker(sdkContext, it!!) }
-        )
-        objectManager.addObjects(
-            markerUpdates.toAdd.map { dataMarker2Marker(sdkContext, it!!) }
-        )
+        objectManager.removeObjects(markerUpdates.toRemove.map {
+            dataMarker2Marker(
+                sdkContext,
+                it!!
+            )
+        })
+        objectManager.addObjects(markerUpdates.toAdd.map { dataMarker2Marker(sdkContext, it!!) })
     }
 
     override fun updatePolylines(polylineUpdates: DataPolylineUpdates) {
-        objectManager.removeObjects(
-            polylineUpdates.toRemove.map { dataPolyline2Polyline(sdkContext, it!!) }
-        )
-        objectManager.addObjects(
-            polylineUpdates.toAdd.map { dataPolyline2Polyline(sdkContext, it!!) }
-        )
+        objectManager.removeObjects(polylineUpdates.toRemove.map {
+            dataPolyline2Polyline(
+                sdkContext,
+                it!!
+            )
+        })
+        objectManager.addObjects(polylineUpdates.toAdd.map {
+            dataPolyline2Polyline(
+                sdkContext,
+                it!!
+            )
+        })
     }
 
 }
