@@ -50,14 +50,14 @@ class DgisHostApi : NSObject, PluginHostApi {
     
     func moveCamera(cameraPosition: DataCameraPosition, duration: Int?, cameraAnimationType: DataCameraAnimationType, completion: @escaping () -> Void) {
         var animationType = DGis.CameraAnimationType.default
-//        switch (cameraAnimationType) {
-//        case .linear:
-//            animationType = DGis.CameraAnimationType.linear
-//        case .showBothPositions:
-//            animationType = DGis.CameraAnimationType.showBothPositions
-//        @unknown default:
-//            animationType = DGis.CameraAnimationType.default
-//        }
+        //        switch (cameraAnimationType) {
+        //        case .linear:
+        //            animationType = DGis.CameraAnimationType.linear
+        //        case .showBothPositions:
+        //            animationType = DGis.CameraAnimationType.showBothPositions
+        //        @unknown default:
+        //            animationType = DGis.CameraAnimationType.default
+        //        }
         
         cameraMoveService.moveToLocation(
             position: DGis.CameraPosition(
@@ -75,12 +75,50 @@ class DgisHostApi : NSObject, PluginHostApi {
         completion()
     }
     
-    func updateMarkers(markerUpdates: DataMarkerUpdates) {
-        mapObjectService.updateMarkers(markerUpdates: markerUpdates)
+    func moveCameraToBounds(
+        firstPoint: DataLatLng,
+        secondPoint: DataLatLng,
+        padding: Double,
+        duration: Int?,
+        cameraAnimationType: DataCameraAnimationType,
+        completion: @escaping () -> Void
+    ) {
+        var animationType = DGis.CameraAnimationType.default
+        let geometry = ComplexGeometry(
+            geometries: [
+                PointGeometry(
+                    point: GeoPoint(
+                        latitude: firstPoint.latitude,
+                        longitude: firstPoint.longitude
+                    )
+                ),
+                PointGeometry(
+                    point: GeoPoint(
+                        latitude: secondPoint.latitude,
+                        longitude: secondPoint.longitude
+                    )
+                )
+            ]
+        )
+        let position = calcPosition(
+            camera: mapFactory.map.camera,
+            geometry: geometry,
+            padding: Padding(bottom: UInt32(padding))
+        )
+        cameraMoveService.moveToLocation(
+            position: position,
+            time: Double(duration ?? 300),
+            animationType: animationType
+        )
+        completion()
     }
     
-    func updatePolylines(polylineUpdates: DataPolylineUpdates) {
-        mapObjectService.updatePolylines(polylineUpdates: polylineUpdates)
+    func updateMarkers(updates: DataMarkerUpdates) {
+        mapObjectService.updateMarkers(markerUpdates: updates)
+    }
+    
+    func updatePolylines(updates: DataPolylineUpdates) {
+        mapObjectService.updatePolylines(polylineUpdates: updates)
     }
     
     func changeMyLocationLayerState(isVisible: Bool) {
