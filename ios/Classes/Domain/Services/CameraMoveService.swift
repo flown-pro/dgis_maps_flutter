@@ -50,14 +50,14 @@ final class CameraMoveService {
         }
     }
     
-    func moveToLocation(position: DGis.CameraPosition, time: TimeInterval, animationType: DGis.CameraAnimationType) {
+    func moveToLocation(position: DGis.CameraPosition, time: TimeInterval?, animationType: DGis.CameraAnimationType) {
         DispatchQueue.main.async {
             self.moveCameraCancellable?.cancel()
             self.moveCameraCancellable = self.map
                 .camera
                 .move(
                     position: position,
-                    time: time,
+                    time: time ?? 0.3,
                     animationType: animationType
                 ).sink { _ in
                     print("Move to location")

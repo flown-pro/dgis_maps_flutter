@@ -59,7 +59,7 @@ class DgisHostApi : NSObject, PluginHostApi {
                 tilt: Tilt(floatLiteral: Float(cameraPosition.tilt)),
                 bearing: Bearing(floatLiteral: cameraPosition.bearing)
             ),
-            time: Double(duration ?? 500) / 1000,
+            time: duration = nil ? nil : Double(duration!),
             animationType: DGis.CameraAnimationType.default //TODO: add CameraAnimationType enum support
         )
         completion()
