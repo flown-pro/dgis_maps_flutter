@@ -57,6 +57,7 @@ class DgisMapController internal constructor(
 
     private fun init(map: Map) {
         this.map = map
+        flutterApi.onNativeMapReady { }
         objectManager = MapObjectManager(map)
         initLocationSource()
         map.camera.stateChannel.connect {
@@ -124,9 +125,7 @@ class DgisMapController internal constructor(
             )
         )
         val position = calcPosition(map.camera, geometry)
-        map.camera.move(position).onResult {
-            callback()
-        }
+        map.camera.move(position).onResult { callback() }
     }
 
     override fun updateMarkers(updates: DataMarkerUpdates) {

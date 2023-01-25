@@ -609,6 +609,9 @@ abstract class PluginFlutterApi {
   /// [cameraState] - индекс в перечислении [CameraState]
   void onCameraStateChanged(DataCameraStateValue cameraState);
 
+  /// Коллбэк на завршение сохдания нативной карты
+  void onNativeMapReady();
+
   static void setup(PluginFlutterApi? api, {BinaryMessenger? binaryMessenger, required int id}) {
     {
       final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
@@ -625,6 +628,20 @@ abstract class PluginFlutterApi {
           assert(arg_cameraState != null,
               'Argument for pro.flown.PluginFlutterApi_$id.onCameraStateChanged was null, expected non-null DataCameraStateValue.');
           api.onCameraStateChanged(arg_cameraState!);
+          return;
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+          'pro.flown.PluginFlutterApi_$id.onNativeMapReady', codec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        channel.setMessageHandler(null);
+      } else {
+        channel.setMessageHandler((Object? message) async {
+          // ignore message
+          api.onNativeMapReady();
           return;
         });
       }

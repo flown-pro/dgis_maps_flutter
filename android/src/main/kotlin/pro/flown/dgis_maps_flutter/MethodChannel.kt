@@ -630,4 +630,11 @@ class PluginFlutterApi(private val binaryMessenger: BinaryMessenger, private val
       callback()
     }
   }
+  /** Коллбэк на завршение сохдания нативной карты */
+  fun onNativeMapReady(callback: () -> Unit) {
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginFlutterApi_$id.onNativeMapReady", codec)
+    channel.send(null) {
+      callback()
+    }
+  }
 }
