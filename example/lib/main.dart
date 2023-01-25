@@ -76,6 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
         southwest: LatLng(58, 28),
         northeast: LatLng(62, 32),
       ),
+      padding: MapPadding.all(20),
       duration: 1000,
       cameraAnimationType: CameraAnimationType.showBothPositions,
     );
