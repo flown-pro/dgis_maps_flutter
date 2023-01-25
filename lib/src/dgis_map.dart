@@ -178,6 +178,5 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
   @override
   void onNativeMapReady() {
     _apiReady.complete();
-    api.changeMyLocationLayerState(widget.myLocationEnabled);
   }
 }
