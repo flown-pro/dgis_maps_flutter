@@ -32,6 +32,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int i = 0;
   int mId = 0;
+  bool isShrinked = false;
+  bool isShrinkedTop = false;
   late DGisMapController controller;
   bool myLocationEnabled = true;
 
@@ -40,6 +42,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void onMapCreated(DGisMapController controller) {
     this.controller = controller;
+  }
+
+  void shrinkMapTop() {
+    setState(() => isShrinkedTop = !isShrinkedTop);
+  }
+
+  void shrinkMap() {
+    setState(() => isShrinked = !isShrinked);
+  }
+
+  void moveMap() {
+    isShrinkedTop = !isShrinkedTop;
+    setState(() => isShrinked = !isShrinked);
   }
 
   Future<void> moveCamera() async {
@@ -102,6 +117,14 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Column(
         children: [
+          AnimatedCrossFade(
+            firstChild: const SizedBox(height: 0),
+            secondChild: const SizedBox(height: 100),
+            crossFadeState: !isShrinkedTop
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            duration: const Duration(seconds: 2),
+          ),
           Expanded(
             child: DGisMap(
               key: ValueKey(i),
@@ -111,6 +134,14 @@ class _MyHomePageState extends State<MyHomePage> {
               markers: markers,
               polylines: polylines,
             ),
+          ),
+          AnimatedCrossFade(
+            firstChild: const SizedBox(height: 0),
+            secondChild: const SizedBox(height: 100),
+            crossFadeState: !isShrinked
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            duration: const Duration(seconds: 2),
           ),
           Row(
             children: [
@@ -136,6 +167,18 @@ class _MyHomePageState extends State<MyHomePage> {
                     TextButton(
                       onPressed: toggleMyLocation,
                       child: const Text('toggleMyLocation'),
+                    ),
+                    TextButton(
+                      onPressed: shrinkMapTop,
+                      child: const Text('shrinkMapTop'),
+                    ),
+                    TextButton(
+                      onPressed: shrinkMap,
+                      child: const Text('shrinkMap'),
+                    ),
+                    TextButton(
+                      onPressed: moveMap,
+                      child: const Text('moveMap'),
                     ),
                   ],
                 ),
