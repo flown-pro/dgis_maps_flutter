@@ -184,6 +184,25 @@ data class DataMarker (
   }
 }
 
+/** Generated class from Pigeon that represents data sent in messages. */
+data class DataCameraStateValue (
+  val value: DataCameraState
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): DataCameraStateValue {
+      val value = DataCameraState.ofRaw(list[0] as Int)!!
+      return DataCameraStateValue(value)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      value?.raw,
+    )
+  }
+}
+
 /**
  * Позиция камеры
  *
@@ -331,35 +350,30 @@ private object PluginHostApiCodec : StandardMessageCodec() {
       }
       130.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataLatLng.fromList(it)
+          DataMapObjectId.fromList(it)
         }
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataMapObjectId.fromList(it)
+          DataMarker.fromList(it)
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataMarker.fromList(it)
+          DataMarkerBitmap.fromList(it)
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataMarkerBitmap.fromList(it)
+          DataMarkerUpdates.fromList(it)
         }
       }
       134.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataMarkerUpdates.fromList(it)
-        }
-      }
-      135.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
           DataPolyline.fromList(it)
         }
       }
-      136.toByte() -> {
+      135.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           DataPolylineUpdates.fromList(it)
         }
@@ -377,32 +391,28 @@ private object PluginHostApiCodec : StandardMessageCodec() {
         stream.write(129)
         writeValue(stream, value.toList())
       }
-      is DataLatLng -> {
+      is DataMapObjectId -> {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is DataMapObjectId -> {
+      is DataMarker -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is DataMarker -> {
+      is DataMarkerBitmap -> {
         stream.write(132)
         writeValue(stream, value.toList())
       }
-      is DataMarkerBitmap -> {
+      is DataMarkerUpdates -> {
         stream.write(133)
         writeValue(stream, value.toList())
       }
-      is DataMarkerUpdates -> {
+      is DataPolyline -> {
         stream.write(134)
         writeValue(stream, value.toList())
       }
-      is DataPolyline -> {
-        stream.write(135)
-        writeValue(stream, value.toList())
-      }
       is DataPolylineUpdates -> {
-        stream.write(136)
+        stream.write(135)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -426,18 +436,20 @@ interface PluginHostApi {
    * [cameraAnimationType] - тип анимации
    */
   fun moveCamera(cameraPosition: DataCameraPosition, duration: Long?, cameraAnimationType: DataCameraAnimationType, callback: () -> Unit)
+  /** Перемещение камеры к области из двух точек */
+  fun moveCameraToBounds(firstPoint: DataLatLng, secondPoint: DataLatLng, padding: Double, duration: Long?, cameraAnimationType: DataCameraAnimationType, callback: () -> Unit)
   /**
    * Обновление маркеров
    *
    * [markerUpdates] - объект с информацией об обновлении маркеров
    */
-  fun updateMarkers(markerUpdates: DataMarkerUpdates)
+  fun updateMarkers(updates: DataMarkerUpdates)
   /**
    * Обновление полилайнов
    *
    * [polylineUpdates] - объект с информацией об обновлении полилайнов
    */
-  fun updatePolylines(polylineUpdates: DataPolylineUpdates)
+  fun updatePolylines(updates: DataPolylineUpdates)
   /**
    * Изменение слоя с маркером своего местоположения
    *
@@ -493,14 +505,38 @@ interface PluginHostApi {
         }
       }
       run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginHostApi_$id.moveCameraToBounds", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            var wrapped = listOf<Any?>()
+            try {
+              val args = message as List<Any?>
+              val firstPointArg = args[0] as DataLatLng
+              val secondPointArg = args[1] as DataLatLng
+              val paddingArg = args[2] as Double
+              val durationArg = args[3].let { if (it is Int) it.toLong() else it as? Long }
+              val cameraAnimationTypeArg = DataCameraAnimationType.ofRaw(args[4] as Int)!!
+              api.moveCameraToBounds(firstPointArg, secondPointArg, paddingArg, durationArg, cameraAnimationTypeArg) {
+                reply.reply(wrapResult(null))
+              }
+            } catch (exception: Error) {
+              wrapped = wrapError(exception)
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginHostApi_$id.updateMarkers", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             var wrapped = listOf<Any?>()
             try {
               val args = message as List<Any?>
-              val markerUpdatesArg = args[0] as DataMarkerUpdates
-              api.updateMarkers(markerUpdatesArg)
+              val updatesArg = args[0] as DataMarkerUpdates
+              api.updateMarkers(updatesArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Error) {
               wrapped = wrapError(exception)
@@ -518,8 +554,8 @@ interface PluginHostApi {
             var wrapped = listOf<Any?>()
             try {
               val args = message as List<Any?>
-              val polylineUpdatesArg = args[0] as DataPolylineUpdates
-              api.updatePolylines(polylineUpdatesArg)
+              val updatesArg = args[0] as DataPolylineUpdates
+              api.updatePolylines(updatesArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Error) {
               wrapped = wrapError(exception)
@@ -552,20 +588,43 @@ interface PluginHostApi {
     }
   }
 }
+@Suppress("UNCHECKED_CAST")
+private object PluginFlutterApiCodec : StandardMessageCodec() {
+  override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
+    return when (type) {
+      128.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          DataCameraStateValue.fromList(it)
+        }
+      }
+      else -> super.readValueOfType(type, buffer)
+    }
+  }
+  override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
+    when (value) {
+      is DataCameraStateValue -> {
+        stream.write(128)
+        writeValue(stream, value.toList())
+      }
+      else -> super.writeValue(stream, value)
+    }
+  }
+}
+
 /** Generated class from Pigeon that represents Flutter messages that can be called from Kotlin. */
 @Suppress("UNCHECKED_CAST")
 class PluginFlutterApi(private val binaryMessenger: BinaryMessenger, private val id: Int) {
   companion object {
     /** The codec used by PluginFlutterApi. */
     private val codec: MessageCodec<Any?> by lazy {
-      StandardMessageCodec()
+      PluginFlutterApiCodec
     }
   }
   /**
    * Коллбэк на изменение состояния камеры
    * [cameraState] - индекс в перечислении [CameraState]
    */
-  fun onCameraStateChanged(cameraStateArg: DataCameraState, callback: () -> Unit) {
+  fun onCameraStateChanged(cameraStateArg: DataCameraStateValue, callback: () -> Unit) {
     val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginFlutterApi_$id.onCameraStateChanged", codec)
     channel.send(listOf(cameraStateArg)) {
       callback()

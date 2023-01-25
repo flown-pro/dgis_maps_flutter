@@ -167,6 +167,27 @@ class DataMarker {
   }
 }
 
+class DataCameraStateValue {
+  DataCameraStateValue({
+    required this.value,
+  });
+
+  DataCameraState value;
+
+  Object encode() {
+    return <Object?>[
+      value.index,
+    ];
+  }
+
+  static DataCameraStateValue decode(Object result) {
+    result as List<Object?>;
+    return DataCameraStateValue(
+      value: DataCameraState.values[result[0]! as int],
+    );
+  }
+}
+
 /// Позиция камеры
 class DataCameraPosition {
   DataCameraPosition({
@@ -333,26 +354,23 @@ class _PluginHostApiCodec extends StandardMessageCodec {
     } else if (value is DataLatLng) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is DataLatLng) {
+    } else if (value is DataMapObjectId) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is DataMapObjectId) {
+    } else if (value is DataMarker) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is DataMarker) {
+    } else if (value is DataMarkerBitmap) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is DataMarkerBitmap) {
+    } else if (value is DataMarkerUpdates) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    } else if (value is DataMarkerUpdates) {
+    } else if (value is DataPolyline) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    } else if (value is DataPolyline) {
-      buffer.putUint8(135);
-      writeValue(buffer, value.encode());
     } else if (value is DataPolylineUpdates) {
-      buffer.putUint8(136);
+      buffer.putUint8(135);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -369,24 +387,21 @@ class _PluginHostApiCodec extends StandardMessageCodec {
         return DataLatLng.decode(readValue(buffer)!);
       
       case 130:       
-        return DataLatLng.decode(readValue(buffer)!);
-      
-      case 131:       
         return DataMapObjectId.decode(readValue(buffer)!);
       
-      case 132:       
+      case 131:       
         return DataMarker.decode(readValue(buffer)!);
       
-      case 133:       
+      case 132:       
         return DataMarkerBitmap.decode(readValue(buffer)!);
       
-      case 134:       
+      case 133:       
         return DataMarkerUpdates.decode(readValue(buffer)!);
       
-      case 135:       
+      case 134:       
         return DataPolyline.decode(readValue(buffer)!);
       
-      case 136:       
+      case 135:       
         return DataPolylineUpdates.decode(readValue(buffer)!);
       
       default:
@@ -463,15 +478,38 @@ class PluginHostApi {
     }
   }
 
+  /// Перемещение камеры к области из двух точек
+  Future<void> moveCameraToBounds(DataLatLng arg_firstPoint, DataLatLng arg_secondPoint, double arg_padding, int? arg_duration, DataCameraAnimationType arg_cameraAnimationType) async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'pro.flown.PluginHostApi_$id.moveCameraToBounds', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(<Object?>[arg_firstPoint, arg_secondPoint, arg_padding, arg_duration, arg_cameraAnimationType.index]) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
   /// Обновление маркеров
   ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров
-  Future<void> updateMarkers(DataMarkerUpdates arg_markerUpdates) async {
+  Future<void> updateMarkers(DataMarkerUpdates arg_updates) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'pro.flown.PluginHostApi_$id.updateMarkers', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
-        await channel.send(<Object?>[arg_markerUpdates]) as List<Object?>?;
+        await channel.send(<Object?>[arg_updates]) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',
@@ -491,12 +529,12 @@ class PluginHostApi {
   /// Обновление полилайнов
   ///
   /// [polylineUpdates] - объект с информацией об обновлении полилайнов
-  Future<void> updatePolylines(DataPolylineUpdates arg_polylineUpdates) async {
+  Future<void> updatePolylines(DataPolylineUpdates arg_updates) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'pro.flown.PluginHostApi_$id.updatePolylines', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
-        await channel.send(<Object?>[arg_polylineUpdates]) as List<Object?>?;
+        await channel.send(<Object?>[arg_updates]) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',
@@ -540,12 +578,36 @@ class PluginHostApi {
   }
 }
 
+class _PluginFlutterApiCodec extends StandardMessageCodec {
+  const _PluginFlutterApiCodec();
+  @override
+  void writeValue(WriteBuffer buffer, Object? value) {
+    if (value is DataCameraStateValue) {
+      buffer.putUint8(128);
+      writeValue(buffer, value.encode());
+    } else {
+      super.writeValue(buffer, value);
+    }
+  }
+
+  @override
+  Object? readValueOfType(int type, ReadBuffer buffer) {
+    switch (type) {
+      case 128:       
+        return DataCameraStateValue.decode(readValue(buffer)!);
+      
+      default:
+        return super.readValueOfType(type, buffer);
+    }
+  }
+}
+
 abstract class PluginFlutterApi {
-  static const MessageCodec<Object?> codec = StandardMessageCodec();
+  static const MessageCodec<Object?> codec = _PluginFlutterApiCodec();
 
   /// Коллбэк на изменение состояния камеры
   /// [cameraState] - индекс в перечислении [CameraState]
-  void onCameraStateChanged(DataCameraState cameraState);
+  void onCameraStateChanged(DataCameraStateValue cameraState);
 
   static void setup(PluginFlutterApi? api, {BinaryMessenger? binaryMessenger, required int id}) {
     {
@@ -559,9 +621,9 @@ abstract class PluginFlutterApi {
           assert(message != null,
           'Argument for pro.flown.PluginFlutterApi_$id.onCameraStateChanged was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final DataCameraState? arg_cameraState = args[0] == null ? null : DataCameraState.values[args[0] as int];
+          final DataCameraStateValue? arg_cameraState = (args[0] as DataCameraStateValue?);
           assert(arg_cameraState != null,
-              'Argument for pro.flown.PluginFlutterApi_$id.onCameraStateChanged was null, expected non-null DataCameraState.');
+              'Argument for pro.flown.PluginFlutterApi_$id.onCameraStateChanged was null, expected non-null DataCameraStateValue.');
           api.onCameraStateChanged(arg_cameraState!);
           return;
         });

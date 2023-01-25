@@ -133,6 +133,9 @@ class _MyHomePageState extends State<MyHomePage> {
               onMapCreated: onMapCreated,
               markers: markers,
               polylines: polylines,
+              onCameraStateChanged: (cameraState) {
+                print(cameraState);
+              },
             ),
           ),
           AnimatedCrossFade(

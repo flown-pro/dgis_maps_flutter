@@ -165,6 +165,24 @@ struct DataMarker {
   }
 }
 
+/// Generated class from Pigeon that represents data sent in messages.
+struct DataCameraStateValue {
+  var value: DataCameraState
+
+  static func fromList(_ list: [Any?]) -> DataCameraStateValue? {
+    let value = DataCameraState(rawValue: list[0] as! Int)!
+
+    return DataCameraStateValue(
+      value: value
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      value.rawValue,
+    ]
+  }
+}
+
 /// Позиция камеры
 ///
 /// Generated class from Pigeon that represents data sent in messages.
@@ -306,18 +324,16 @@ private class PluginHostApiCodecReader: FlutterStandardReader {
       case 129:
         return DataLatLng.fromList(self.readValue() as! [Any])
       case 130:
-        return DataLatLng.fromList(self.readValue() as! [Any])
-      case 131:
         return DataMapObjectId.fromList(self.readValue() as! [Any])
-      case 132:
+      case 131:
         return DataMarker.fromList(self.readValue() as! [Any])
-      case 133:
+      case 132:
         return DataMarkerBitmap.fromList(self.readValue() as! [Any])
-      case 134:
+      case 133:
         return DataMarkerUpdates.fromList(self.readValue() as! [Any])
-      case 135:
+      case 134:
         return DataPolyline.fromList(self.readValue() as! [Any])
-      case 136:
+      case 135:
         return DataPolylineUpdates.fromList(self.readValue() as! [Any])
       default:
         return super.readValue(ofType: type)
@@ -333,26 +349,23 @@ private class PluginHostApiCodecWriter: FlutterStandardWriter {
     } else if let value = value as? DataLatLng {
       super.writeByte(129)
       super.writeValue(value.toList())
-    } else if let value = value as? DataLatLng {
+    } else if let value = value as? DataMapObjectId {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? DataMapObjectId {
+    } else if let value = value as? DataMarker {
       super.writeByte(131)
       super.writeValue(value.toList())
-    } else if let value = value as? DataMarker {
+    } else if let value = value as? DataMarkerBitmap {
       super.writeByte(132)
       super.writeValue(value.toList())
-    } else if let value = value as? DataMarkerBitmap {
+    } else if let value = value as? DataMarkerUpdates {
       super.writeByte(133)
       super.writeValue(value.toList())
-    } else if let value = value as? DataMarkerUpdates {
+    } else if let value = value as? DataPolyline {
       super.writeByte(134)
       super.writeValue(value.toList())
-    } else if let value = value as? DataPolyline {
-      super.writeByte(135)
-      super.writeValue(value.toList())
     } else if let value = value as? DataPolylineUpdates {
-      super.writeByte(136)
+      super.writeByte(135)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -386,14 +399,16 @@ protocol PluginHostApi {
   /// если не указана, используется нативное значение
   /// [cameraAnimationType] - тип анимации
   func moveCamera(cameraPosition: DataCameraPosition, duration: Int?, cameraAnimationType: DataCameraAnimationType, completion: @escaping () -> Void)
+  /// Перемещение камеры к области из двух точек
+  func moveCameraToBounds(firstPoint: DataLatLng, secondPoint: DataLatLng, padding: Double, duration: Int?, cameraAnimationType: DataCameraAnimationType, completion: @escaping () -> Void)
   /// Обновление маркеров
   ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров
-  func updateMarkers(markerUpdates: DataMarkerUpdates)
+  func updateMarkers(updates: DataMarkerUpdates)
   /// Обновление полилайнов
   ///
   /// [polylineUpdates] - объект с информацией об обновлении полилайнов
-  func updatePolylines(polylineUpdates: DataPolylineUpdates)
+  func updatePolylines(updates: DataPolylineUpdates)
   /// Изменение слоя с маркером своего местоположения
   ///
   /// [isVisible] - true, добавляет слой со своей локацией, если его еще нет на карте
@@ -438,6 +453,23 @@ class PluginHostApiSetup {
     } else {
       moveCameraChannel.setMessageHandler(nil)
     }
+    /// Перемещение камеры к области из двух точек
+    let moveCameraToBoundsChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id).moveCameraToBounds", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      moveCameraToBoundsChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let firstPointArg = args[0] as! DataLatLng
+        let secondPointArg = args[1] as! DataLatLng
+        let paddingArg = args[2] as! Double
+        let durationArg = args[3] as? Int
+        let cameraAnimationTypeArg = DataCameraAnimationType(rawValue: args[4] as! Int)!
+        api.moveCameraToBounds(firstPoint: firstPointArg, secondPoint: secondPointArg, padding: paddingArg, duration: durationArg, cameraAnimationType: cameraAnimationTypeArg) {
+          reply(wrapResult(nil))
+        }
+      }
+    } else {
+      moveCameraToBoundsChannel.setMessageHandler(nil)
+    }
     /// Обновление маркеров
     ///
     /// [markerUpdates] - объект с информацией об обновлении маркеров
@@ -445,8 +477,8 @@ class PluginHostApiSetup {
     if let api = api {
       updateMarkersChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let markerUpdatesArg = args[0] as! DataMarkerUpdates
-        api.updateMarkers(markerUpdates: markerUpdatesArg)
+        let updatesArg = args[0] as! DataMarkerUpdates
+        api.updateMarkers(updates: updatesArg)
         reply(wrapResult(nil))
       }
     } else {
@@ -459,8 +491,8 @@ class PluginHostApiSetup {
     if let api = api {
       updatePolylinesChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let polylineUpdatesArg = args[0] as! DataPolylineUpdates
-        api.updatePolylines(polylineUpdates: polylineUpdatesArg)
+        let updatesArg = args[0] as! DataPolylineUpdates
+        api.updatePolylines(updates: updatesArg)
         reply(wrapResult(nil))
       }
     } else {
@@ -483,6 +515,42 @@ class PluginHostApiSetup {
     }
   }
 }
+private class PluginFlutterApiCodecReader: FlutterStandardReader {
+  override func readValue(ofType type: UInt8) -> Any? {
+    switch type {
+      case 128:
+        return DataCameraStateValue.fromList(self.readValue() as! [Any])
+      default:
+        return super.readValue(ofType: type)
+    }
+  }
+}
+
+private class PluginFlutterApiCodecWriter: FlutterStandardWriter {
+  override func writeValue(_ value: Any) {
+    if let value = value as? DataCameraStateValue {
+      super.writeByte(128)
+      super.writeValue(value.toList())
+    } else {
+      super.writeValue(value)
+    }
+  }
+}
+
+private class PluginFlutterApiCodecReaderWriter: FlutterStandardReaderWriter {
+  override func reader(with data: Data) -> FlutterStandardReader {
+    return PluginFlutterApiCodecReader(data: data)
+  }
+
+  override func writer(with data: NSMutableData) -> FlutterStandardWriter {
+    return PluginFlutterApiCodecWriter(data: data)
+  }
+}
+
+class PluginFlutterApiCodec: FlutterStandardMessageCodec {
+  static let shared = PluginFlutterApiCodec(readerWriter: PluginFlutterApiCodecReaderWriter())
+}
+
 /// Generated class from Pigeon that represents Flutter messages that can be called from Swift.
 class PluginFlutterApi {
   private let binaryMessenger: FlutterBinaryMessenger
@@ -491,10 +559,13 @@ class PluginFlutterApi {
     self.binaryMessenger = binaryMessenger
     self.id = id
   }
+  var codec: FlutterStandardMessageCodec {
+    return PluginFlutterApiCodec.shared
+  }
   /// Коллбэк на изменение состояния камеры
   /// [cameraState] - индекс в перечислении [CameraState]
-  func onCameraStateChanged(cameraState cameraStateArg: DataCameraState, completion: @escaping () -> Void) {
-    let channel = FlutterBasicMessageChannel(name: "pro.flown.PluginFlutterApi_\(id).onCameraStateChanged", binaryMessenger: binaryMessenger)
+  func onCameraStateChanged(cameraState cameraStateArg: DataCameraStateValue, completion: @escaping () -> Void) {
+    let channel = FlutterBasicMessageChannel(name: "pro.flown.PluginFlutterApi_\(id).onCameraStateChanged", binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([cameraStateArg] as [Any?]) { _ in
       completion()
     }
