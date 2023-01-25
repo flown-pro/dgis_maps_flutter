@@ -70,6 +70,17 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Future<void> moveCameraToBounds() async {
+    await controller.moveCameraToBounds(
+      cameraPosition: LatLngBounds(
+        southwest: LatLng(58, 28),
+        northeast: LatLng(62, 32),
+      ),
+      duration: 1000,
+      cameraAnimationType: CameraAnimationType.showBothPositions,
+    );
+  }
+
   Future<void> getCameraPosition() async {
     final cameraPosition = await controller.getCameraPosition();
     if (!mounted) return;
@@ -154,6 +165,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     TextButton(
                       onPressed: moveCamera,
                       child: const Text('moveCamera'),
+                    ),
+                    TextButton(
+                      onPressed: moveCameraToBounds,
+                      child: const Text('moveCameraToBounds'),
                     ),
                     TextButton(
                       onPressed: getCameraPosition,

@@ -40,6 +40,11 @@ class DGisMapController {
     int? duration,
     CameraAnimationType cameraAnimationType = CameraAnimationType.def,
   }) =>
-      _api.moveCameraToBounds(cameraPosition.northeast,
-          cameraPosition.northeast, padding, duration, cameraAnimationType);
+      _api.moveCameraToBounds(
+        cameraPosition.northeast,
+        cameraPosition.southwest,
+        padding,
+        duration,
+        cameraAnimationType,
+      );
 }

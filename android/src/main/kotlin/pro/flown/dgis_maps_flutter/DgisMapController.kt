@@ -125,7 +125,11 @@ class DgisMapController internal constructor(
             )
         )
         val position = calcPosition(map.camera, geometry)
-        map.camera.move(position).onResult { callback() }
+        map.camera.move(
+            position,
+            time = Duration.ofMilliseconds(duration!!),
+            animationType = toAnimationType(cameraAnimationType)
+        ).onResult { callback() }
     }
 
     override fun updateMarkers(updates: DataMarkerUpdates) {
