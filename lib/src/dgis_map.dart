@@ -3,6 +3,7 @@ library dgis_maps_flutter;
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -117,18 +118,39 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
     ).encode();
 
     if (defaultTargetPlatform == TargetPlatform.android) {
-      return AndroidView(
+      return PlatformViewLink(
         viewType: _kChannelName,
-        onPlatformViewCreated: onViewCreated,
-        gestureRecognizers: const {},
-        creationParams: creationParams,
-        creationParamsCodec: const StandardMessageCodec(),
+        surfaceFactory: (context, PlatformViewController controller) {
+          return AndroidViewSurface(
+            controller: controller as AndroidViewController,
+            gestureRecognizers: {},
+            hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+          );
+        },
+        onCreatePlatformView: (params) {
+          onViewCreated(params.id);
+          final AndroidViewController controller =
+              PlatformViewsService.initExpensiveAndroidView(
+            id: params.id,
+            viewType: _kChannelName,
+            layoutDirection: TextDirection.ltr,
+            creationParams: creationParams,
+            creationParamsCodec: const StandardMessageCodec(),
+            onFocus: () {
+              params.onFocusChanged(true);
+            },
+          )
+                ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+                ..create();
+          return controller;
+        },
       );
     } else if (defaultTargetPlatform == TargetPlatform.iOS) {
       return UiKitView(
         viewType: _kChannelName,
         onPlatformViewCreated: onViewCreated,
         gestureRecognizers: const {},
+        layoutDirection: TextDirection.ltr,
         creationParams: creationParams,
         creationParamsCodec: const StandardMessageCodec(),
       );
