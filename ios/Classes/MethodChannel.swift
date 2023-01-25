@@ -400,15 +400,15 @@ protocol PluginHostApi {
   /// [cameraAnimationType] - тип анимации
   func moveCamera(cameraPosition: DataCameraPosition, duration: Int?, cameraAnimationType: DataCameraAnimationType, completion: @escaping () -> Void)
   /// Перемещение камеры к области из двух точек
-  func moveCameraToBounds(firstPoint: DataLatLng, fsecondPoint: DataLatLng, padding: Double, duration: Int?, cameraAnimationType: DataCameraAnimationType, completion: @escaping () -> Void)
+  func moveCameraToBounds(firstPoint: DataLatLng, secondPoint: DataLatLng, padding: Double, duration: Int?, cameraAnimationType: DataCameraAnimationType, completion: @escaping () -> Void)
   /// Обновление маркеров
   ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров
-  func updateMarkers(markerUpdates: DataMarkerUpdates)
+  func updateMarkers(updates: DataMarkerUpdates)
   /// Обновление полилайнов
   ///
   /// [polylineUpdates] - объект с информацией об обновлении полилайнов
-  func updatePolylines(polylineUpdates: DataPolylineUpdates)
+  func updatePolylines(updates: DataPolylineUpdates)
   /// Изменение слоя с маркером своего местоположения
   ///
   /// [isVisible] - true, добавляет слой со своей локацией, если его еще нет на карте
@@ -459,11 +459,11 @@ class PluginHostApiSetup {
       moveCameraToBoundsChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let firstPointArg = args[0] as! DataLatLng
-        let fsecondPointArg = args[1] as! DataLatLng
+        let secondPointArg = args[1] as! DataLatLng
         let paddingArg = args[2] as! Double
         let durationArg = args[3] as? Int
         let cameraAnimationTypeArg = DataCameraAnimationType(rawValue: args[4] as! Int)!
-        api.moveCameraToBounds(firstPoint: firstPointArg, fsecondPoint: fsecondPointArg, padding: paddingArg, duration: durationArg, cameraAnimationType: cameraAnimationTypeArg) {
+        api.moveCameraToBounds(firstPoint: firstPointArg, secondPoint: secondPointArg, padding: paddingArg, duration: durationArg, cameraAnimationType: cameraAnimationTypeArg) {
           reply(wrapResult(nil))
         }
       }
@@ -477,8 +477,8 @@ class PluginHostApiSetup {
     if let api = api {
       updateMarkersChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let markerUpdatesArg = args[0] as! DataMarkerUpdates
-        api.updateMarkers(markerUpdates: markerUpdatesArg)
+        let updatesArg = args[0] as! DataMarkerUpdates
+        api.updateMarkers(updates: updatesArg)
         reply(wrapResult(nil))
       }
     } else {
@@ -491,8 +491,8 @@ class PluginHostApiSetup {
     if let api = api {
       updatePolylinesChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let polylineUpdatesArg = args[0] as! DataPolylineUpdates
-        api.updatePolylines(polylineUpdates: polylineUpdatesArg)
+        let updatesArg = args[0] as! DataPolylineUpdates
+        api.updatePolylines(updates: updatesArg)
         reply(wrapResult(nil))
       }
     } else {

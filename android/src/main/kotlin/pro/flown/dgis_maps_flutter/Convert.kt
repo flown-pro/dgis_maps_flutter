@@ -41,13 +41,10 @@ fun dataBitmap2Icon(context: Context, data: DataMarkerBitmap?): Image? {
 }
 
 @SuppressLint("PrivateResource")
-fun dataMarker2Marker(context: Context, marker: DataMarker): Marker {
+fun toMarker(context: Context, marker: DataMarker): Marker {
     return Marker(
         MarkerOptions(
-            position = GeoPointWithElevation(
-                latitude = marker.position.latitude,
-                longitude = marker.position.longitude,
-            ),
+            position = GeoPointWithElevation(toGeoPoint(marker.position)),
             icon = dataBitmap2Icon(context, marker.bitmap) ?: imageFromResource(
                 context,
                 R.drawable.dgis_ic_road_event_marker_comment
@@ -57,13 +54,24 @@ fun dataMarker2Marker(context: Context, marker: DataMarker): Marker {
     )
 }
 
-fun dataPolyline2Polyline(context: Context, polyline: DataPolyline): Polyline {
+fun toPolyline(polyline: DataPolyline): Polyline {
     return Polyline(
         PolylineOptions(
-            points = polyline.points.map { GeoPoint(it!!.latitude, it.longitude) }.toList(),
+            points = polyline.points.map { toGeoPoint(it!!) }.toList(),
             color = Color(polyline.color.toInt()),
             erasedPart = polyline.erasedPart,
             width = LogicalPixel(polyline.width.toFloat()),
         )
     )
+}
+
+fun toGeoPoint(latLng: DataLatLng): GeoPoint {
+    return GeoPoint(
+        latitude = latLng.latitude,
+        longitude = latLng.longitude
+    )
+}
+
+fun toDataLatLng(latLng: GeoPoint): DataLatLng {
+    return DataLatLng(latLng.latitude.value, latLng.longitude.value)
 }

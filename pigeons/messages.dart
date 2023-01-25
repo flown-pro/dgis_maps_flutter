@@ -189,7 +189,7 @@ abstract class PluginHostApi {
   @async
   void moveCameraToBounds(
     DataLatLng firstPoint,
-    DataLatLng fsecondPoint,
+    DataLatLng secondPoint,
     double padding,
     int? duration,
     DataCameraAnimationType cameraAnimationType,
@@ -197,12 +197,12 @@ abstract class PluginHostApi {
   /// Обновление маркеров
   ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров
-  void updateMarkers(DataMarkerUpdates markerUpdates);
+  void updateMarkers(DataMarkerUpdates updates);
 
   /// Обновление полилайнов
   ///
   /// [polylineUpdates] - объект с информацией об обновлении полилайнов
-  void updatePolylines(DataPolylineUpdates polylineUpdates);
+  void updatePolylines(DataPolylineUpdates updates);
 
   /// Изменение слоя с маркером своего местоположения
   ///

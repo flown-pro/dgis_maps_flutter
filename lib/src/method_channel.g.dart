@@ -479,12 +479,12 @@ class PluginHostApi {
   }
 
   /// Перемещение камеры к области из двух точек
-  Future<void> moveCameraToBounds(DataLatLng arg_firstPoint, DataLatLng arg_fsecondPoint, double arg_padding, int? arg_duration, DataCameraAnimationType arg_cameraAnimationType) async {
+  Future<void> moveCameraToBounds(DataLatLng arg_firstPoint, DataLatLng arg_secondPoint, double arg_padding, int? arg_duration, DataCameraAnimationType arg_cameraAnimationType) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'pro.flown.PluginHostApi_$id.moveCameraToBounds', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
-        await channel.send(<Object?>[arg_firstPoint, arg_fsecondPoint, arg_padding, arg_duration, arg_cameraAnimationType.index]) as List<Object?>?;
+        await channel.send(<Object?>[arg_firstPoint, arg_secondPoint, arg_padding, arg_duration, arg_cameraAnimationType.index]) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',
@@ -504,12 +504,12 @@ class PluginHostApi {
   /// Обновление маркеров
   ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров
-  Future<void> updateMarkers(DataMarkerUpdates arg_markerUpdates) async {
+  Future<void> updateMarkers(DataMarkerUpdates arg_updates) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'pro.flown.PluginHostApi_$id.updateMarkers', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
-        await channel.send(<Object?>[arg_markerUpdates]) as List<Object?>?;
+        await channel.send(<Object?>[arg_updates]) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',
@@ -529,12 +529,12 @@ class PluginHostApi {
   /// Обновление полилайнов
   ///
   /// [polylineUpdates] - объект с информацией об обновлении полилайнов
-  Future<void> updatePolylines(DataPolylineUpdates arg_polylineUpdates) async {
+  Future<void> updatePolylines(DataPolylineUpdates arg_updates) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'pro.flown.PluginHostApi_$id.updatePolylines', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
-        await channel.send(<Object?>[arg_polylineUpdates]) as List<Object?>?;
+        await channel.send(<Object?>[arg_updates]) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',

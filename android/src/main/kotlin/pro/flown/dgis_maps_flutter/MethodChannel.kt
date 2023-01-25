@@ -437,19 +437,19 @@ interface PluginHostApi {
    */
   fun moveCamera(cameraPosition: DataCameraPosition, duration: Long?, cameraAnimationType: DataCameraAnimationType, callback: () -> Unit)
   /** Перемещение камеры к области из двух точек */
-  fun moveCameraToBounds(firstPoint: DataLatLng, fsecondPoint: DataLatLng, padding: Double, duration: Long?, cameraAnimationType: DataCameraAnimationType, callback: () -> Unit)
+  fun moveCameraToBounds(firstPoint: DataLatLng, secondPoint: DataLatLng, padding: Double, duration: Long?, cameraAnimationType: DataCameraAnimationType, callback: () -> Unit)
   /**
    * Обновление маркеров
    *
    * [markerUpdates] - объект с информацией об обновлении маркеров
    */
-  fun updateMarkers(markerUpdates: DataMarkerUpdates)
+  fun updateMarkers(updates: DataMarkerUpdates)
   /**
    * Обновление полилайнов
    *
    * [polylineUpdates] - объект с информацией об обновлении полилайнов
    */
-  fun updatePolylines(polylineUpdates: DataPolylineUpdates)
+  fun updatePolylines(updates: DataPolylineUpdates)
   /**
    * Изменение слоя с маркером своего местоположения
    *
@@ -512,11 +512,11 @@ interface PluginHostApi {
             try {
               val args = message as List<Any?>
               val firstPointArg = args[0] as DataLatLng
-              val fsecondPointArg = args[1] as DataLatLng
+              val secondPointArg = args[1] as DataLatLng
               val paddingArg = args[2] as Double
               val durationArg = args[3].let { if (it is Int) it.toLong() else it as? Long }
               val cameraAnimationTypeArg = DataCameraAnimationType.ofRaw(args[4] as Int)!!
-              api.moveCameraToBounds(firstPointArg, fsecondPointArg, paddingArg, durationArg, cameraAnimationTypeArg) {
+              api.moveCameraToBounds(firstPointArg, secondPointArg, paddingArg, durationArg, cameraAnimationTypeArg) {
                 reply.reply(wrapResult(null))
               }
             } catch (exception: Error) {
@@ -535,8 +535,8 @@ interface PluginHostApi {
             var wrapped = listOf<Any?>()
             try {
               val args = message as List<Any?>
-              val markerUpdatesArg = args[0] as DataMarkerUpdates
-              api.updateMarkers(markerUpdatesArg)
+              val updatesArg = args[0] as DataMarkerUpdates
+              api.updateMarkers(updatesArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Error) {
               wrapped = wrapError(exception)
@@ -554,8 +554,8 @@ interface PluginHostApi {
             var wrapped = listOf<Any?>()
             try {
               val args = message as List<Any?>
-              val polylineUpdatesArg = args[0] as DataPolylineUpdates
-              api.updatePolylines(polylineUpdatesArg)
+              val updatesArg = args[0] as DataPolylineUpdates
+              api.updatePolylines(updatesArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Error) {
               wrapped = wrapError(exception)
