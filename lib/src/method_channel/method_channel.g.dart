@@ -512,6 +512,32 @@ class PluginHostApi {
       return;
     }
   }
+
+  /// Изменение слоя с маркером своего местоположения
+  ///
+  /// [isVisible] - true, добавляет слой со своей локацией, если его еще нет на карте
+  /// false - убирает слой с карты, если он етсь на карте
+  Future<void> changeMyLocationLayerState(bool arg_isVisible) async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'pro.flown.PluginHostApi_$id.changeMyLocationLayerState', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(<Object?>[arg_isVisible]) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
 }
 
 abstract class PluginFlutterApi {

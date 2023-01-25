@@ -190,6 +190,12 @@ abstract class PluginHostApi {
   ///
   /// [polylineUpdates] - объект с информацией об обновлении полилайнов
   void updatePolylines(DataPolylineUpdates polylineUpdates);
+
+  /// Изменение слоя с маркером своего местоположения
+  ///
+  /// [isVisible] - true, добавляет слой со своей локацией, если его еще нет на карте
+  /// false - убирает слой с карты, если он етсь на карте
+  void changeMyLocationLayerState(bool isVisible);
 }
 
 @FlutterApi()

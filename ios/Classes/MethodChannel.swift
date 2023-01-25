@@ -394,6 +394,11 @@ protocol PluginHostApi {
   ///
   /// [polylineUpdates] - объект с информацией об обновлении полилайнов
   func updatePolylines(polylineUpdates: DataPolylineUpdates)
+  /// Изменение слоя с маркером своего местоположения
+  ///
+  /// [isVisible] - true, добавляет слой со своей локацией, если его еще нет на карте
+  /// false - убирает слой с карты, если он етсь на карте
+  func changeMyLocationLayerState(isVisible: Bool)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -461,6 +466,21 @@ class PluginHostApiSetup {
       }
     } else {
       updatePolylinesChannel.setMessageHandler(nil)
+    }
+    /// Изменение слоя с маркером своего местоположения
+    ///
+    /// [isVisible] - true, добавляет слой со своей локацией, если его еще нет на карте
+    /// false - убирает слой с карты, если он етсь на карте
+    let changeMyLocationLayerStateChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id).changeMyLocationLayerState", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      changeMyLocationLayerStateChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let isVisibleArg = args[0] as! Bool
+        api.changeMyLocationLayerState(isVisible: isVisibleArg)
+        reply(wrapResult(nil))
+      }
+    } else {
+      changeMyLocationLayerStateChannel.setMessageHandler(nil)
     }
   }
 }

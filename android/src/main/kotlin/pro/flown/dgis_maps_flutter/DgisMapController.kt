@@ -1,6 +1,7 @@
 package pro.flown.dgis_maps_flutter
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.platform.PlatformView
@@ -21,6 +22,7 @@ class DgisMapController internal constructor(
     private val mapView: MapView
     private lateinit var map: Map
     private lateinit var objectManager: MapObjectManager
+    private lateinit var myLocationSource: MyLocationMapObjectSource
     private val flutterApi = PluginFlutterApi(binaryMessenger, id)
 
     init {
@@ -47,6 +49,7 @@ class DgisMapController internal constructor(
     private fun init(map: Map) {
         this.map = map
         objectManager = MapObjectManager(map)
+        initLocationSource()
 //
 //        imageFromAsset(sdkContext, "")
 //
@@ -67,22 +70,44 @@ class DgisMapController internal constructor(
 //        }
     }
 
+
+    private fun initLocationSource() {
+        myLocationSource = MyLocationMapObjectSource(
+            sdkContext,
+            MyLocationDirectionBehaviour.FOLLOW_SATELLITE_HEADING,
+            createSmoothMyLocationController()
+        )
+    }
+
+    override fun changeMyLocationLayerState(isVisible: Boolean) {
+        var isMyLocationVisible =
+            map.sources.contains(myLocationSource);
+        if (isVisible && !isMyLocationVisible) {
+            map.addSource(myLocationSource);
+        } else if (!isVisible && isMyLocationVisible) {
+            map.removeSource(myLocationSource);
+        }
+    }
+
     override fun getCameraPosition(callback: (DataCameraPosition) -> Unit) {
         return callback(
             DataCameraPosition(
-            target = DataLatLng(map.camera.position.point.latitude.value,map.camera.position.point.longitude.value),
-zoom = map.camera.position.zoom.value.toDouble(),
-            bearing = map.camera.position.bearing.value,
-            tilt = map.camera.position.tilt.value.toDouble(),
+                target = DataLatLng(
+                    map.camera.position.point.latitude.value,
+                    map.camera.position.point.longitude.value
+                ),
+                zoom = map.camera.position.zoom.value.toDouble(),
+                bearing = map.camera.position.bearing.value,
+                tilt = map.camera.position.tilt.value.toDouble(),
             )
-                );
+        );
     }
 
     override fun moveCamera(
         cameraPosition: DataCameraPosition,
         duration: Long?,
         cameraAnimationType: DataCameraAnimationType,
-        callback: () -> Unit
+        callback: () -> Unit,
     ) {
         map.camera.move(
             CameraPosition(
@@ -107,10 +132,10 @@ zoom = map.camera.position.zoom.value.toDouble(),
 
     override fun updatePolylines(polylineUpdates: DataPolylineUpdates) {
         objectManager.removeObjects(
-            polylineUpdates.toRemove.map { dataPolyline2Polyline(sdkContext,it!!) }
+            polylineUpdates.toRemove.map { dataPolyline2Polyline(sdkContext, it!!) }
         )
         objectManager.addObjects(
-            polylineUpdates.toAdd.map { dataPolyline2Polyline(sdkContext,it!!) }
+            polylineUpdates.toAdd.map { dataPolyline2Polyline(sdkContext, it!!) }
         )
     }
 

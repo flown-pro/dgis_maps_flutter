@@ -33,6 +33,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int i = 0;
   int mId = 0;
   late DGisMapController controller;
+  bool myLocationEnabled = true;
 
   Set<Marker> markers = {};
   Set<Polyline> polylines = {};
@@ -85,6 +86,12 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {});
   }
 
+  void toggleMyLocation() {
+    setState(() {
+      myLocationEnabled = !myLocationEnabled;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,6 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Expanded(
             child: DGisMap(
               key: ValueKey(i),
+              myLocationEnabled: myLocationEnabled,
               initialPosition: CameraPosition(target: LatLng(60, 30), zoom: 7),
               onMapCreated: onMapCreated,
               markers: markers,
@@ -124,6 +132,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     TextButton(
                       onPressed: addPolyline,
                       child: const Text('addPolyline'),
+                    ),
+                    TextButton(
+                      onPressed: toggleMyLocation,
+                      child: const Text('toggleMyLocation'),
                     ),
                   ],
                 ),

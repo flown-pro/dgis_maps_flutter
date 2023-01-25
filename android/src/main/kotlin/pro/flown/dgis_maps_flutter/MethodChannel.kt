@@ -438,6 +438,13 @@ interface PluginHostApi {
    * [polylineUpdates] - объект с информацией об обновлении полилайнов
    */
   fun updatePolylines(polylineUpdates: DataPolylineUpdates)
+  /**
+   * Изменение слоя с маркером своего местоположения
+   *
+   * [isVisible] - true, добавляет слой со своей локацией, если его еще нет на карте
+   * false - убирает слой с карты, если он етсь на карте
+   */
+  fun changeMyLocationLayerState(isVisible: Boolean)
 
   companion object {
     /** The codec used by PluginHostApi. */
@@ -515,6 +522,25 @@ interface PluginHostApi {
               val args = message as List<Any?>
               val polylineUpdatesArg = args[0] as DataPolylineUpdates
               api.updatePolylines(polylineUpdatesArg)
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Error) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginHostApi_$id.changeMyLocationLayerState", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            var wrapped = listOf<Any?>()
+            try {
+              val args = message as List<Any?>
+              val isVisibleArg = args[0] as Boolean
+              api.changeMyLocationLayerState(isVisibleArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Error) {
               wrapped = wrapError(exception)

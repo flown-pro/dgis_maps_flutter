@@ -23,6 +23,7 @@ class DGisMap extends StatefulWidget {
     this.markers = const {},
     this.polylines = const {},
     this.onCameraStateChanged,
+    this.myLocationEnabled = true,
     required this.initialPosition,
   }) : super(key: key);
 
@@ -32,6 +33,7 @@ class DGisMap extends StatefulWidget {
 
   final Set<Marker> markers;
   final Set<Polyline> polylines;
+  final bool myLocationEnabled;
 
   final CameraStateChangedCallback? onCameraStateChanged;
 
@@ -69,6 +71,9 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
         toRemove: _polylines.difference(widget.polylines),
       );
       _polylines = widget.polylines.toSet();
+    }
+    if (oldWidget.myLocationEnabled != widget.myLocationEnabled) {
+      api.changeMyLocationLayerState(widget.myLocationEnabled);
     }
   }
 
