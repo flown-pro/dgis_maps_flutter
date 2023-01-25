@@ -52,7 +52,6 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
   void initState() {
     _markers = widget.markers.toSet();
     _polylines = widget.polylines.toSet();
-    api.changeMyLocationLayerState(widget.myLocationEnabled);
     super.initState();
   }
 
@@ -172,5 +171,6 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
   @override
   void onNativeMapReady() {
     _apiReady.complete();
+    api.changeMyLocationLayerState(widget.myLocationEnabled);
   }
 }
