@@ -204,6 +204,38 @@ data class DataCameraStateValue (
 }
 
 /**
+ * Отступ камеры от краев экрана в пикселях
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class DataPadding (
+  val left: Long,
+  val top: Long,
+  val right: Long,
+  val bottom: Long
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): DataPadding {
+      val left = list[0].let { if (it is Int) it.toLong() else it as Long }
+      val top = list[1].let { if (it is Int) it.toLong() else it as Long }
+      val right = list[2].let { if (it is Int) it.toLong() else it as Long }
+      val bottom = list[3].let { if (it is Int) it.toLong() else it as Long }
+      return DataPadding(left, top, right, bottom)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      left,
+      top,
+      right,
+      bottom,
+    )
+  }
+}
+
+/**
  * Позиция камеры
  *
  * Generated class from Pigeon that represents data sent in messages.
@@ -370,10 +402,15 @@ private object PluginHostApiCodec : StandardMessageCodec() {
       }
       134.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataPolyline.fromList(it)
+          DataPadding.fromList(it)
         }
       }
       135.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          DataPolyline.fromList(it)
+        }
+      }
+      136.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           DataPolylineUpdates.fromList(it)
         }
@@ -407,12 +444,16 @@ private object PluginHostApiCodec : StandardMessageCodec() {
         stream.write(133)
         writeValue(stream, value.toList())
       }
-      is DataPolyline -> {
+      is DataPadding -> {
         stream.write(134)
         writeValue(stream, value.toList())
       }
-      is DataPolylineUpdates -> {
+      is DataPolyline -> {
         stream.write(135)
+        writeValue(stream, value.toList())
+      }
+      is DataPolylineUpdates -> {
+        stream.write(136)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -437,7 +478,7 @@ interface PluginHostApi {
    */
   fun moveCamera(cameraPosition: DataCameraPosition, duration: Long?, cameraAnimationType: DataCameraAnimationType, callback: () -> Unit)
   /** Перемещение камеры к области из двух точек */
-  fun moveCameraToBounds(firstPoint: DataLatLng, secondPoint: DataLatLng, padding: Double, duration: Long?, cameraAnimationType: DataCameraAnimationType, callback: () -> Unit)
+  fun moveCameraToBounds(firstPoint: DataLatLng, secondPoint: DataLatLng, padding: DataPadding, duration: Long?, cameraAnimationType: DataCameraAnimationType, callback: () -> Unit)
   /**
    * Обновление маркеров
    *
@@ -513,7 +554,7 @@ interface PluginHostApi {
               val args = message as List<Any?>
               val firstPointArg = args[0] as DataLatLng
               val secondPointArg = args[1] as DataLatLng
-              val paddingArg = args[2] as Double
+              val paddingArg = args[2] as DataPadding
               val durationArg = args[3].let { if (it is Int) it.toLong() else it as? Long }
               val cameraAnimationTypeArg = DataCameraAnimationType.ofRaw(args[4] as Int)!!
               api.moveCameraToBounds(firstPointArg, secondPointArg, paddingArg, durationArg, cameraAnimationTypeArg) {

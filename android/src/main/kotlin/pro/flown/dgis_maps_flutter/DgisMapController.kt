@@ -25,9 +25,14 @@ class DgisMapController internal constructor(
     private val sdkContext: ru.dgis.sdk.Context
     private val mapView: MapView
     private lateinit var map: Map
-    private lateinit var objectManager: MapObjectManager
-    private lateinit var myLocationSource: MyLocationMapObjectSource
+    private lateinit var objectManager: MapObjectManager = MapObjectManager(map)
+    private lateinit var myLocationSource: MyLocationMapObjectSource = MyLocationMapObjectSource(
+        sdkContext,
+        MyLocationDirectionBehaviour.FOLLOW_MAGNETIC_HEADING,
+        createSmoothMyLocationController()
+    )
     private val flutterApi = PluginFlutterApi(binaryMessenger, id)
+    private var cameraStateConnection: AutoCloseable
 
     init {
         sdkContext = DGis.initialize(context.applicationContext)
@@ -36,7 +41,7 @@ class DgisMapController internal constructor(
         val locationSource = CustomLocationManager(context.applicationContext)
         registerPlatformLocationSource(sdkContext, locationSource)
 
-        val params = DataCreationParams.fromList(args as List<Any?>);
+        val params = DataCreationParams.fromList(args as List<Any?>)
         mapView = MapView(context, MapOptions().also {
             it.position = CameraPosition(
                 toGeoPoint(params.position),
@@ -52,34 +57,24 @@ class DgisMapController internal constructor(
     }
 
     override fun dispose() {
-//        TODO("Not yet implemented")
+        cameraStateConnection.close()
     }
 
     private fun init(map: Map) {
         this.map = map
         flutterApi.onNativeMapReady { }
-        objectManager = MapObjectManager(map)
-        initLocationSource()
-        map.camera.stateChannel.connect {
+        cameraStateConnection = map.camera.stateChannel.connect {
             flutterApi.onCameraStateChanged(cameraStateArg = toDataCameraStateValue(it)) {}
         }
     }
 
 
-    private fun initLocationSource() {
-        myLocationSource = MyLocationMapObjectSource(
-            sdkContext,
-            MyLocationDirectionBehaviour.FOLLOW_SATELLITE_HEADING,
-            createSmoothMyLocationController()
-        )
-    }
-
     override fun changeMyLocationLayerState(isVisible: Boolean) {
-        val isMyLocationVisible = map.sources.contains(myLocationSource);
+        val isMyLocationVisible = map.sources.contains(myLocationSource)
         if (isVisible && !isMyLocationVisible) {
-            map.addSource(myLocationSource);
+            map.addSource(myLocationSource)
         } else if (!isVisible && isMyLocationVisible) {
-            map.removeSource(myLocationSource);
+            map.removeSource(myLocationSource)
         }
     }
 
@@ -113,7 +108,7 @@ class DgisMapController internal constructor(
     override fun moveCameraToBounds(
         firstPoint: DataLatLng,
         secondPoint: DataLatLng,
-        padding: Double,
+        padding: DataPadding,
         duration: Long?,
         cameraAnimationType: DataCameraAnimationType,
         callback: () -> Unit
@@ -124,7 +119,11 @@ class DgisMapController internal constructor(
                 PointGeometry(toGeoPoint(secondPoint))
             )
         )
-        val position = calcPosition(map.camera, geometry)
+        val position = calcPosition(
+            map.camera,
+            geometry,
+            toPadding(padding)
+        )
         map.camera.move(
             position,
             time = Duration.ofMilliseconds(duration!!),

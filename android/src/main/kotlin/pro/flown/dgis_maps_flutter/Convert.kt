@@ -8,6 +8,14 @@ import ru.dgis.sdk.coordinates.GeoPoint
 import ru.dgis.sdk.geometry.GeoPointWithElevation
 import ru.dgis.sdk.map.*
 
+fun toPadding(padding: DataPadding): Padding? {
+    return Padding(
+        padding.left.toInt(),
+        padding.top.toInt(),
+        padding.right.toInt(),
+        padding.bottom.toInt()
+    )
+}
 
 fun toAnimationType(cameraAnimationType: DataCameraAnimationType): CameraAnimationType {
     return when (cameraAnimationType) {

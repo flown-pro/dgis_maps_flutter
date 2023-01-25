@@ -188,6 +188,43 @@ class DataCameraStateValue {
   }
 }
 
+/// Отступ камеры от краев экрана в пикселях
+class DataPadding {
+  DataPadding({
+    required this.left,
+    required this.top,
+    required this.right,
+    required this.bottom,
+  });
+
+  int left;
+
+  int top;
+
+  int right;
+
+  int bottom;
+
+  Object encode() {
+    return <Object?>[
+      left,
+      top,
+      right,
+      bottom,
+    ];
+  }
+
+  static DataPadding decode(Object result) {
+    result as List<Object?>;
+    return DataPadding(
+      left: result[0]! as int,
+      top: result[1]! as int,
+      right: result[2]! as int,
+      bottom: result[3]! as int,
+    );
+  }
+}
+
 /// Позиция камеры
 class DataCameraPosition {
   DataCameraPosition({
@@ -366,11 +403,14 @@ class _PluginHostApiCodec extends StandardMessageCodec {
     } else if (value is DataMarkerUpdates) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    } else if (value is DataPolyline) {
+    } else if (value is DataPadding) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    } else if (value is DataPolylineUpdates) {
+    } else if (value is DataPolyline) {
       buffer.putUint8(135);
+      writeValue(buffer, value.encode());
+    } else if (value is DataPolylineUpdates) {
+      buffer.putUint8(136);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -399,9 +439,12 @@ class _PluginHostApiCodec extends StandardMessageCodec {
         return DataMarkerUpdates.decode(readValue(buffer)!);
       
       case 134:       
-        return DataPolyline.decode(readValue(buffer)!);
+        return DataPadding.decode(readValue(buffer)!);
       
       case 135:       
+        return DataPolyline.decode(readValue(buffer)!);
+      
+      case 136:       
         return DataPolylineUpdates.decode(readValue(buffer)!);
       
       default:
@@ -479,7 +522,7 @@ class PluginHostApi {
   }
 
   /// Перемещение камеры к области из двух точек
-  Future<void> moveCameraToBounds(DataLatLng arg_firstPoint, DataLatLng arg_secondPoint, double arg_padding, int? arg_duration, DataCameraAnimationType arg_cameraAnimationType) async {
+  Future<void> moveCameraToBounds(DataLatLng arg_firstPoint, DataLatLng arg_secondPoint, DataPadding arg_padding, int? arg_duration, DataCameraAnimationType arg_cameraAnimationType) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'pro.flown.PluginHostApi_$id.moveCameraToBounds', codec,
         binaryMessenger: _binaryMessenger);

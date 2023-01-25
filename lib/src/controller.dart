@@ -1,18 +1,23 @@
+import 'dart:async';
+
 import 'method_channel.g.dart';
 import 'types/types.dart';
 
 /// Controller for a single DGis instance running on the host platform.
 class DGisMapController {
   DGisMapController(
-    this._api, {
+    this._api,
+    this._completer, {
     required this.mapId,
   });
 
   final int mapId;
   final PluginHostApi _api;
+  final Completer<void> _completer;
 
   /// Получение текущей позиции карты [CameraPosition]
   Future<CameraPosition> getCameraPosition() async {
+    await _completer.future;
     final dataCameraPosition = await _api.getCameraPosition();
     return CameraPosition(
       target: LatLng(
@@ -30,21 +35,25 @@ class DGisMapController {
     required CameraPosition cameraPosition,
     int? duration,
     CameraAnimationType cameraAnimationType = CameraAnimationType.def,
-  }) =>
-      _api.moveCamera(cameraPosition, duration, cameraAnimationType);
+  }) async {
+    await _completer.future;
+    return _api.moveCamera(cameraPosition, duration, cameraAnimationType);
+  }
 
   /// Переход камеры к выбранной точке [CameraPosition]
   Future<void> moveCameraToBounds({
     required LatLngBounds cameraPosition,
-    double padding = 0,
+    MapPadding? padding,
     int? duration,
     CameraAnimationType cameraAnimationType = CameraAnimationType.def,
-  }) =>
-      _api.moveCameraToBounds(
-        cameraPosition.northeast,
-        cameraPosition.southwest,
-        padding,
-        duration,
-        cameraAnimationType,
-      );
+  }) async {
+    await _completer.future;
+    return _api.moveCameraToBounds(
+      cameraPosition.northeast,
+      cameraPosition.southwest,
+      padding ?? MapPadding.zero,
+      duration,
+      cameraAnimationType,
+    );
+  }
 }
