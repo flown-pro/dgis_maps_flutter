@@ -1,11 +1,13 @@
-import 'package:dgis_maps_flutter/dgis_maps_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+import '../method_channel.g.dart';
+import 'types.dart';
 
 class Polyline extends DataPolyline {
   Polyline({
     required MapObjectId polylineId,
-    required List<DataLatLng> points,
+    required List<LatLng> points,
     double width = 1.0,
     Color color = Colors.black,
     double erasedPart = 0.0,

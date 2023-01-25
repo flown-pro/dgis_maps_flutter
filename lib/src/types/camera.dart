@@ -1,4 +1,4 @@
-import '../method_channel/method_channel.g.dart';
+import '../method_channel.g.dart';
 import 'types.dart';
 
 class CameraPosition extends DataCameraPosition {

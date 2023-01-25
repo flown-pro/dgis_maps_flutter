@@ -1,4 +1,4 @@
-import 'package:dgis_maps_flutter/dgis_maps_flutter.dart';
+import '../method_channel.g.dart';
 
 class MapObjectId extends DataMapObjectId {
   MapObjectId(String value) : super(value: value);

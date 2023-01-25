@@ -2,10 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// All the public types exposed by this package.
+export 'bitmap.dart';
 export 'camera.dart';
+export 'enums.dart';
 export 'location.dart';
+export 'map_object_id.dart';
 export 'marker.dart';
 export 'polyline.dart';
-export 'map_object_id.dart';
-export 'bitmap.dart';

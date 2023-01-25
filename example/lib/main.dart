@@ -51,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
         tilt: 0,
       ),
       duration: 1000,
-      cameraAnimationType: DataCameraAnimationType.linear,
+      cameraAnimationType: CameraAnimationType.linear,
     );
   }
 
