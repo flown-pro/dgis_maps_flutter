@@ -49,6 +49,16 @@ class DgisHostApi : NSObject, PluginHostApi {
     }
     
     func moveCamera(cameraPosition: DataCameraPosition, duration: Int?, cameraAnimationType: DataCameraAnimationType, completion: @escaping () -> Void) {
+        var animationType = DGis.CameraAnimationType.default
+//        switch (cameraAnimationType) {
+//        case .linear:
+//            animationType = DGis.CameraAnimationType.linear
+//        case .showBothPositions:
+//            animationType = DGis.CameraAnimationType.showBothPositions
+//        @unknown default:
+//            animationType = DGis.CameraAnimationType.default
+//        }
+        
         cameraMoveService.moveToLocation(
             position: DGis.CameraPosition(
                 point: DGis.GeoPoint(
@@ -60,7 +70,7 @@ class DgisHostApi : NSObject, PluginHostApi {
                 bearing: Bearing(floatLiteral: cameraPosition.bearing)
             ),
             time: Double(duration ?? 300),
-            animationType: DGis.CameraAnimationType.default //TODO: add CameraAnimationType enum support
+            animationType: animationType
         )
         completion()
     }

@@ -30,25 +30,27 @@ final class CameraMoveService {
     }
     
     func startCameraStateStream() {
-        cameraStream = map.camera.stateChannel.sink { state in
-            var newState : DataCameraState
-            switch (state) {
-            case .busy:
-                newState = DataCameraState.busy
-            case .fly:
-                newState = DataCameraState.fly
-            case .followPosition:
-                newState = DataCameraState.followPosition
-            case .free:
-                newState = DataCameraState.free
-            @unknown default:
-                newState = DataCameraState.free
-            }
-            self.flutterApi.onCameraStateChanged(
-                cameraState: newState,
-                completion: {}
-            )
-        }
+        stopCameraStateStream()
+//        cameraStream = map.camera.stateChannel.sink { state in
+//            var newState : DataCameraState
+//            switch (state) {
+//            case .busy:
+//                newState = DataCameraState.busy
+//            case .fly:
+//                newState = DataCameraState.fly
+//            case .followPosition:
+//                newState = DataCameraState.followPosition
+//            case .free:
+//                newState = DataCameraState.free
+//            @unknown default:
+//                newState = DataCameraState.free
+//            }
+//            print(newState)
+////            self.flutterApi.onCameraStateChanged( //TODO: enum wtf
+////                cameraState: newState,
+////                completion: {}
+////            )
+//        }
     }
     
     func stopCameraStateStream() {
@@ -76,14 +78,14 @@ final class CameraMoveService {
         }
     }
     
-    func moveToLocation(position: DGis.CameraPosition, time: TimeInterval?, animationType: DGis.CameraAnimationType) {
+    func moveToLocation(position: DGis.CameraPosition, time: TimeInterval, animationType: DGis.CameraAnimationType) {
         DispatchQueue.main.async {
             self.moveCameraCancellable?.cancel()
             self.moveCameraCancellable = self.map
                 .camera
                 .move(
                     position: position,
-                    time: time ?? 0.3,
+                    time: time,
                     animationType: animationType
                 ).sink { _ in
                     print("Move to location")
