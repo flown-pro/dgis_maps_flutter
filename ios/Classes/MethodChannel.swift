@@ -570,4 +570,11 @@ class PluginFlutterApi {
       completion()
     }
   }
+  /// Коллбэк на завршение сохдания нативной карты
+  func onNativeMapReady(completion: @escaping () -> Void) {
+    let channel = FlutterBasicMessageChannel(name: "pro.flown.PluginFlutterApi_\(id).onNativeMapReady", binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage(nil) { _ in
+      completion()
+    }
+  }
 }

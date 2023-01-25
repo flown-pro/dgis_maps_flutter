@@ -1,4 +1,3 @@
-
 import 'package:pigeon/pigeon.dart';
 
 @ConfigurePigeon(PigeonOptions(
@@ -185,6 +184,7 @@ abstract class PluginHostApi {
     int? duration,
     DataCameraAnimationType cameraAnimationType,
   );
+
   /// Перемещение камеры к области из двух точек
   @async
   void moveCameraToBounds(
@@ -194,6 +194,7 @@ abstract class PluginHostApi {
     int? duration,
     DataCameraAnimationType cameraAnimationType,
   );
+
   /// Обновление маркеров
   ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров
@@ -216,6 +217,9 @@ abstract class PluginFlutterApi {
   /// Коллбэк на изменение состояния камеры
   /// [cameraState] - индекс в перечислении [CameraState]
   void onCameraStateChanged(DataCameraStateValue cameraState);
+
+  /// Коллбэк на завршение сохдания нативной карты
+  void onNativeMapReady();
 }
 
 /// Класс, используемый для генерации моделей,

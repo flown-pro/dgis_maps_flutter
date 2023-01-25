@@ -42,7 +42,7 @@ class DGisMap extends StatefulWidget {
 }
 
 class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
-  final _controller = Completer<DGisMapController>();
+  final _apiReady = Completer<void>();
   late final PluginHostApi api;
 
   Set<Marker> _markers = const {};
@@ -77,33 +77,37 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
     }
   }
 
-  void _updateMarkers({
+  Future<void> _updateMarkers({
     required Set<Marker> toAdd,
     required Set<Marker> toRemove,
-  }) =>
-      api.updateMarkers(
-        DataMarkerUpdates(
-          toRemove: toRemove.toList(),
-          toAdd: toAdd.toList(),
-        ),
-      );
+  }) async {
+    await _apiReady.future;
+    return api.updateMarkers(
+      DataMarkerUpdates(
+        toRemove: toRemove.toList(),
+        toAdd: toAdd.toList(),
+      ),
+    );
+  }
 
-  void _updatePolylines({
+  Future<void> _updatePolylines({
     required Set<Polyline> toAdd,
     required Set<Polyline> toRemove,
-  }) =>
-      api.updatePolylines(
-        DataPolylineUpdates(
-          toRemove: toRemove.toList(),
-          toAdd: toAdd.toList(),
-        ),
-      );
+  }) async {
+    await _apiReady.future;
+    return api.updatePolylines(
+      DataPolylineUpdates(
+        toRemove: toRemove.toList(),
+        toAdd: toAdd.toList(),
+      ),
+    );
+  }
 
   Future<void> onViewCreated(int id) async {
     api = PluginHostApi(id: id);
     final controller = DGisMapController(api, mapId: id);
     PluginFlutterApi.setup(this, id: id);
-    if (!_controller.isCompleted) _controller.complete(controller);
+    await _apiReady.future;
     final MapCreatedCallback? onMapCreated = widget.onMapCreated;
     if (onMapCreated != null) {
       onMapCreated(controller);
@@ -163,4 +167,9 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
   @override
   void onCameraStateChanged(DataCameraStateValue cameraState) =>
       widget.onCameraStateChanged?.call(cameraState.value);
+
+  @override
+  void onNativeMapReady() {
+    _apiReady.complete();
+  }
 }
