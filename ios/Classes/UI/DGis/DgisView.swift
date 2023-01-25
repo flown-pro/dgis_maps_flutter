@@ -22,7 +22,9 @@ class DGisNativeView: NSObject, FlutterPlatformView {
         arguments args: Any?,
         binaryMessenger messenger: FlutterBinaryMessenger?,
         dgisService: DGisSdkService,
-        settingsService: ISettingsService
+        settingsService: ISettingsService,
+        flutterApi: PluginFlutterApi
+        
     ) {
         viewModel = DGisViewModel(
             arguments: args,
@@ -34,6 +36,7 @@ class DGisNativeView: NSObject, FlutterPlatformView {
         super.init()
         let controller = UIHostingController(rootView: makeMapView())
         _view = controller.view
+        flutterApi.onNativeMapReady(completion: {})
     }
     
     private func makeMapView() -> some View {

@@ -69,7 +69,7 @@ class DgisHostApi : NSObject, PluginHostApi {
                 tilt: Tilt(floatLiteral: Float(cameraPosition.tilt)),
                 bearing: Bearing(floatLiteral: cameraPosition.bearing)
             ),
-            time: Double(duration ?? 300),
+            time: Double(duration ?? 300) / 1000,
             animationType: animationType
         )
         completion()
@@ -107,7 +107,7 @@ class DgisHostApi : NSObject, PluginHostApi {
         )
         cameraMoveService.moveToLocation(
             position: position,
-            time: Double(duration ?? 300),
+            time: Double(duration ?? 300) / 1000,
             animationType: animationType
         )
         completion()

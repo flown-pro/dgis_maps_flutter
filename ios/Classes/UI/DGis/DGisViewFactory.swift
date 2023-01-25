@@ -63,7 +63,8 @@ class DgisNativeViewFactory: NSObject, FlutterPlatformViewFactory {
             arguments: args,
             binaryMessenger: messenger,
             dgisService: dgisService,
-            settingsService: settingsService
+            settingsService: settingsService,
+            flutterApi: flutterApi
         )
     }
     
