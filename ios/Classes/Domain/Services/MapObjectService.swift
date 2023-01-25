@@ -52,52 +52,84 @@ final class MapObjectService {
         self.imageFactory = imageFactory
     }
     
-    func createMarker(geoPoint: GeoPointWithElevation, image: UIImage, text: String?) {
-        let icon = self.makeIcon(
-            image: image,
-            size: self.size
-        )
+    
+    func updateMarkers(markerUpdates: DataMarkerUpdates) {
+        let toAdd = markerUpdates.toAdd.filter({ marker in
+            marker != nil
+        }).map { data2Marker(data: $0!) }
+        let toRemove = markerUpdates.toRemove.filter({ marker in
+            marker != nil
+        }).map { data2Marker(data: $0!) }
         
-        let options = MarkerOptions(
-            position: geoPoint,
-            icon: icon,
-            text: text
+        self.mapObjectManager.removeAndAddObjects(
+            objectsToRemove: toRemove,
+            objectsToAdd: toAdd
         )
-        let marker = DGis.Marker(options: options)
-        self.mapObjectManager.addObject(item: marker)
+    }
+    
+    private func data2Marker(data: DataMarker) -> DGis.Marker {
+        let icon = data.bitmap == nil ? nil : makeIcon(bitmap: data.bitmap!, size: MarkerSize.medium)
+        return DGis.Marker(
+            options: MarkerOptions(
+                position: GeoPointWithElevation(
+                    latitude: Latitude(floatLiteral: data.position.latitude),
+                    longitude: Longitude(floatLiteral: data.position.longitude)
+                ),
+                icon: icon,
+                text: data.infoText
+            )
+        )
     }
     
     
-    
-    private func makeIcon(image: UIImage, size: MarkerSize) -> DGis.Image? {
-        let typeSize = TypeSize(image: image, size: size)
-        if let icon = self.icons[typeSize] {
-            return icon
-        } else if let scaledImage = image.applyingSymbolConfiguration(.init(scale: size.scale)) {
-            let icon = self.imageFactory.make(image: scaledImage)
-            self.icons[typeSize] = icon
-            return icon
-        } else {
-            return nil
+    private func makeIcon(bitmap: DataMarkerBitmap, size: MarkerSize) -> DGis.Image? {
+        let image = UIImage(data: Data(bitmap.bytes.data))
+        if (image != nil) {
+            let typeSize = TypeSize(image: image!, size: size)
+            if let icon = self.icons[typeSize] {
+                return icon
+            } else if let scaledImage = image!.applyingSymbolConfiguration(.init(scale: size.scale)) {
+                let icon = self.imageFactory.make(image: scaledImage)
+                self.icons[typeSize] = icon
+                return icon
+            }
         }
+        return nil
     }
     
-    func createPolyline(polyline: String, width: Float = 2, color: DGis.Color = DGis.Color.init()) {
-        let coordinates: [CLLocationCoordinate2D]? = decodePolyline(polyline)
-        var points = [GeoPoint]()
-        coordinates?.forEach({ points.append(GeoPoint(latitude: $0.latitude, longitude: $0.longitude)) })
-        
-        // Line settings.
-        let options = PolylineOptions(
-            points: points,
-            width: LogicalPixel(value: width),
-            color: color
+    func updatePolylines(polylineUpdates: DataPolylineUpdates) {
+        let toAdd = polylineUpdates.toAdd.filter({ line in
+            line != nil
+        }).map { data2Polyline(data: $0!) }
+        let toRemove = polylineUpdates.toRemove.filter({ line in
+            line != nil
+        }).map { data2Polyline(data: $0!) }
+        self.mapObjectManager.removeAndAddObjects(
+            objectsToRemove: toRemove,
+            objectsToAdd: toAdd
         )
-        
-        // Create and add the line to the map.
-        let polyline = DGis.Polyline(options: options)
-        self.mapObjectManager.addObject(item: polyline)
-        
+    }
+    
+    private func data2Polyline(data: DataPolyline) -> DGis.Polyline {
+        var points = [GeoPoint]()
+        data.points.forEach(
+            { p in
+                if (p != nil) {
+                    points.append(
+                        GeoPoint(
+                            latitude: p!.latitude,
+                            longitude: p!.longitude
+                        )
+                    )
+                }
+            }
+        )
+        let options = DGis.PolylineOptions(
+            points: points,
+            width: LogicalPixel(value: Float(data.width)),
+            color: DGis.Color(argb: UInt32(data.color))
+        )
+        return DGis.Polyline(options: options)
     }
     
     func removeAll() {

@@ -680,7 +680,7 @@ String? _swiftTypeForBuiltinDartType(TypeDeclaration type) {
     'void': 'Void',
     'bool': 'Bool',
     'String': 'String',
-    'int': 'Int32',
+    'int': 'Int',
     'double': 'Double',
     'Uint8List': 'FlutterStandardTypedData',
     'Int32List': 'FlutterStandardTypedData',

@@ -269,14 +269,14 @@ struct DataPolyline {
   var polylineId: DataMapObjectId
   var points: [DataLatLng?]
   var width: Double
-  var color: Int32
+  var color: Int
   var erasedPart: Double
 
   static func fromList(_ list: [Any?]) -> DataPolyline? {
     let polylineId = DataMapObjectId.fromList(list[0] as! [Any?])!
     let points = list[1] as! [DataLatLng?]
     let width = list[2] as! Double
-    let color = list[3] as! Int32
+    let color = list[3] as! Int
     let erasedPart = list[4] as! Double
 
     return DataPolyline(
@@ -385,7 +385,7 @@ protocol PluginHostApi {
   /// [duration] - длительность анимации в миллисекундах,
   /// если не указана, используется нативное значение
   /// [cameraAnimationType] - тип анимации
-  func moveCamera(cameraPosition: DataCameraPosition, duration: Int32?, cameraAnimationType: DataCameraAnimationType, completion: @escaping () -> Void)
+  func moveCamera(cameraPosition: DataCameraPosition, duration: Int?, cameraAnimationType: DataCameraAnimationType, completion: @escaping () -> Void)
   /// Обновление маркеров
   ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров
@@ -429,7 +429,7 @@ class PluginHostApiSetup {
       moveCameraChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let cameraPositionArg = args[0] as! DataCameraPosition
-        let durationArg = args[1] as? Int32
+        let durationArg = args[1] as? Int
         let cameraAnimationTypeArg = DataCameraAnimationType(rawValue: args[2] as! Int)!
         api.moveCamera(cameraPosition: cameraPositionArg, duration: durationArg, cameraAnimationType: cameraAnimationTypeArg) {
           reply(wrapResult(nil))

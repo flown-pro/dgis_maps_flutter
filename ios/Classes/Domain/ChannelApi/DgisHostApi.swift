@@ -9,8 +9,6 @@ import DGis
 
 class DgisHostApi : NSObject, PluginHostApi {
     
-    
-    
     private let sdk: DGis.Container
     private let mapFactory : IMapFactory
     private let mapFactoryProvider : IMapFactoryProvider
@@ -36,26 +34,22 @@ class DgisHostApi : NSObject, PluginHostApi {
     }
     
     
-    func getCameraPosition(completion: @escaping (CameraPosition) -> Void) {
+    
+    func getCameraPosition() -> DataCameraPosition {
         let dgisPosition = mapFactory.map.camera.position
-        let position = CameraPosition(
+        let position = DataCameraPosition(
             bearing: dgisPosition.bearing.value,
-            target: LatLng(
+            target: DataLatLng(
                 latitude: dgisPosition.point.latitude.value,
                 longitude: dgisPosition.point.longitude.value
             ),
             tilt: Double(dgisPosition.tilt.value),
             zoom: Double(dgisPosition.zoom.value)
         )
-        completion(position)
+        return position
     }
     
-    func moveCamera(
-        cameraPosition: CameraPosition,
-        duration: Int32?,
-        cameraAnimationType: CameraAnimationType,
-        completion: @escaping () -> Void
-    ) {
+    func moveCamera(cameraPosition: DataCameraPosition, duration: Int?, cameraAnimationType: DataCameraAnimationType, completion: @escaping () -> Void) {
         cameraMoveService.moveToLocation(
             position: DGis.CameraPosition(
                 point: DGis.GeoPoint(
@@ -72,30 +66,16 @@ class DgisHostApi : NSObject, PluginHostApi {
         completion()
     }
     
-    func updateMarkers(markerUpdates: MarkerUpdates) {
+    func updateMarkers(markerUpdates: DataMarkerUpdates) {
+        mapObjectService.updateMarkers(markerUpdates: markerUpdates)
+    }
+    
+    func updatePolylines(polylineUpdates: DataPolylineUpdates) {
+        mapObjectService.updatePolylines(polylineUpdates: polylineUpdates)
+    }
+    
+    func changeMyLocationLayerState(isVisible: Bool) {
         
-    }
-    
-    func addTestMarker() {
-        let flatPoint = mapFactory.map.camera.position.point
-        let point = GeoPointWithElevation(
-            latitude: flatPoint.latitude,
-            longitude: flatPoint.longitude
-        )
-        mapObjectService.createMarker(
-            geoPoint: point,
-            image: UIImage(systemName: "camera.fill")!
-                .withTintColor(.systemGray),
-            text: "hello, world"
-        )
-    }
-    
-    func addTestPolyline() {
-        mapObjectService.createPolyline(
-            polyline: "miaz@}mvrVkez@?sbAgtcApu^_wXbubAucAdjErwg@ejE~|x@iuKfxv@y~u@?go`AidPwbg@inc@cmGehjBztdAkdPt~hA}vXpn~@?vs\\f~vA?||x@glXpqnBoi`B?qvwArcA",
-            width: 4,
-            color: DGis.Color.init(argb: 0x80FF0000)
-        )
     }
     
 }
