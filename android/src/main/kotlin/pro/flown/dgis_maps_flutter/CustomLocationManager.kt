@@ -52,7 +52,7 @@ class CustomLocationManager(private val applicationContext: Context) : LocationS
 
         val newPriority = when (accuracy) {
             DesiredAccuracy.HIGH -> LocationRequest.PRIORITY_HIGH_ACCURACY
-            DesiredAccuracy.MEDIUM -> LocationRequest.PRIORITY_HIGH_ACCURACY
+            DesiredAccuracy.MEDIUM -> LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
             DesiredAccuracy.LOW -> LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
         }
         val request = LocationRequest.create().apply {

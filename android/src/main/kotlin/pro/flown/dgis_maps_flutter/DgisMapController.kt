@@ -23,16 +23,12 @@ class DgisMapController internal constructor(
     binaryMessenger: BinaryMessenger,
 ) : PlatformView, PluginHostApi {
     private val sdkContext: ru.dgis.sdk.Context
+    private val flutterApi = PluginFlutterApi(binaryMessenger, id)
     private val mapView: MapView
     private lateinit var map: Map
-    private lateinit var objectManager: MapObjectManager = MapObjectManager(map)
-    private lateinit var myLocationSource: MyLocationMapObjectSource = MyLocationMapObjectSource(
-        sdkContext,
-        MyLocationDirectionBehaviour.FOLLOW_MAGNETIC_HEADING,
-        createSmoothMyLocationController()
-    )
-    private val flutterApi = PluginFlutterApi(binaryMessenger, id)
-    private var cameraStateConnection: AutoCloseable
+    private lateinit var objectManager: MapObjectManager
+    private var myLocationSource: MyLocationMapObjectSource? = null
+    private lateinit var cameraStateConnection: AutoCloseable
 
     init {
         sdkContext = DGis.initialize(context.applicationContext)
@@ -44,8 +40,7 @@ class DgisMapController internal constructor(
         val params = DataCreationParams.fromList(args as List<Any?>)
         mapView = MapView(context, MapOptions().also {
             it.position = CameraPosition(
-                toGeoPoint(params.position),
-                Zoom(params.zoom.toFloat())
+                toGeoPoint(params.position), Zoom(params.zoom.toFloat())
             )
         })
         PluginHostApi.setUp(binaryMessenger, id, this)
@@ -62,19 +57,24 @@ class DgisMapController internal constructor(
 
     private fun init(map: Map) {
         this.map = map
+        objectManager = MapObjectManager(map)
         flutterApi.onNativeMapReady { }
         cameraStateConnection = map.camera.stateChannel.connect {
             flutterApi.onCameraStateChanged(cameraStateArg = toDataCameraStateValue(it)) {}
         }
     }
 
-
     override fun changeMyLocationLayerState(isVisible: Boolean) {
-        val isMyLocationVisible = map.sources.contains(myLocationSource)
+        myLocationSource = myLocationSource ?: MyLocationMapObjectSource(
+            sdkContext,
+            MyLocationDirectionBehaviour.FOLLOW_SATELLITE_HEADING,
+            createSmoothMyLocationController()
+        )
+        val isMyLocationVisible = map.sources.contains(myLocationSource!!)
         if (isVisible && !isMyLocationVisible) {
-            map.addSource(myLocationSource)
+            map.addSource(myLocationSource!!)
         } else if (!isVisible && isMyLocationVisible) {
-            map.removeSource(myLocationSource)
+            map.removeSource(myLocationSource!!)
         }
     }
 
@@ -99,8 +99,7 @@ class DgisMapController internal constructor(
                 zoom = Zoom(cameraPosition.zoom.toFloat()),
                 tilt = Tilt(cameraPosition.tilt.toFloat()),
                 bearing = Bearing(cameraPosition.bearing),
-            ),
-            time = Duration.ofMilliseconds(duration!!),
+            ), time = Duration.ofMilliseconds(duration ?: 100),
             animationType = toAnimationType(cameraAnimationType)
         ).onResult { callback() }
     }
@@ -115,18 +114,14 @@ class DgisMapController internal constructor(
     ) {
         val geometry = ComplexGeometry(
             listOf(
-                PointGeometry(toGeoPoint(firstPoint)),
-                PointGeometry(toGeoPoint(secondPoint))
+                PointGeometry(toGeoPoint(firstPoint)), PointGeometry(toGeoPoint(secondPoint))
             )
         )
         val position = calcPosition(
-            map.camera,
-            geometry,
-            toPadding(padding)
+            map.camera, geometry, toPadding(padding)
         )
         map.camera.move(
-            position,
-            time = Duration.ofMilliseconds(duration!!),
+            position, time = Duration.ofMilliseconds(duration ?: 100),
             animationType = toAnimationType(cameraAnimationType)
         ).onResult { callback() }
     }
