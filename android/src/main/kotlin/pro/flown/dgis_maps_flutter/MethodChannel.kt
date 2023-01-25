@@ -331,35 +331,30 @@ private object PluginHostApiCodec : StandardMessageCodec() {
       }
       130.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataLatLng.fromList(it)
+          DataMapObjectId.fromList(it)
         }
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataMapObjectId.fromList(it)
+          DataMarker.fromList(it)
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataMarker.fromList(it)
+          DataMarkerBitmap.fromList(it)
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataMarkerBitmap.fromList(it)
+          DataMarkerUpdates.fromList(it)
         }
       }
       134.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataMarkerUpdates.fromList(it)
-        }
-      }
-      135.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
           DataPolyline.fromList(it)
         }
       }
-      136.toByte() -> {
+      135.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           DataPolylineUpdates.fromList(it)
         }
@@ -377,32 +372,28 @@ private object PluginHostApiCodec : StandardMessageCodec() {
         stream.write(129)
         writeValue(stream, value.toList())
       }
-      is DataLatLng -> {
+      is DataMapObjectId -> {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is DataMapObjectId -> {
+      is DataMarker -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is DataMarker -> {
+      is DataMarkerBitmap -> {
         stream.write(132)
         writeValue(stream, value.toList())
       }
-      is DataMarkerBitmap -> {
+      is DataMarkerUpdates -> {
         stream.write(133)
         writeValue(stream, value.toList())
       }
-      is DataMarkerUpdates -> {
+      is DataPolyline -> {
         stream.write(134)
         writeValue(stream, value.toList())
       }
-      is DataPolyline -> {
-        stream.write(135)
-        writeValue(stream, value.toList())
-      }
       is DataPolylineUpdates -> {
-        stream.write(136)
+        stream.write(135)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -426,6 +417,8 @@ interface PluginHostApi {
    * [cameraAnimationType] - тип анимации
    */
   fun moveCamera(cameraPosition: DataCameraPosition, duration: Long?, cameraAnimationType: DataCameraAnimationType, callback: () -> Unit)
+  /** Перемещение камеры к области из двух точек */
+  fun moveCameraToBounds(firstPoint: DataLatLng, fsecondPoint: DataLatLng, padding: Double, duration: Long?, cameraAnimationType: DataCameraAnimationType, callback: () -> Unit)
   /**
    * Обновление маркеров
    *
@@ -481,6 +474,30 @@ interface PluginHostApi {
               val durationArg = args[1].let { if (it is Int) it.toLong() else it as? Long }
               val cameraAnimationTypeArg = DataCameraAnimationType.ofRaw(args[2] as Int)!!
               api.moveCamera(cameraPositionArg, durationArg, cameraAnimationTypeArg) {
+                reply.reply(wrapResult(null))
+              }
+            } catch (exception: Error) {
+              wrapped = wrapError(exception)
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginHostApi_$id.moveCameraToBounds", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            var wrapped = listOf<Any?>()
+            try {
+              val args = message as List<Any?>
+              val firstPointArg = args[0] as DataLatLng
+              val fsecondPointArg = args[1] as DataLatLng
+              val paddingArg = args[2] as Double
+              val durationArg = args[3].let { if (it is Int) it.toLong() else it as? Long }
+              val cameraAnimationTypeArg = DataCameraAnimationType.ofRaw(args[4] as Int)!!
+              api.moveCameraToBounds(firstPointArg, fsecondPointArg, paddingArg, durationArg, cameraAnimationTypeArg) {
                 reply.reply(wrapResult(null))
               }
             } catch (exception: Error) {

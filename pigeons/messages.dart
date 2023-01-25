@@ -1,7 +1,8 @@
+
 import 'package:pigeon/pigeon.dart';
 
 @ConfigurePigeon(PigeonOptions(
-  dartOut: 'lib/src/method_channel/method_channel.g.dart',
+  dartOut: 'lib/src/method_channel.g.dart',
   kotlinOptions: KotlinOptions(package: 'pro.flown.dgis_maps_flutter'),
   kotlinOut:
       'android/src/main/kotlin/pro/flown/dgis_maps_flutter/MethodChannel.kt',
@@ -179,7 +180,15 @@ abstract class PluginHostApi {
     int? duration,
     DataCameraAnimationType cameraAnimationType,
   );
-
+  /// Перемещение камеры к области из двух точек
+  @async
+  void moveCameraToBounds(
+    DataLatLng firstPoint,
+    DataLatLng fsecondPoint,
+    double padding,
+    int? duration,
+    DataCameraAnimationType cameraAnimationType,
+  );
   /// Обновление маркеров
   ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров
