@@ -16,7 +16,7 @@ final class CameraMoveService {
     private var locationService: LocationService?
     private var moveCameraCancellable: DGis.Cancellable?
     private var cameraStream: DGis.Cancellable?
-     
+    
     
     init(
         locationManagerFactory: @escaping () -> LocationService?,
@@ -31,26 +31,25 @@ final class CameraMoveService {
     
     func startCameraStateStream() {
         stopCameraStateStream()
-//        cameraStream = map.camera.stateChannel.sink { state in
-//            var newState : DataCameraState
-//            switch (state) {
-//            case .busy:
-//                newState = DataCameraState.busy
-//            case .fly:
-//                newState = DataCameraState.fly
-//            case .followPosition:
-//                newState = DataCameraState.followPosition
-//            case .free:
-//                newState = DataCameraState.free
-//            @unknown default:
-//                newState = DataCameraState.free
-//            }
-//            print(newState)
-////            self.flutterApi.onCameraStateChanged( //TODO: enum wtf
-////                cameraState: newState,
-////                completion: {}
-////            )
-//        }
+        cameraStream = map.camera.stateChannel.sink { state in
+            var newState : DataCameraState
+            switch (state) {
+            case .busy:
+                newState = DataCameraState.busy
+            case .fly:
+                newState = DataCameraState.fly
+            case .followPosition:
+                newState = DataCameraState.followPosition
+            case .free:
+                newState = DataCameraState.free
+            @unknown default:
+                newState = DataCameraState.free
+            }
+            self.flutterApi.onCameraStateChanged(
+                cameraState: DataCameraStateValue.init(value: newState),
+                completion: {}
+            )
+        }
     }
     
     func stopCameraStateStream() {
@@ -73,12 +72,21 @@ final class CameraMoveService {
                     bearing: .init(value: 0)
                 ),
                 time: 1.0,
-                animationType: .linear
+                dataAnimationType: .linear
             )
         }
     }
     
-    func moveToLocation(position: DGis.CameraPosition, time: TimeInterval, animationType: DGis.CameraAnimationType) {
+    func moveToLocation(position: DGis.CameraPosition, time: TimeInterval, dataAnimationType: DataCameraAnimationType) {
+        var animationType = DGis.CameraAnimationType.default
+        switch (dataAnimationType) {
+        case .linear:
+            animationType = DGis.CameraAnimationType.linear
+        case .showBothPositions:
+            animationType = DGis.CameraAnimationType.showBothPositions
+        case .def:
+            animationType = DGis.CameraAnimationType.default
+        }
         DispatchQueue.main.async {
             self.moveCameraCancellable?.cancel()
             print(position, time, animationType)
