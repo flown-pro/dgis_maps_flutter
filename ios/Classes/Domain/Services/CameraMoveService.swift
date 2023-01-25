@@ -23,12 +23,10 @@ final class CameraMoveService {
         self.locationManagerFactory = locationManagerFactory
         self.map = map
         
-        let source = MyLocationMapObjectSource(
-            context: sdkContext,
-            directionBehaviour: .followMagneticHeading
-        )
-        self.map.addSource(source: source)
+        
     }
+    
+    
     
     
     func moveToSelfPosition() {

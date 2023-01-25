@@ -34,7 +34,6 @@ class DgisHostApi : NSObject, PluginHostApi {
     }
     
     
-    
     func getCameraPosition() -> DataCameraPosition {
         let dgisPosition = mapFactory.map.camera.position
         let position = DataCameraPosition(
@@ -75,7 +74,7 @@ class DgisHostApi : NSObject, PluginHostApi {
     }
     
     func changeMyLocationLayerState(isVisible: Bool) {
-        
+        mapObjectService.toggleSelfMarker(isVisible: isVisible)
     }
     
 }

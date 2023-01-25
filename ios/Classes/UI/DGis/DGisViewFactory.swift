@@ -36,10 +36,7 @@ class DgisNativeViewFactory: NSObject, FlutterPlatformViewFactory {
             LocationService()
         }
         let map = dgisService.mapFactory.map
-        let mapObjectService = MapObjectService(
-            map: map,
-            imageFactory: dgisService.sdk.imageFactory
-        )
+        let mapObjectService = MapObjectService(dgisSdkService: dgisService)
         let cameraMoveService = CameraMoveService(
             locationManagerFactory: locationServiceFactory,
             map: map,
