@@ -43,7 +43,7 @@ fun geoRectToBounds(geoRect: GeoRect): DataLatLngBounds {
             latitude = geoRect.southWestPoint.latitude.value,
             longitude = geoRect.southWestPoint.longitude.value
         ),
-        notheast = DataLatLng(
+        northeast = DataLatLng(
             latitude = geoRect.northEastPoint.latitude.value,
             longitude = geoRect.northEastPoint.longitude.value
         ),
