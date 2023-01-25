@@ -52,6 +52,7 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
   void initState() {
     _markers = widget.markers.toSet();
     _polylines = widget.polylines.toSet();
+    api.changeMyLocationLayerState(widget.myLocationEnabled);
     super.initState();
   }
 
