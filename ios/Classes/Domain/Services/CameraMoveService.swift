@@ -11,23 +11,49 @@ import DGis
 final class CameraMoveService {
     private let locationManagerFactory: () -> LocationService?
     private let map: Map
-    private var locationService: LocationService?
+    private let flutterApi: PluginFlutterApi
     
+    private var locationService: LocationService?
     private var moveCameraCancellable: DGis.Cancellable?
+    private var cameraStream: DGis.Cancellable?
+     
     
     init(
         locationManagerFactory: @escaping () -> LocationService?,
         map: Map,
-        sdkContext: DGis.Context
+        flutterApi: PluginFlutterApi
     ) {
         self.locationManagerFactory = locationManagerFactory
         self.map = map
-        
-        
+        self.flutterApi = flutterApi
+        startCameraStateStream()
     }
     
+    func startCameraStateStream() {
+        cameraStream = map.camera.stateChannel.sink { state in
+            var newState : DataCameraState
+            switch (state) {
+            case .busy:
+                newState = DataCameraState.busy
+            case .fly:
+                newState = DataCameraState.fly
+            case .followPosition:
+                newState = DataCameraState.followPosition
+            case .free:
+                newState = DataCameraState.free
+            @unknown default:
+                newState = DataCameraState.free
+            }
+            self.flutterApi.onCameraStateChanged(
+                cameraState: newState,
+                completion: {}
+            )
+        }
+    }
     
-    
+    func stopCameraStateStream() {
+        cameraStream?.cancel()
+    }
     
     func moveToSelfPosition() {
         if self.locationService == nil {
