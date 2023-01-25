@@ -167,6 +167,27 @@ class DataMarker {
   }
 }
 
+class DataCameraStateValue {
+  DataCameraStateValue({
+    required this.value,
+  });
+
+  DataCameraState value;
+
+  Object encode() {
+    return <Object?>[
+      value.index,
+    ];
+  }
+
+  static DataCameraStateValue decode(Object result) {
+    result as List<Object?>;
+    return DataCameraStateValue(
+      value: DataCameraState.values[result[0]! as int],
+    );
+  }
+}
+
 /// Позиция камеры
 class DataCameraPosition {
   DataCameraPosition({
@@ -540,12 +561,36 @@ class PluginHostApi {
   }
 }
 
+class _PluginFlutterApiCodec extends StandardMessageCodec {
+  const _PluginFlutterApiCodec();
+  @override
+  void writeValue(WriteBuffer buffer, Object? value) {
+    if (value is DataCameraStateValue) {
+      buffer.putUint8(128);
+      writeValue(buffer, value.encode());
+    } else {
+      super.writeValue(buffer, value);
+    }
+  }
+
+  @override
+  Object? readValueOfType(int type, ReadBuffer buffer) {
+    switch (type) {
+      case 128:       
+        return DataCameraStateValue.decode(readValue(buffer)!);
+      
+      default:
+        return super.readValueOfType(type, buffer);
+    }
+  }
+}
+
 abstract class PluginFlutterApi {
-  static const MessageCodec<Object?> codec = StandardMessageCodec();
+  static const MessageCodec<Object?> codec = _PluginFlutterApiCodec();
 
   /// Коллбэк на изменение состояния камеры
   /// [cameraState] - индекс в перечислении [CameraState]
-  void onCameraStateChanged(DataCameraState cameraState);
+  void onCameraStateChanged(DataCameraStateValue cameraState);
 
   static void setup(PluginFlutterApi? api, {BinaryMessenger? binaryMessenger, required int id}) {
     {
@@ -559,9 +604,9 @@ abstract class PluginFlutterApi {
           assert(message != null,
           'Argument for pro.flown.PluginFlutterApi_$id.onCameraStateChanged was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final DataCameraState? arg_cameraState = args[0] == null ? null : DataCameraState.values[args[0] as int];
+          final DataCameraStateValue? arg_cameraState = (args[0] as DataCameraStateValue?);
           assert(arg_cameraState != null,
-              'Argument for pro.flown.PluginFlutterApi_$id.onCameraStateChanged was null, expected non-null DataCameraState.');
+              'Argument for pro.flown.PluginFlutterApi_$id.onCameraStateChanged was null, expected non-null DataCameraStateValue.');
           api.onCameraStateChanged(arg_cameraState!);
           return;
         });

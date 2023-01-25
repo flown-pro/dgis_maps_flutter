@@ -184,6 +184,25 @@ data class DataMarker (
   }
 }
 
+/** Generated class from Pigeon that represents data sent in messages. */
+data class DataCameraStateValue (
+  val value: DataCameraState
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): DataCameraStateValue {
+      val value = DataCameraState.ofRaw(list[0] as Int)!!
+      return DataCameraStateValue(value)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      value?.raw,
+    )
+  }
+}
+
 /**
  * Позиция камеры
  *
@@ -552,20 +571,43 @@ interface PluginHostApi {
     }
   }
 }
+@Suppress("UNCHECKED_CAST")
+private object PluginFlutterApiCodec : StandardMessageCodec() {
+  override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
+    return when (type) {
+      128.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          DataCameraStateValue.fromList(it)
+        }
+      }
+      else -> super.readValueOfType(type, buffer)
+    }
+  }
+  override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
+    when (value) {
+      is DataCameraStateValue -> {
+        stream.write(128)
+        writeValue(stream, value.toList())
+      }
+      else -> super.writeValue(stream, value)
+    }
+  }
+}
+
 /** Generated class from Pigeon that represents Flutter messages that can be called from Kotlin. */
 @Suppress("UNCHECKED_CAST")
 class PluginFlutterApi(private val binaryMessenger: BinaryMessenger, private val id: Int) {
   companion object {
     /** The codec used by PluginFlutterApi. */
     private val codec: MessageCodec<Any?> by lazy {
-      StandardMessageCodec()
+      PluginFlutterApiCodec
     }
   }
   /**
    * Коллбэк на изменение состояния камеры
    * [cameraState] - индекс в перечислении [CameraState]
    */
-  fun onCameraStateChanged(cameraStateArg: DataCameraState, callback: () -> Unit) {
+  fun onCameraStateChanged(cameraStateArg: DataCameraStateValue, callback: () -> Unit) {
     val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginFlutterApi_$id.onCameraStateChanged", codec)
     channel.send(listOf(cameraStateArg)) {
       callback()

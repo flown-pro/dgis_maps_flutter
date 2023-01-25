@@ -161,6 +161,6 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
   }
 
   @override
-  void onCameraStateChanged(CameraState cameraState) =>
-      widget.onCameraStateChanged?.call(cameraState);
+  void onCameraStateChanged(DataCameraStateValue cameraState) =>
+      widget.onCameraStateChanged?.call(cameraState.value);
 }

@@ -58,9 +58,9 @@ class DgisMapController internal constructor(
         this.map = map
         objectManager = MapObjectManager(map)
         initLocationSource()
-//        map.camera.stateChannel.connect {
-//            flutterApi.onCameraStateChanged(cameraStateArg = toDataCameraState(it)) {}
-//        }
+        map.camera.stateChannel.connect {
+            flutterApi.onCameraStateChanged(cameraStateArg = toDataCameraStateValue(it)) {}
+        }
     }
 
 

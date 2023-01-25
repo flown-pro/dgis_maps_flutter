@@ -165,6 +165,24 @@ struct DataMarker {
   }
 }
 
+/// Generated class from Pigeon that represents data sent in messages.
+struct DataCameraStateValue {
+  var value: DataCameraState
+
+  static func fromList(_ list: [Any?]) -> DataCameraStateValue? {
+    let value = DataCameraState(rawValue: list[0] as! Int)!
+
+    return DataCameraStateValue(
+      value: value
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      value.rawValue,
+    ]
+  }
+}
+
 /// Позиция камеры
 ///
 /// Generated class from Pigeon that represents data sent in messages.
@@ -483,6 +501,42 @@ class PluginHostApiSetup {
     }
   }
 }
+private class PluginFlutterApiCodecReader: FlutterStandardReader {
+  override func readValue(ofType type: UInt8) -> Any? {
+    switch type {
+      case 128:
+        return DataCameraStateValue.fromList(self.readValue() as! [Any])
+      default:
+        return super.readValue(ofType: type)
+    }
+  }
+}
+
+private class PluginFlutterApiCodecWriter: FlutterStandardWriter {
+  override func writeValue(_ value: Any) {
+    if let value = value as? DataCameraStateValue {
+      super.writeByte(128)
+      super.writeValue(value.toList())
+    } else {
+      super.writeValue(value)
+    }
+  }
+}
+
+private class PluginFlutterApiCodecReaderWriter: FlutterStandardReaderWriter {
+  override func reader(with data: Data) -> FlutterStandardReader {
+    return PluginFlutterApiCodecReader(data: data)
+  }
+
+  override func writer(with data: NSMutableData) -> FlutterStandardWriter {
+    return PluginFlutterApiCodecWriter(data: data)
+  }
+}
+
+class PluginFlutterApiCodec: FlutterStandardMessageCodec {
+  static let shared = PluginFlutterApiCodec(readerWriter: PluginFlutterApiCodecReaderWriter())
+}
+
 /// Generated class from Pigeon that represents Flutter messages that can be called from Swift.
 class PluginFlutterApi {
   private let binaryMessenger: FlutterBinaryMessenger
@@ -491,10 +545,13 @@ class PluginFlutterApi {
     self.binaryMessenger = binaryMessenger
     self.id = id
   }
+  var codec: FlutterStandardMessageCodec {
+    return PluginFlutterApiCodec.shared
+  }
   /// Коллбэк на изменение состояния камеры
   /// [cameraState] - индекс в перечислении [CameraState]
-  func onCameraStateChanged(cameraState cameraStateArg: DataCameraState, completion: @escaping () -> Void) {
-    let channel = FlutterBasicMessageChannel(name: "pro.flown.PluginFlutterApi_\(id).onCameraStateChanged", binaryMessenger: binaryMessenger)
+  func onCameraStateChanged(cameraState cameraStateArg: DataCameraStateValue, completion: @escaping () -> Void) {
+    let channel = FlutterBasicMessageChannel(name: "pro.flown.PluginFlutterApi_\(id).onCameraStateChanged", binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([cameraStateArg] as [Any?]) { _ in
       completion()
     }

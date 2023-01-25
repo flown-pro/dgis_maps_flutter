@@ -17,13 +17,15 @@ fun toAnimationType(cameraAnimationType: DataCameraAnimationType): CameraAnimati
     }
 }
 
-fun toDataCameraState(cameraState: CameraState): DataCameraState {
-    return when (cameraState) {
-        CameraState.BUSY -> DataCameraState.BUSY
-        CameraState.FLY -> DataCameraState.FLY
-        CameraState.FOLLOW_POSITION -> DataCameraState.FOLLOWPOSITION
-        CameraState.FREE -> DataCameraState.FREE
-    }
+fun toDataCameraStateValue(cameraState: CameraState): DataCameraStateValue {
+    return DataCameraStateValue(
+        when (cameraState) {
+            CameraState.BUSY -> DataCameraState.BUSY
+            CameraState.FLY -> DataCameraState.FLY
+            CameraState.FOLLOW_POSITION -> DataCameraState.FOLLOWPOSITION
+            CameraState.FREE -> DataCameraState.FREE
+        }
+    )
 }
 
 private fun toBitmap(o: Any): Bitmap? {

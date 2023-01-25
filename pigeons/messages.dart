@@ -1,7 +1,7 @@
 import 'package:pigeon/pigeon.dart';
 
 @ConfigurePigeon(PigeonOptions(
-  dartOut: 'lib/src/method_channel/method_channel.g.dart',
+  dartOut: 'lib/src/method_channel.g.dart',
   kotlinOptions: KotlinOptions(package: 'pro.flown.dgis_maps_flutter'),
   kotlinOut:
       'android/src/main/kotlin/pro/flown/dgis_maps_flutter/MethodChannel.kt',
@@ -68,6 +68,11 @@ class DataMarker {
 
   /// Текст под маркером
   final String? infoText;
+}
+
+class DataCameraStateValue {
+  DataCameraStateValue(this.value);
+  DataCameraState value;
 }
 
 /// Состояние камеры
@@ -201,7 +206,7 @@ abstract class PluginHostApi {
 abstract class PluginFlutterApi {
   /// Коллбэк на изменение состояния камеры
   /// [cameraState] - индекс в перечислении [CameraState]
-  void onCameraStateChanged(DataCameraState cameraState);
+  void onCameraStateChanged(DataCameraStateValue cameraState);
 }
 
 /// Класс, используемый для генерации моделей,
