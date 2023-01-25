@@ -225,6 +225,32 @@ class DataPadding {
   }
 }
 
+class DataLatLngBounds {
+  DataLatLngBounds({
+    required this.southwest,
+    required this.northeast,
+  });
+
+  DataLatLng southwest;
+
+  DataLatLng northeast;
+
+  Object encode() {
+    return <Object?>[
+      southwest.encode(),
+      northeast.encode(),
+    ];
+  }
+
+  static DataLatLngBounds decode(Object result) {
+    result as List<Object?>;
+    return DataLatLngBounds(
+      southwest: DataLatLng.decode(result[0]! as List<Object?>),
+      northeast: DataLatLng.decode(result[1]! as List<Object?>),
+    );
+  }
+}
+
 /// Позиция камеры
 class DataCameraPosition {
   DataCameraPosition({
@@ -391,26 +417,29 @@ class _PluginHostApiCodec extends StandardMessageCodec {
     } else if (value is DataLatLng) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is DataMapObjectId) {
+    } else if (value is DataLatLngBounds) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is DataMarker) {
+    } else if (value is DataMapObjectId) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is DataMarkerBitmap) {
+    } else if (value is DataMarker) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is DataMarkerUpdates) {
+    } else if (value is DataMarkerBitmap) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    } else if (value is DataPadding) {
+    } else if (value is DataMarkerUpdates) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    } else if (value is DataPolyline) {
+    } else if (value is DataPadding) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    } else if (value is DataPolylineUpdates) {
+    } else if (value is DataPolyline) {
       buffer.putUint8(136);
+      writeValue(buffer, value.encode());
+    } else if (value is DataPolylineUpdates) {
+      buffer.putUint8(137);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -427,24 +456,27 @@ class _PluginHostApiCodec extends StandardMessageCodec {
         return DataLatLng.decode(readValue(buffer)!);
       
       case 130:       
-        return DataMapObjectId.decode(readValue(buffer)!);
+        return DataLatLngBounds.decode(readValue(buffer)!);
       
       case 131:       
-        return DataMarker.decode(readValue(buffer)!);
+        return DataMapObjectId.decode(readValue(buffer)!);
       
       case 132:       
-        return DataMarkerBitmap.decode(readValue(buffer)!);
+        return DataMarker.decode(readValue(buffer)!);
       
       case 133:       
-        return DataMarkerUpdates.decode(readValue(buffer)!);
+        return DataMarkerBitmap.decode(readValue(buffer)!);
       
       case 134:       
-        return DataPadding.decode(readValue(buffer)!);
+        return DataMarkerUpdates.decode(readValue(buffer)!);
       
       case 135:       
-        return DataPolyline.decode(readValue(buffer)!);
+        return DataPadding.decode(readValue(buffer)!);
       
       case 136:       
+        return DataPolyline.decode(readValue(buffer)!);
+      
+      case 137:       
         return DataPolylineUpdates.decode(readValue(buffer)!);
       
       default:
@@ -617,6 +649,34 @@ class PluginHostApi {
       );
     } else {
       return;
+    }
+  }
+
+  /// Получение координат текущего экрана
+  Future<DataLatLngBounds> getVisibleArea() async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'pro.flown.PluginHostApi_$id.getVisibleArea', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(null) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else if (replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (replyList[0] as DataLatLngBounds?)!;
     }
   }
 }

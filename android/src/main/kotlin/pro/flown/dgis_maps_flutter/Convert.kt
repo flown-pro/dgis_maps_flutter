@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import ru.dgis.sdk.Context
 import ru.dgis.sdk.coordinates.GeoPoint
+import ru.dgis.sdk.coordinates.GeoRect
 import ru.dgis.sdk.geometry.GeoPointWithElevation
 import ru.dgis.sdk.map.*
 
@@ -34,6 +35,19 @@ fun toDataCameraStateValue(cameraState: CameraState): DataCameraStateValue {
             CameraState.FREE -> DataCameraState.FREE
         }
     )
+}
+
+fun geoRectToBounds(geoRect: GeoRect): DataLatLngBounds {
+    return DataLatLngBounds(
+        southwest = DataLatLng(
+            latitude = geoRect.southWestPoint.latitude.value,
+            longitude = geoRect.southWestPoint.longitude.value
+        ),
+        notheast = DataLatLng(
+            latitude = geoRect.northEastPoint.latitude.value,
+            longitude = geoRect.northEastPoint.longitude.value
+        ),
+    );
 }
 
 private fun toBitmap(o: Any): Bitmap? {

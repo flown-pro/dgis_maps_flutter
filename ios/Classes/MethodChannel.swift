@@ -215,6 +215,28 @@ struct DataPadding {
   }
 }
 
+/// Generated class from Pigeon that represents data sent in messages.
+struct DataLatLngBounds {
+  var southwest: DataLatLng
+  var northeast: DataLatLng
+
+  static func fromList(_ list: [Any?]) -> DataLatLngBounds? {
+    let southwest = DataLatLng.fromList(list[0] as! [Any?])!
+    let northeast = DataLatLng.fromList(list[1] as! [Any?])!
+
+    return DataLatLngBounds(
+      southwest: southwest,
+      northeast: northeast
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      southwest.toList(),
+      northeast.toList(),
+    ]
+  }
+}
+
 /// Позиция камеры
 ///
 /// Generated class from Pigeon that represents data sent in messages.
@@ -356,18 +378,20 @@ private class PluginHostApiCodecReader: FlutterStandardReader {
       case 129:
         return DataLatLng.fromList(self.readValue() as! [Any])
       case 130:
-        return DataMapObjectId.fromList(self.readValue() as! [Any])
+        return DataLatLngBounds.fromList(self.readValue() as! [Any])
       case 131:
-        return DataMarker.fromList(self.readValue() as! [Any])
+        return DataMapObjectId.fromList(self.readValue() as! [Any])
       case 132:
-        return DataMarkerBitmap.fromList(self.readValue() as! [Any])
+        return DataMarker.fromList(self.readValue() as! [Any])
       case 133:
-        return DataMarkerUpdates.fromList(self.readValue() as! [Any])
+        return DataMarkerBitmap.fromList(self.readValue() as! [Any])
       case 134:
-        return DataPadding.fromList(self.readValue() as! [Any])
+        return DataMarkerUpdates.fromList(self.readValue() as! [Any])
       case 135:
-        return DataPolyline.fromList(self.readValue() as! [Any])
+        return DataPadding.fromList(self.readValue() as! [Any])
       case 136:
+        return DataPolyline.fromList(self.readValue() as! [Any])
+      case 137:
         return DataPolylineUpdates.fromList(self.readValue() as! [Any])
       default:
         return super.readValue(ofType: type)
@@ -383,26 +407,29 @@ private class PluginHostApiCodecWriter: FlutterStandardWriter {
     } else if let value = value as? DataLatLng {
       super.writeByte(129)
       super.writeValue(value.toList())
-    } else if let value = value as? DataMapObjectId {
+    } else if let value = value as? DataLatLngBounds {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? DataMarker {
+    } else if let value = value as? DataMapObjectId {
       super.writeByte(131)
       super.writeValue(value.toList())
-    } else if let value = value as? DataMarkerBitmap {
+    } else if let value = value as? DataMarker {
       super.writeByte(132)
       super.writeValue(value.toList())
-    } else if let value = value as? DataMarkerUpdates {
+    } else if let value = value as? DataMarkerBitmap {
       super.writeByte(133)
       super.writeValue(value.toList())
-    } else if let value = value as? DataPadding {
+    } else if let value = value as? DataMarkerUpdates {
       super.writeByte(134)
       super.writeValue(value.toList())
-    } else if let value = value as? DataPolyline {
+    } else if let value = value as? DataPadding {
       super.writeByte(135)
       super.writeValue(value.toList())
-    } else if let value = value as? DataPolylineUpdates {
+    } else if let value = value as? DataPolyline {
       super.writeByte(136)
+      super.writeValue(value.toList())
+    } else if let value = value as? DataPolylineUpdates {
+      super.writeByte(137)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -451,6 +478,8 @@ protocol PluginHostApi {
   /// [isVisible] - true, добавляет слой со своей локацией, если его еще нет на карте
   /// false - убирает слой с карты, если он етсь на карте
   func changeMyLocationLayerState(isVisible: Bool)
+  /// Получение координат текущего экрана
+  func getVisibleArea() -> DataLatLngBounds
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -549,6 +578,16 @@ class PluginHostApiSetup {
       }
     } else {
       changeMyLocationLayerStateChannel.setMessageHandler(nil)
+    }
+    /// Получение координат текущего экрана
+    let getVisibleAreaChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id).getVisibleArea", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getVisibleAreaChannel.setMessageHandler { _, reply in
+        let result = api.getVisibleArea()
+        reply(wrapResult(result))
+      }
+    } else {
+      getVisibleAreaChannel.setMessageHandler(nil)
     }
   }
 }

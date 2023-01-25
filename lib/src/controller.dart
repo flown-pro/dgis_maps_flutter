@@ -40,6 +40,15 @@ class DGisMapController {
     return _api.moveCamera(cameraPosition, duration, cameraAnimationType);
   }
 
+  Future<LatLngBounds> getVisibleRegion() async {
+    await _completer.future;
+    final bounds = await _api.getVisibleArea();
+    return LatLngBounds(
+      southwest: LatLng(bounds.southwest.latitude, bounds.southwest.longitude),
+      northeast: LatLng(bounds.northeast.latitude, bounds.northeast.longitude),
+    );
+  }
+
   /// Переход камеры к выбранной точке [CameraPosition]
   Future<void> moveCameraToBounds({
     required LatLngBounds cameraPosition,

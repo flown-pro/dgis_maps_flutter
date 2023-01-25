@@ -104,13 +104,17 @@ class DgisMapController internal constructor(
         ).onResult { callback() }
     }
 
+    override fun getVisibleArea(): DataLatLngBounds {
+        return geoRectToBounds(map.camera.visibleArea.bounds);
+    }
+
     override fun moveCameraToBounds(
         firstPoint: DataLatLng,
         secondPoint: DataLatLng,
         padding: DataPadding,
         duration: Long?,
         cameraAnimationType: DataCameraAnimationType,
-        callback: () -> Unit
+        callback: () -> Unit,
     ) {
         val geometry = ComplexGeometry(
             listOf(

@@ -120,6 +120,12 @@ class DataPadding {
   final int bottom;
 }
 
+class DataLatLngBounds {
+  DataLatLngBounds(this.southwest, this.northeast);
+  final DataLatLng southwest;
+  final DataLatLng northeast;
+}
+
 /// Позиция камеры
 class DataCameraPosition {
   const DataCameraPosition({
@@ -225,6 +231,9 @@ abstract class PluginHostApi {
   /// [isVisible] - true, добавляет слой со своей локацией, если его еще нет на карте
   /// false - убирает слой с карты, если он етсь на карте
   void changeMyLocationLayerState(bool isVisible);
+
+  /// Получение координат текущего экрана
+  DataLatLngBounds getVisibleArea();
 }
 
 @FlutterApi()

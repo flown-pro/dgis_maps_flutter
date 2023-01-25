@@ -48,13 +48,14 @@ class LatLng extends DataLatLng {
 /// * lng ∈ [-180, `northeast.longitude`] ∪ [`southwest.longitude`, 180],
 ///   if `northeast.longitude` < `southwest.longitude`
 @immutable
-class LatLngBounds {
+class LatLngBounds extends DataLatLngBounds {
   /// Creates geographical bounding box with the specified corners.
   ///
   /// The latitude of the southwest corner cannot be larger than the
   /// latitude of the northeast corner.
-  LatLngBounds({required this.southwest, required this.northeast});
-      // : assert(southwest.latitude <= northeast.latitude);
+  LatLngBounds({required this.southwest, required this.northeast})
+      : super(southwest: southwest, northeast: northeast);
+  // : assert(southwest.latitude <= northeast.latitude);
 
   /// The southwest corner of the rectangle.
   final LatLng southwest;

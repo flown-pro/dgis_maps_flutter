@@ -235,6 +235,28 @@ data class DataPadding (
   }
 }
 
+/** Generated class from Pigeon that represents data sent in messages. */
+data class DataLatLngBounds (
+  val southwest: DataLatLng,
+  val northeast: DataLatLng
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): DataLatLngBounds {
+      val southwest = DataLatLng.fromList(list[0] as List<Any?>)
+      val northeast = DataLatLng.fromList(list[1] as List<Any?>)
+      return DataLatLngBounds(southwest, northeast)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      southwest?.toList(),
+      northeast?.toList(),
+    )
+  }
+}
+
 /**
  * Позиция камеры
  *
@@ -382,35 +404,40 @@ private object PluginHostApiCodec : StandardMessageCodec() {
       }
       130.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataMapObjectId.fromList(it)
+          DataLatLngBounds.fromList(it)
         }
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataMarker.fromList(it)
+          DataMapObjectId.fromList(it)
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataMarkerBitmap.fromList(it)
+          DataMarker.fromList(it)
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataMarkerUpdates.fromList(it)
+          DataMarkerBitmap.fromList(it)
         }
       }
       134.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataPadding.fromList(it)
+          DataMarkerUpdates.fromList(it)
         }
       }
       135.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DataPolyline.fromList(it)
+          DataPadding.fromList(it)
         }
       }
       136.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          DataPolyline.fromList(it)
+        }
+      }
+      137.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           DataPolylineUpdates.fromList(it)
         }
@@ -428,32 +455,36 @@ private object PluginHostApiCodec : StandardMessageCodec() {
         stream.write(129)
         writeValue(stream, value.toList())
       }
-      is DataMapObjectId -> {
+      is DataLatLngBounds -> {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is DataMarker -> {
+      is DataMapObjectId -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is DataMarkerBitmap -> {
+      is DataMarker -> {
         stream.write(132)
         writeValue(stream, value.toList())
       }
-      is DataMarkerUpdates -> {
+      is DataMarkerBitmap -> {
         stream.write(133)
         writeValue(stream, value.toList())
       }
-      is DataPadding -> {
+      is DataMarkerUpdates -> {
         stream.write(134)
         writeValue(stream, value.toList())
       }
-      is DataPolyline -> {
+      is DataPadding -> {
         stream.write(135)
         writeValue(stream, value.toList())
       }
-      is DataPolylineUpdates -> {
+      is DataPolyline -> {
         stream.write(136)
+        writeValue(stream, value.toList())
+      }
+      is DataPolylineUpdates -> {
+        stream.write(137)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -498,6 +529,8 @@ interface PluginHostApi {
    * false - убирает слой с карты, если он етсь на карте
    */
   fun changeMyLocationLayerState(isVisible: Boolean)
+  /** Получение координат текущего экрана */
+  fun getVisibleArea(): DataLatLngBounds
 
   companion object {
     /** The codec used by PluginHostApi. */
@@ -617,6 +650,22 @@ interface PluginHostApi {
               val isVisibleArg = args[0] as Boolean
               api.changeMyLocationLayerState(isVisibleArg)
               wrapped = listOf<Any?>(null)
+            } catch (exception: Error) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginHostApi_$id.getVisibleArea", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            var wrapped = listOf<Any?>()
+            try {
+              wrapped = listOf<Any?>(api.getVisibleArea())
             } catch (exception: Error) {
               wrapped = wrapError(exception)
             }
