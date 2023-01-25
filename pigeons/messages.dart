@@ -1,3 +1,4 @@
+
 import 'package:pigeon/pigeon.dart';
 
 @ConfigurePigeon(PigeonOptions(
@@ -184,7 +185,15 @@ abstract class PluginHostApi {
     int? duration,
     DataCameraAnimationType cameraAnimationType,
   );
-
+  /// Перемещение камеры к области из двух точек
+  @async
+  void moveCameraToBounds(
+    DataLatLng firstPoint,
+    DataLatLng fsecondPoint,
+    double padding,
+    int? duration,
+    DataCameraAnimationType cameraAnimationType,
+  );
   /// Обновление маркеров
   ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров

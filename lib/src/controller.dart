@@ -32,4 +32,14 @@ class DGisMapController {
     CameraAnimationType cameraAnimationType = CameraAnimationType.def,
   }) =>
       _api.moveCamera(cameraPosition, duration, cameraAnimationType);
+
+  /// Переход камеры к выбранной точке [CameraPosition]
+  Future<void> moveCameraToBounds({
+    required LatLngBounds cameraPosition,
+    double padding = 0,
+    int? duration,
+    CameraAnimationType cameraAnimationType = CameraAnimationType.def,
+  }) =>
+      _api.moveCameraToBounds(cameraPosition.northeast,
+          cameraPosition.northeast, padding, duration, cameraAnimationType);
 }

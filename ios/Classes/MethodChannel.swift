@@ -324,18 +324,16 @@ private class PluginHostApiCodecReader: FlutterStandardReader {
       case 129:
         return DataLatLng.fromList(self.readValue() as! [Any])
       case 130:
-        return DataLatLng.fromList(self.readValue() as! [Any])
-      case 131:
         return DataMapObjectId.fromList(self.readValue() as! [Any])
-      case 132:
+      case 131:
         return DataMarker.fromList(self.readValue() as! [Any])
-      case 133:
+      case 132:
         return DataMarkerBitmap.fromList(self.readValue() as! [Any])
-      case 134:
+      case 133:
         return DataMarkerUpdates.fromList(self.readValue() as! [Any])
-      case 135:
+      case 134:
         return DataPolyline.fromList(self.readValue() as! [Any])
-      case 136:
+      case 135:
         return DataPolylineUpdates.fromList(self.readValue() as! [Any])
       default:
         return super.readValue(ofType: type)
@@ -351,26 +349,23 @@ private class PluginHostApiCodecWriter: FlutterStandardWriter {
     } else if let value = value as? DataLatLng {
       super.writeByte(129)
       super.writeValue(value.toList())
-    } else if let value = value as? DataLatLng {
+    } else if let value = value as? DataMapObjectId {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? DataMapObjectId {
+    } else if let value = value as? DataMarker {
       super.writeByte(131)
       super.writeValue(value.toList())
-    } else if let value = value as? DataMarker {
+    } else if let value = value as? DataMarkerBitmap {
       super.writeByte(132)
       super.writeValue(value.toList())
-    } else if let value = value as? DataMarkerBitmap {
+    } else if let value = value as? DataMarkerUpdates {
       super.writeByte(133)
       super.writeValue(value.toList())
-    } else if let value = value as? DataMarkerUpdates {
+    } else if let value = value as? DataPolyline {
       super.writeByte(134)
       super.writeValue(value.toList())
-    } else if let value = value as? DataPolyline {
-      super.writeByte(135)
-      super.writeValue(value.toList())
     } else if let value = value as? DataPolylineUpdates {
-      super.writeByte(136)
+      super.writeByte(135)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -404,6 +399,8 @@ protocol PluginHostApi {
   /// если не указана, используется нативное значение
   /// [cameraAnimationType] - тип анимации
   func moveCamera(cameraPosition: DataCameraPosition, duration: Int?, cameraAnimationType: DataCameraAnimationType, completion: @escaping () -> Void)
+  /// Перемещение камеры к области из двух точек
+  func moveCameraToBounds(firstPoint: DataLatLng, fsecondPoint: DataLatLng, padding: Double, duration: Int?, cameraAnimationType: DataCameraAnimationType, completion: @escaping () -> Void)
   /// Обновление маркеров
   ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров
@@ -455,6 +452,23 @@ class PluginHostApiSetup {
       }
     } else {
       moveCameraChannel.setMessageHandler(nil)
+    }
+    /// Перемещение камеры к области из двух точек
+    let moveCameraToBoundsChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id).moveCameraToBounds", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      moveCameraToBoundsChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let firstPointArg = args[0] as! DataLatLng
+        let fsecondPointArg = args[1] as! DataLatLng
+        let paddingArg = args[2] as! Double
+        let durationArg = args[3] as? Int
+        let cameraAnimationTypeArg = DataCameraAnimationType(rawValue: args[4] as! Int)!
+        api.moveCameraToBounds(firstPoint: firstPointArg, fsecondPoint: fsecondPointArg, padding: paddingArg, duration: durationArg, cameraAnimationType: cameraAnimationTypeArg) {
+          reply(wrapResult(nil))
+        }
+      }
+    } else {
+      moveCameraToBoundsChannel.setMessageHandler(nil)
     }
     /// Обновление маркеров
     ///
