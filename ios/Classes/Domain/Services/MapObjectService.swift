@@ -35,31 +35,34 @@ final class MapObjectService {
         let size: MarkerSize
     }
     
+    ///
+    
     @Published var size: MarkerSize = .medium
     
-    private let dgisSdkService: DGisSdkService
     private let imageFactory: IImageFactory
-    private lazy var mapObjectManager: MapObjectManager =
-    MapObjectManager(map: self.map)
+    private let mapFactory: IMapFactory
+    private let context: DGis.Context
     
-    private var map: Map
+    private lazy var mapObjectManager: MapObjectManager = MapObjectManager(map: self.mapFactory.map)
     private lazy var myLocationSource: MyLocationMapObjectSource = MyLocationMapObjectSource(
-        context: dgisSdkService.sdk.context,
+        context: context,
         directionBehaviour: .followMagneticHeading
     )
     private var icons: [TypeSize: DGis.Image] = [:]
     
+    
     init(dgisSdkService: DGisSdkService) {
-        self.dgisSdkService = dgisSdkService
-        self.map = dgisSdkService.mapFactory.map
+        
         self.imageFactory = dgisSdkService.sdk.imageFactory
+        self.mapFactory = dgisSdkService.mapFactory
+        self.context = dgisSdkService.sdk.context
     }
     
     func toggleSelfMarker(isVisible: Bool) {
         if (isVisible) {
-            self.map.addSource(source: myLocationSource)
+            self.mapFactory.map.addSource(source: myLocationSource)
         } else {
-            self.map.removeSource(source: myLocationSource)
+            self.mapFactory.map.removeSource(source: myLocationSource)
         }
     }
     

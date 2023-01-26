@@ -2,18 +2,10 @@ import SwiftUI
 import DGis
 
 struct MapViewFactory {
-    private let sdk: DGis.Container
     private let mapFactory: IMapFactory
-    private let settingsService: ISettingsService
 
-    internal init(
-        sdk: DGis.Container,
-        mapFactory: IMapFactory,
-        settingsService: ISettingsService
-    ) {
-        self.sdk = sdk
+    internal init(mapFactory: IMapFactory) {
         self.mapFactory = mapFactory
-        self.settingsService = settingsService
     }
 
     func makeMapView(

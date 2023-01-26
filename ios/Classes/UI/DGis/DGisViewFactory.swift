@@ -28,30 +28,18 @@ class DgisNativeViewFactory: NSObject, FlutterPlatformViewFactory {
             initParams = DataCreationParams.fromList(args as! [Any?])
         }
         let dgisService = DGisSdkService(params: initParams)
-        let settingsStorage = UserDefaults.standard
-        let settingsService = SettingsService(
-            storage: settingsStorage
-        )
-        settingsService.onCurrentLanguageDidChange = {
-            dgisService.mapFactoryProvider.resetMapFactory()
-        }
-        let locationServiceFactory = {
-            LocationService()
-        }
-        let map = dgisService.mapFactory.map
+        
+        let locationService = LocationService()
         let mapObjectService = MapObjectService(dgisSdkService: dgisService)
         let flutterApi = PluginFlutterApi(binaryMessenger: messenger, id: viewId)
         let cameraMoveService = CameraMoveService(
-            locationManagerFactory: locationServiceFactory,
-            map: map,
-            flutterApi: flutterApi
+            mapFactory: dgisService.mapFactory,
+            flutterApi: flutterApi,
+            locationService: locationService
         )
         let dgisHostApi = DgisHostApi(
-            sdk: dgisService.sdk,
             mapFactory: dgisService.mapFactory,
-            mapFactoryProvider: dgisService.mapFactoryProvider,
             mapObjectService: mapObjectService,
-            settingsService: settingsService,
             cameraMoveService: cameraMoveService
         )
         PluginHostApiSetup.setUp(
@@ -59,18 +47,10 @@ class DgisNativeViewFactory: NSObject, FlutterPlatformViewFactory {
             id: viewId,
             api: dgisHostApi
         )
-
+        let mapViewFactory = MapViewFactory(mapFactory: dgisService.mapFactory)
         return DGisNativeView(
-            frame: frame,
-            viewIdentifier: viewId,
-            arguments: args,
-            binaryMessenger: messenger,
-            dgisService: dgisService,
-            settingsService: settingsService,
+            mapViewFactory: mapViewFactory,
             flutterApi: flutterApi
         )
     }
-    
-   
-    
 }

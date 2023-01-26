@@ -71,26 +71,9 @@ class MapFactoryProvider: IMapFactoryProvider {
 		}
 	}
 
-	private func makeGestureViewFactory(mapGesturesType: MapGesturesType) -> IMapGestureViewFactory {
-//		switch mapGesturesType {
-//			case .default(let scalingCenter):
-//				let center: MapGestureViewOptions.ScalingCenter
-//				switch scalingCenter {
-//					case .camera:
-//						center = .cameraPosition
-//					case .event:
-//						center = .eventCenter
-//				}
-//				return MapGestureViewFactory(
-//					options: MapGestureViewOptions(
-//						doubleTapScalingCenter: center,
-//                        twoFingerTapScalingCenter: center
-//					)
-//				)
-//			case .custom:
-				return CustomGestureViewFactory()
-//		}
-	}
+    private func makeGestureViewFactory(mapGesturesType: MapGesturesType) -> IMapGestureViewFactory {
+        CustomGestureViewFactory()
+    }
 }
 
 

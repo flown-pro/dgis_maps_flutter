@@ -9,27 +9,17 @@ import DGis
 
 class DgisHostApi : NSObject, PluginHostApi {
     
-    private let sdk: DGis.Container
     private let mapFactory : IMapFactory
-    private let mapFactoryProvider : IMapFactoryProvider
     private let mapObjectService: MapObjectService
-    
-    private let settingsService: ISettingsService
     private let cameraMoveService: CameraMoveService
     
     init(
-        sdk: DGis.Container,
-        mapFactory: IMapFactory,
-        mapFactoryProvider: IMapFactoryProvider,
+        mapFactory : IMapFactory,
         mapObjectService: MapObjectService,
-        settingsService: ISettingsService,
         cameraMoveService: CameraMoveService
     ) {
-        self.sdk = sdk
         self.mapFactory = mapFactory
-        self.mapFactoryProvider = mapFactoryProvider
         self.mapObjectService = mapObjectService
-        self.settingsService = settingsService
         self.cameraMoveService = cameraMoveService
     }
     

@@ -9,29 +9,28 @@ import DGis
 
 
 final class CameraMoveService {
-    private let locationManagerFactory: () -> LocationService?
-    private let map: Map
+    private let mapFactory : IMapFactory
     private let flutterApi: PluginFlutterApi
+    private let locationService: LocationService
     
-    private var locationService: LocationService?
     private var moveCameraCancellable: DGis.Cancellable?
     private var cameraStream: DGis.Cancellable?
     
     
     init(
-        locationManagerFactory: @escaping () -> LocationService?,
-        map: Map,
-        flutterApi: PluginFlutterApi
+        mapFactory : IMapFactory,
+        flutterApi: PluginFlutterApi,
+        locationService: LocationService
     ) {
-        self.locationManagerFactory = locationManagerFactory
-        self.map = map
+        self.mapFactory = mapFactory
         self.flutterApi = flutterApi
+        self.locationService = locationService
         startCameraStateStream()
     }
     
     func startCameraStateStream() {
         stopCameraStateStream()
-        cameraStream = map.camera.stateChannel.sink { state in
+        cameraStream = mapFactory.map.camera.stateChannel.sink { state in
             var newState : DataCameraState
             switch (state) {
             case .busy:
@@ -57,10 +56,7 @@ final class CameraMoveService {
     }
     
     func moveToSelfPosition() {
-        if self.locationService == nil {
-            self.locationService = self.locationManagerFactory()
-        }
-        self.locationService?.getCurrentPosition { (coordinates) in
+        self.locationService.getCurrentPosition { (coordinates) in
             self.moveToLocation(
                 position: DGis.CameraPosition(
                     point: DGis.GeoPoint(
@@ -89,7 +85,7 @@ final class CameraMoveService {
         }
         DispatchQueue.main.async {
             self.moveCameraCancellable?.cancel()
-            self.moveCameraCancellable = self.map
+            self.moveCameraCancellable = self.mapFactory.map
                 .camera
                 .move(
                     position: position,

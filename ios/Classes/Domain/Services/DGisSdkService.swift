@@ -12,8 +12,6 @@ class DGisSdkService {
     var sdk: DGis.Container
     var mapFactory : IMapFactory
     
-    lazy var mapFactoryProvider = MapFactoryProvider(container: self.sdk, mapGesturesType: .default(.event))
-    
     init(params: DataCreationParams?) {
         sdk = DGis.Container()
         var mapOptions = MapOptions.default
@@ -28,9 +26,7 @@ class DGisSdkService {
                 zoom: Zoom(value: Float(params!.zoom))
             )
             mapOptions.position = cameraPosition
-            
         }
-        
         mapFactory = try! sdk.makeMapFactory(options: mapOptions)
     }
     
