@@ -7,11 +7,11 @@ struct MapViewFactory {
     private let settingsService: ISettingsService
 
     internal init(
-        sdk: DGis.Container,
+        dgisService: DGisSdkService,
         mapFactory: IMapFactory,
         settingsService: ISettingsService
     ) {
-        self.sdk = sdk
+        self.sdk = dgisService.sdk
         self.mapFactory = mapFactory
         self.settingsService = settingsService
     }

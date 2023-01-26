@@ -12,7 +12,7 @@ import SwiftUI
 
 class DGisNativeView: NSObject, FlutterPlatformView {
     
-    @ObservedObject private var viewModel: DGisViewModel
+    private var viewModel: DGisViewModel
     
     private var _view: UIView
     
@@ -24,26 +24,27 @@ class DGisNativeView: NSObject, FlutterPlatformView {
         dgisService: DGisSdkService,
         settingsService: ISettingsService,
         flutterApi: PluginFlutterApi
-        
     ) {
+        print(dgisService.mapFactory.mapView.bounds)
         viewModel = DGisViewModel(
-            arguments: args,
-            binaryMessenger: messenger,
-            dgisService: dgisService,
-            settingsService:settingsService
+//            arguments: args,
+//            binaryMessenger: messenger,
+            dgisService: dgisService
+//            settingsService:settingsService
         )
         _view = UIView()
         super.init()
-        let controller = UIHostingController(rootView: makeMapView())
+        let factory = MapViewFactory(
+            dgisService: dgisService,
+            mapFactory: dgisService.mapFactory,
+            settingsService: settingsService
+        )
+        let mapView = factory.makeMapViewWithMarkerViewOverlay()
+        let controller = UIHostingController(rootView: mapView)
         _view = controller.view
         flutterApi.onNativeMapReady(completion: {})
     }
     
-    private func makeMapView() -> some View {
-        let mapView = viewModel.makeMapViewFactory()
-//        return mapView.makeMapViewWithMarkerViewOverlay(tapRecognizerCallback: viewModel.onMapTap)
-        return mapView.makeMapViewWithMarkerViewOverlay()
-    }
     
     func view() -> UIView {
         return _view

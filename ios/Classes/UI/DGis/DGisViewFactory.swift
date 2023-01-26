@@ -24,9 +24,9 @@ class DgisNativeViewFactory: NSObject, FlutterPlatformViewFactory {
         arguments args: Any?
     ) -> FlutterPlatformView {
         var initParams : DataCreationParams?
-        if (args != nil) {
-            initParams = DataCreationParams.fromList(args as! [Any?])
-        }
+//        if (args != nil) {
+//            initParams = DataCreationParams.fromList(args as! [Any?])
+//        }
         let dgisService = DGisSdkService(params: initParams)
         let settingsStorage = UserDefaults.standard
         let settingsService = SettingsService(
@@ -54,11 +54,11 @@ class DgisNativeViewFactory: NSObject, FlutterPlatformViewFactory {
             settingsService: settingsService,
             cameraMoveService: cameraMoveService
         )
-        PluginHostApiSetup.setUp(
-            binaryMessenger: messenger,
-            id: viewId,
-            api: dgisHostApi
-        )
+//        PluginHostApiSetup.setUp(
+//            binaryMessenger: messenger,
+//            id: viewId,
+//            api: dgisHostApi
+//        )
 
         return DGisNativeView(
             frame: frame,

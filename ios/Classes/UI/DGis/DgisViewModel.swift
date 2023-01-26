@@ -9,29 +9,29 @@ import Flutter
 import DGis
 
 
-final class DGisViewModel: ObservableObject {
+final class DGisViewModel {
     
     private let dgisService: DGisSdkService
-    private let settingsService: ISettingsService
+//    private let settingsService: ISettingsService
     
     init(
-        arguments args: Any?,
-        binaryMessenger messenger: FlutterBinaryMessenger?,
-        dgisService: DGisSdkService,
-        settingsService: ISettingsService
+//        arguments args: Any?,
+//        binaryMessenger messenger: FlutterBinaryMessenger?,
+        dgisService: DGisSdkService
+//        settingsService: ISettingsService
     ) {
         self.dgisService = dgisService
-        self.settingsService = settingsService
+//        self.settingsService = settingsService
     }
     
     
-    func makeMapViewFactory() -> MapViewFactory {
-        MapViewFactory(
-            sdk: dgisService.sdk,
-            mapFactory: dgisService.mapFactory,
-            settingsService: settingsService
-        )
-    }
+//    func makeMapViewFactory() -> MapViewFactory {
+//        MapViewFactory(
+//            sdk: dgisService.sdk,
+//            mapFactory: dgisService.mapFactory,
+//            settingsService: settingsService
+//        )
+//    }
     
 }
 
