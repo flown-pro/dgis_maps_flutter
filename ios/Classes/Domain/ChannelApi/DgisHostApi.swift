@@ -120,4 +120,18 @@ class DgisHostApi : NSObject, PluginHostApi {
         mapObjectService.toggleSelfMarker(isVisible: isVisible)
     }
     
+    func getVisibleArea() -> DataLatLngBounds {
+        let bounds = mapFactory.map.camera.visibleArea.bounds
+        return DataLatLngBounds(
+            southwest: DataLatLng(
+                latitude: bounds.southWestPoint.latitude.value,
+                longitude: bounds.southWestPoint.longitude.value
+            ),
+            northeast: DataLatLng(
+                latitude: bounds.northEastPoint.latitude.value,
+                longitude: bounds.northEastPoint.longitude.value
+            )
+        )
+    }
+    
 }
