@@ -89,7 +89,6 @@ final class CameraMoveService {
         }
         DispatchQueue.main.async {
             self.moveCameraCancellable?.cancel()
-            print(position, time, animationType)
             self.moveCameraCancellable = self.map
                 .camera
                 .move(
