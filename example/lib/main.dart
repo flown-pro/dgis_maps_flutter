@@ -121,96 +121,92 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return DGisMap(
-      key: ValueKey(i),
-      myLocationEnabled: myLocationEnabled,
-      initialPosition: CameraPosition(target: LatLng(60, 30), zoom: 7),
-      onMapCreated: onMapCreated,
-      markers: markers,
-      polylines: polylines,
-      onCameraStateChanged: (cameraState) {
-        print(cameraState);
-      },
-    );
-    return Column(
-      children: [
-        AnimatedCrossFade(
-          firstChild: const SizedBox(height: 0),
-          secondChild: const SizedBox(height: 100),
-          crossFadeState: !isShrinkedTop
-              ? CrossFadeState.showFirst
-              : CrossFadeState.showSecond,
-          duration: const Duration(seconds: 2),
-        ),
-        Expanded(
-          child: DGisMap(
-            key: ValueKey(i),
-            myLocationEnabled: myLocationEnabled,
-            initialPosition: CameraPosition(target: LatLng(60, 30), zoom: 7),
-            onMapCreated: onMapCreated,
-            markers: markers,
-            polylines: polylines,
-            onCameraStateChanged: (cameraState) {
-              print(cameraState);
-            },
+    return Scaffold(
+      appBar: AppBar(),
+      floatingActionButton: FloatingActionButton(
+        child: Text("iter\n$i"),
+        onPressed: () => setState(() => i++),
+      ),
+      body: Column(
+        children: [
+          AnimatedCrossFade(
+            firstChild: const SizedBox(height: 0),
+            secondChild: const SizedBox(height: 100),
+            crossFadeState: !isShrinkedTop
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            duration: const Duration(seconds: 2),
           ),
-        ),
-        AnimatedCrossFade(
-          firstChild: const SizedBox(height: 0),
-          secondChild: const SizedBox(height: 100),
-          crossFadeState: !isShrinked
-              ? CrossFadeState.showFirst
-              : CrossFadeState.showSecond,
-          duration: const Duration(seconds: 2),
-        ),
-        Row(
-          children: [
-            Expanded(
-              child: Wrap(
-                children: [
-                  TextButton(
-                    onPressed: moveCamera,
-                    child: const Text('moveCamera'),
-                  ),
-                  TextButton(
-                    onPressed: moveCameraToBounds,
-                    child: const Text('moveCameraToBounds'),
-                  ),
-                  TextButton(
-                    onPressed: getCameraPosition,
-                    child: const Text('getCameraPosition'),
-                  ),
-                  TextButton(
-                    onPressed: addMarker,
-                    child: const Text('addMarker'),
-                  ),
-                  TextButton(
-                    onPressed: addPolyline,
-                    child: const Text('addPolyline'),
-                  ),
-                  TextButton(
-                    onPressed: toggleMyLocation,
-                    child: const Text('toggleMyLocation'),
-                  ),
-                  TextButton(
-                    onPressed: shrinkMapTop,
-                    child: const Text('shrinkMapTop'),
-                  ),
-                  TextButton(
-                    onPressed: shrinkMap,
-                    child: const Text('shrinkMap'),
-                  ),
-                  TextButton(
-                    onPressed: moveMap,
-                    child: const Text('moveMap'),
-                  ),
-                ],
-              ),
+          Expanded(
+            child: DGisMap(
+              key: ValueKey(i),
+              myLocationEnabled: myLocationEnabled,
+              initialPosition: CameraPosition(target: LatLng(60, 30), zoom: 7),
+              onMapCreated: onMapCreated,
+              markers: markers,
+              polylines: polylines,
+              onCameraStateChanged: (cameraState) {
+                print(cameraState);
+              },
             ),
-            const SizedBox(width: 100),
-          ],
-        ),
-      ],
+          ),
+          AnimatedCrossFade(
+            firstChild: const SizedBox(height: 0),
+            secondChild: const SizedBox(height: 100),
+            crossFadeState: !isShrinked
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            duration: const Duration(seconds: 2),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Wrap(
+                  children: [
+                    TextButton(
+                      onPressed: moveCamera,
+                      child: const Text('moveCamera'),
+                    ),
+                    TextButton(
+                      onPressed: moveCameraToBounds,
+                      child: const Text('moveCameraToBounds'),
+                    ),
+                    TextButton(
+                      onPressed: getCameraPosition,
+                      child: const Text('getCameraPosition'),
+                    ),
+                    TextButton(
+                      onPressed: addMarker,
+                      child: const Text('addMarker'),
+                    ),
+                    TextButton(
+                      onPressed: addPolyline,
+                      child: const Text('addPolyline'),
+                    ),
+                    TextButton(
+                      onPressed: toggleMyLocation,
+                      child: const Text('toggleMyLocation'),
+                    ),
+                    TextButton(
+                      onPressed: shrinkMapTop,
+                      child: const Text('shrinkMapTop'),
+                    ),
+                    TextButton(
+                      onPressed: shrinkMap,
+                      child: const Text('shrinkMap'),
+                    ),
+                    TextButton(
+                      onPressed: moveMap,
+                      child: const Text('moveMap'),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 100),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

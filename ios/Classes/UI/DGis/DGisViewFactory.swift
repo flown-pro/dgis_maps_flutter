@@ -13,7 +13,6 @@ import SwiftUI
 class DgisNativeViewFactory: NSObject, FlutterPlatformViewFactory {
     private let messenger: FlutterBinaryMessenger
     
-    
     init(messenger: FlutterBinaryMessenger) {
         self.messenger = messenger
         super.init()

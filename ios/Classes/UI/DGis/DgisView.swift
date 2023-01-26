@@ -21,6 +21,7 @@ class DGisNativeView: NSObject, FlutterPlatformView {
         _view = UIView()
         super.init()
         let mapView = mapViewFactory.makeMapViewWithMarkerViewOverlay()
+            .edgesIgnoringSafeArea([.top, .bottom])
         let controller = UIHostingController(rootView: mapView)
         _view = controller.view
         flutterApi.onNativeMapReady(completion: {})

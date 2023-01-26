@@ -38,7 +38,12 @@ class DgisHostApi : NSObject, PluginHostApi {
         return position
     }
     
-    func moveCamera(cameraPosition: DataCameraPosition, duration: Int?, cameraAnimationType: DataCameraAnimationType, completion: @escaping () -> Void) {
+    func moveCamera(
+        cameraPosition: DataCameraPosition,
+        duration: Int?,
+        cameraAnimationType: DataCameraAnimationType,
+        completion: @escaping () -> Void
+    ) {
         cameraMoveService.moveToLocation(
             position: DGis.CameraPosition(
                 point: DGis.GeoPoint(
@@ -63,7 +68,6 @@ class DgisHostApi : NSObject, PluginHostApi {
         cameraAnimationType: DataCameraAnimationType,
         completion: @escaping () -> Void
     ) {
-        var animationType = DGis.CameraAnimationType.default
         let geometry = ComplexGeometry(
             geometries: [
                 PointGeometry(

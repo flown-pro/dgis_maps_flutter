@@ -73,7 +73,11 @@ final class CameraMoveService {
         }
     }
     
-    func moveToLocation(position: DGis.CameraPosition, time: TimeInterval, dataAnimationType: DataCameraAnimationType) {
+    func moveToLocation(
+        position: DGis.CameraPosition,
+        time: TimeInterval,
+        dataAnimationType: DataCameraAnimationType
+    ) {
         var animationType = DGis.CameraAnimationType.default
         switch (dataAnimationType) {
         case .linear:
