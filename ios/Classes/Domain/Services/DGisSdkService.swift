@@ -9,11 +9,10 @@ import DGis
 
 class DGisSdkService {
     
-    var sdk: DGis.Container
+    static let sdk = DGis.Container()
     var mapFactory : IMapFactory
     
     init(params: DataCreationParams?) {
-        sdk = DGis.Container()
         var mapOptions = MapOptions.default
         mapOptions.deviceDensity = DeviceDensity(value: Float(UIScreen.main.nativeScale))
         if (params != nil) {
@@ -27,7 +26,7 @@ class DGisSdkService {
             )
             mapOptions.position = cameraPosition
         }
-        mapFactory = try! sdk.makeMapFactory(options: mapOptions)
+        mapFactory = try! DGisSdkService.sdk.makeMapFactory(options: mapOptions)
     }
     
     

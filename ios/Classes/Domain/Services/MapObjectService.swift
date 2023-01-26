@@ -53,9 +53,9 @@ final class MapObjectService {
     
     init(dgisSdkService: DGisSdkService) {
         
-        self.imageFactory = dgisSdkService.sdk.imageFactory
+        self.imageFactory = DGisSdkService.sdk.imageFactory
         self.mapFactory = dgisSdkService.mapFactory
-        self.context = dgisSdkService.sdk.context
+        self.context = DGisSdkService.sdk.context
     }
     
     func toggleSelfMarker(isVisible: Bool) {

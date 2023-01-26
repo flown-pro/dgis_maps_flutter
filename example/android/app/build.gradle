@@ -43,7 +43,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "pro.flown.dgis_maps_flutter_example"
+        applicationId "pro.flown.dgis_maps_flutter_android_example"
         minSdkVersion 21
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()

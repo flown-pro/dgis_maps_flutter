@@ -10,7 +10,7 @@ import UIKit
 import SwiftUI
 
 
-class DGisNativeView: NSObject, FlutterPlatformView {
+class DGisNativeView: NSObject, FlutterPlatformView {    
     
     private var _view: UIView
     
