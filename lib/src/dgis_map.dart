@@ -63,7 +63,7 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
     updateWidgetFields();
   }
 
-  updateWidgetFields() {
+  void updateWidgetFields() {
     if (_markers != widget.markers) {
       _updateMarkers(
         toAdd: widget.markers.difference(_markers),
@@ -175,8 +175,10 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
   }
 
   @override
-  void onCameraStateChanged(DataCameraStateValue cameraState) =>
-      widget.onCameraStateChanged?.call(cameraState.value);
+  Future<void> onCameraStateChanged(DataCameraStateValue cameraState) async {
+    await _apiReady.future;
+    widget.onCameraStateChanged?.call(cameraState.value);
+  }
 
   @override
   void onNativeMapReady() {
