@@ -1,6 +1,7 @@
 package pro.flown.dgis_maps_flutter
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.platform.PlatformView
@@ -9,6 +10,8 @@ import ru.dgis.sdk.Duration
 import ru.dgis.sdk.coordinates.Bearing
 import ru.dgis.sdk.demo.CustomCompassManager
 import ru.dgis.sdk.demo.CustomLocationManager
+import ru.dgis.sdk.directory.SearchManager
+import ru.dgis.sdk.directory.SearchQueryBuilder
 import ru.dgis.sdk.geometry.ComplexGeometry
 import ru.dgis.sdk.geometry.PointGeometry
 import ru.dgis.sdk.map.*
@@ -29,6 +32,7 @@ class DgisMapController internal constructor(
     private lateinit var objectManager: MapObjectManager
     private var myLocationSource: MyLocationMapObjectSource? = null
     private lateinit var cameraStateConnection: AutoCloseable
+    private lateinit var dataLoadingConnection: AutoCloseable
 
     init {
         sdkContext = DGis.initialize(context.applicationContext)
@@ -42,6 +46,13 @@ class DgisMapController internal constructor(
             it.position = CameraPosition(
                 toGeoPoint(params.position), Zoom(params.zoom.toFloat())
             )
+            val lightTheme = "day"
+            val darkTheme = "night"
+            when (params.mapTheme) {
+                DataMapTheme.AUTO -> it.setTheme(lightTheme, darkTheme)
+                DataMapTheme.DARK -> it.setTheme(darkTheme)
+                DataMapTheme.LIGHT -> it.setTheme(lightTheme)
+            }
         })
         PluginHostApi.setUp(binaryMessenger, id, this)
         mapView.getMapAsync { init(it) }
@@ -57,11 +68,23 @@ class DgisMapController internal constructor(
 
     private fun init(map: Map) {
         this.map = map
-        objectManager = MapObjectManager(map)
-        flutterApi.onNativeMapReady { }
-        cameraStateConnection = map.camera.stateChannel.connect {
-            flutterApi.onCameraStateChanged(cameraStateArg = toDataCameraStateValue(it)) {}
+        dataLoadingConnection = map.dataLoadingStateChannel.connect {
+            if (it == MapDataLoadingState.LOADED) {
+                flutterApi.onNativeMapReady { }
+                dataLoadingConnection.close()
+            }
         }
+        cameraStateConnection = map.camera.stateChannel.connect {
+            flutterApi.onCameraStateChanged(toDataCameraStateValue(it)) {}
+        }
+        objectManager = MapObjectManager(map)
+//        val searchManager = SearchManager.createOnlineManager(sdkContext)
+//        searchManager.search(SearchQueryBuilder.fromQueryText("осенний").build()).onResult {
+//            it.itemMarkerInfos.onResult { it ->
+//                Log.v("searchMarkers", it.toString())
+//            }
+//            Log.v("onSearch", it.toString())
+//        }
     }
 
     override fun changeMyLocationLayerState(isVisible: Boolean) {
