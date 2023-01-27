@@ -25,6 +25,19 @@ class DGisSdkService {
                 zoom: Zoom(value: Float(params!.zoom))
             )
             mapOptions.position = cameraPosition
+            
+            let lightTheme: Theme = "day"
+            let darkTheme: Theme = "night"
+            switch (params!.mapTheme) {
+            case .auto:
+                if #available(iOS 13.0, *) {
+                    mapOptions.appearance = .automatic(light: lightTheme, dark: darkTheme)
+                }
+            case .dark:
+                mapOptions.appearance = .universal(darkTheme)
+            case .light:
+                mapOptions.appearance = .universal(lightTheme)
+            }
         }
         mapFactory = try! DGisSdkService.sdk.makeMapFactory(options: mapOptions)
     }

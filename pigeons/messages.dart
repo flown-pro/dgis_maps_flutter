@@ -12,9 +12,11 @@ class DataCreationParams {
   const DataCreationParams({
     required this.position,
     this.zoom = 0,
+    this.mapTheme = DataMapTheme.auto,
   });
   final DataLatLng position;
   final double zoom;
+  final DataMapTheme mapTheme;
 }
 
 // TODO(kit): Documentation
@@ -73,6 +75,18 @@ class DataMarker {
 class DataCameraStateValue {
   DataCameraStateValue(this.value);
   DataCameraState value;
+}
+
+/// Тема карты
+enum DataMapTheme {
+  /// Тема, заданная на устройстве пользователя
+  auto,
+
+  /// Темная тема карты
+  dark,
+
+  /// Светлая тема карты
+  light,
 }
 
 /// Состояние камеры

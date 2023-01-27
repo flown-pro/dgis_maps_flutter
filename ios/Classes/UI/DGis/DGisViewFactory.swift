@@ -18,6 +18,10 @@ class DgisNativeViewFactory: NSObject, FlutterPlatformViewFactory {
         super.init()
     }
     
+    public func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
+          return PluginHostApiCodec.sharedInstance()
+    }
+    
     func create(
         withFrame frame: CGRect,
         viewIdentifier viewId: Int64,

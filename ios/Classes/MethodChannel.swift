@@ -24,6 +24,16 @@ private func wrapError(_ error: FlutterError) -> [Any?] {
   ]
 }
 
+/// Тема карты
+enum DataMapTheme: Int {
+  /// Тема, заданная на устройстве пользователя
+  case auto = 0
+  /// Темная тема карты
+  case dark = 1
+  /// Светлая тема карты
+  case light = 2
+}
+
 /// Состояние камеры
 /// https://docs.2gis.com/ru/android/sdk/reference/5.1/ru.dgis.sdk.map.CameraState
 enum DataCameraState: Int {
@@ -53,20 +63,24 @@ enum DataCameraAnimationType: Int {
 struct DataCreationParams {
   var position: DataLatLng
   var zoom: Double
+  var mapTheme: DataMapTheme
 
   static func fromList(_ list: [Any?]) -> DataCreationParams? {
     let position = DataLatLng.fromList(list[0] as! [Any?])!
     let zoom = list[1] as! Double
+    let mapTheme = DataMapTheme(rawValue: list[2] as! Int)!
 
     return DataCreationParams(
       position: position,
-      zoom: zoom
+      zoom: zoom,
+      mapTheme: mapTheme
     )
   }
   func toList() -> [Any?] {
     return [
       position.toList(),
       zoom,
+      mapTheme.rawValue,
     ]
   }
 }

@@ -23,6 +23,22 @@ private fun wrapError(exception: Throwable): List<Any> {
   )
 }
 
+/** Тема карты */
+enum class DataMapTheme(val raw: Int) {
+  /** Тема, заданная на устройстве пользователя */
+  AUTO(0),
+  /** Темная тема карты */
+  DARK(1),
+  /** Светлая тема карты */
+  LIGHT(2);
+
+  companion object {
+    fun ofRaw(raw: Int): DataMapTheme? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 /**
  * Состояние камеры
  * https://docs.2gis.com/ru/android/sdk/reference/5.1/ru.dgis.sdk.map.CameraState
@@ -69,7 +85,8 @@ enum class DataCameraAnimationType(val raw: Int) {
 /** Generated class from Pigeon that represents data sent in messages. */
 data class DataCreationParams (
   val position: DataLatLng,
-  val zoom: Double
+  val zoom: Double,
+  val mapTheme: DataMapTheme
 
 ) {
   companion object {
@@ -77,13 +94,15 @@ data class DataCreationParams (
     fun fromList(list: List<Any?>): DataCreationParams {
       val position = DataLatLng.fromList(list[0] as List<Any?>)
       val zoom = list[1] as Double
-      return DataCreationParams(position, zoom)
+      val mapTheme = DataMapTheme.ofRaw(list[2] as Int)!!
+      return DataCreationParams(position, zoom, mapTheme)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
       position?.toList(),
       zoom,
+      mapTheme?.raw,
     )
   }
 }

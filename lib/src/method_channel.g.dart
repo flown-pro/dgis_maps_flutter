@@ -8,6 +8,16 @@ import 'dart:typed_data' show Float64List, Int32List, Int64List, Uint8List;
 import 'package:flutter/foundation.dart' show ReadBuffer, WriteBuffer;
 import 'package:flutter/services.dart';
 
+/// Тема карты
+enum DataMapTheme {
+  /// Тема, заданная на устройстве пользователя
+  auto,
+  /// Темная тема карты
+  dark,
+  /// Светлая тема карты
+  light,
+}
+
 /// Состояние камеры
 /// https://docs.2gis.com/ru/android/sdk/reference/5.1/ru.dgis.sdk.map.CameraState
 enum DataCameraState {
@@ -37,16 +47,20 @@ class DataCreationParams {
   DataCreationParams({
     required this.position,
     required this.zoom,
+    required this.mapTheme,
   });
 
   DataLatLng position;
 
   double zoom;
 
+  DataMapTheme mapTheme;
+
   Object encode() {
     return <Object?>[
       position.encode(),
       zoom,
+      mapTheme.index,
     ];
   }
 
@@ -55,6 +69,7 @@ class DataCreationParams {
     return DataCreationParams(
       position: DataLatLng.decode(result[0]! as List<Object?>),
       zoom: result[1]! as double,
+      mapTheme: DataMapTheme.values[result[2]! as int],
     );
   }
 }

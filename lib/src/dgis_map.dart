@@ -25,9 +25,11 @@ class DGisMap extends StatefulWidget {
     this.onCameraStateChanged,
     this.myLocationEnabled = true,
     required this.initialPosition,
+    this.mapTheme = MapTheme.auto,
   }) : super(key: key);
 
   final CameraPosition initialPosition;
+  final MapTheme mapTheme;
 
   final MapCreatedCallback? onMapCreated;
 
@@ -126,6 +128,7 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
     final creationParams = DataCreationParams(
       position: widget.initialPosition.target,
       zoom: widget.initialPosition.zoom,
+      mapTheme: widget.mapTheme,
     ).encode();
 
     if (defaultTargetPlatform == TargetPlatform.android) {
