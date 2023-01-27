@@ -148,7 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onCameraStateChanged: (cameraState) {
                 print(cameraState);
               },
-              mapTheme: MapTheme.dark,
+              mapTheme: MapTheme.light,
             ),
           ),
           AnimatedCrossFade(

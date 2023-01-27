@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 // https://github.com/flutter/plugins/blob/main/packages/google_maps_flutter/google_maps_flutter_platform_interface/lib/src/types/location.dart
 
-import 'package:flutter/foundation.dart' show immutable, objectRuntimeType;
+import 'package:flutter/foundation.dart' show objectRuntimeType;
 
 import '../method_channel.g.dart';
 
@@ -47,7 +47,6 @@ class LatLng extends DataLatLng {
 ///   if `southwest.longitude` ≤ `northeast.longitude`,
 /// * lng ∈ [-180, `northeast.longitude`] ∪ [`southwest.longitude`, 180],
 ///   if `northeast.longitude` < `southwest.longitude`
-@immutable
 class LatLngBounds extends DataLatLngBounds {
   /// Creates geographical bounding box with the specified corners.
   ///
