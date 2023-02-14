@@ -59,9 +59,10 @@ final class MapObjectService {
     }
     
     func toggleSelfMarker(isVisible: Bool) {
-        if (isVisible) {
+        let containsMarker = self.mapFactory.map.sources.contains(myLocationSource)
+        if (isVisible && !containsMarker) {
             self.mapFactory.map.addSource(source: myLocationSource)
-        } else {
+        } else if (containsMarker) {
             self.mapFactory.map.removeSource(source: myLocationSource)
         }
     }
