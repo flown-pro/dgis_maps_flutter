@@ -25,6 +25,7 @@ class DGisMap extends StatefulWidget {
     this.onCameraStateChanged,
     this.myLocationEnabled = true,
     required this.initialPosition,
+    required this.onTapMarker,
     this.mapTheme = MapTheme.auto,
   }) : super(key: key);
 
@@ -32,6 +33,7 @@ class DGisMap extends StatefulWidget {
   final MapTheme mapTheme;
 
   final MapCreatedCallback? onMapCreated;
+  final Function(Marker) onTapMarker;
 
   final Set<Marker> markers;
   final Set<Polyline> polylines;
@@ -45,6 +47,7 @@ class DGisMap extends StatefulWidget {
 
 class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
   final _apiReady = Completer<void>();
+  final _methodChannel = const MethodChannel("fgis");
   late final PluginHostApi api;
 
   Set<Marker> _markers = const {};
@@ -54,6 +57,7 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
   @override
   void initState() {
     updateWidgetFields();
+    _methodChannel.setMethodCallHandler((call) => _handleMethodCall(call));
     super.initState();
   }
 
@@ -183,5 +187,18 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
   @override
   void onNativeMapReady() {
     _apiReady.complete();
+  }
+
+  Future<void> _handleMethodCall(MethodCall call) async {
+    switch (call.method) {
+      case 'ontap_marker':
+        String id = call.arguments['id'];
+        final list = _markers;
+        widget.onTapMarker(
+            list.firstWhere((element) => element.markerId.value == id));
+        break;
+      default:
+        throw MissingPluginException();
+    }
   }
 }

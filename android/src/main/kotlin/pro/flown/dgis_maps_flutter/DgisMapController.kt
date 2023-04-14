@@ -41,6 +41,10 @@ class DgisMapController internal constructor(
         val locationSource = CustomLocationManager(context.applicationContext)
         registerPlatformLocationSource(sdkContext, locationSource)
 
+        // Создаем канал для общения..
+        methodChannel = MethodChannel(messenger, "fgis")
+        methodChannel.setMethodCallHandler(this)
+
         val params = DataCreationParams.fromList(args as List<Any?>)
         mapView = MapView(context, MapOptions().also {
             it.position = CameraPosition(
@@ -56,6 +60,27 @@ class DgisMapController internal constructor(
         })
         PluginHostApi.setUp(binaryMessenger, id, this)
         mapView.getMapAsync { init(it) }
+        mapView.setTouchEventsObserver(object : TouchEventsObserver {
+            override fun onTap(point: ScreenPoint) {
+                map.getRenderedObjects(point, ScreenDistance(1f)).onResult {
+                    for (renderedObjectInfo in it) {
+                        if(renderedObjectInfo.item.item.userData != null) {
+                            val args = mapOf(
+                                "id" to renderedObjectInfo.item.item.userData
+                            )
+
+                            Log.d("DGIS", "нажатие на камеру")
+
+                            methodChannel.invokeMethod(
+                                "ontap_marker",
+                                args
+                            )
+                        }
+                    }
+                }
+                super.onTap(point)
+            }
+        })
     }
 
     override fun getView(): View {

@@ -71,7 +71,8 @@ fun toMarker(context: Context, marker: DataMarker): Marker {
                 context,
                 R.drawable.dgis_ic_road_event_marker_comment
             ),
-            text = marker.infoText ?: ""
+            text = marker.infoText ?: "",
+            userData = marker.markerId
         )
     )
 }
