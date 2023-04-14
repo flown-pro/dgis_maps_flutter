@@ -26,10 +26,11 @@ class DgisMapController internal constructor(
     context: Context,
     args: Any?,
     binaryMessenger: BinaryMessenger,
-) : PlatformView, PluginHostApi {
+) : PlatformView, PluginHostApi  {
     private val sdkContext: ru.dgis.sdk.Context
     private val flutterApi = PluginFlutterApi(binaryMessenger, id)
     private val mapView: MapView
+    private var methodChannel: MethodChannel
     private lateinit var map: Map
     private lateinit var objectManager: MapObjectManager
     private var myLocationSource: MyLocationMapObjectSource? = null
@@ -44,8 +45,8 @@ class DgisMapController internal constructor(
         registerPlatformLocationSource(sdkContext, locationSource)
 
         // Создаем канал для общения..
-        methodChannel = MethodChannel(messenger, "fgis")
-        methodChannel.setMethodCallHandler(this)
+        methodChannel = MethodChannel(binaryMessenger, "fgis")
+//        methodChannel.setMethodCallHandler(this)
 
         val params = DataCreationParams.fromList(args as List<Any?>)
         mapView = MapView(context, MapOptions().also {
