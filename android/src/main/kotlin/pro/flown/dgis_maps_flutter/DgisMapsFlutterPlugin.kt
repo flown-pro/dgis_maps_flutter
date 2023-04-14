@@ -14,4 +14,5 @@ class DgisMapsFlutterPlugin : FlutterPlugin {
     }
 
     override fun onDetachedFromEngine(binding: FlutterPluginBinding) {}
+
 }
