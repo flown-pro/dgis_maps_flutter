@@ -5,6 +5,8 @@ import android.util.Log
 import android.view.View
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.platform.PlatformView
+import io.flutter.plugin.common.MethodCall
+import io.flutter.plugin.common.MethodChannel
 import ru.dgis.sdk.DGis
 import ru.dgis.sdk.Duration
 import ru.dgis.sdk.coordinates.Bearing
