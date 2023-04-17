@@ -62,7 +62,7 @@ class DgisMapController internal constructor(
             }
         })
         PluginHostApi.setUp(binaryMessenger, id, this)
-        map.addSource(locationSource)
+
         mapView.getMapAsync { init(it) }
         mapView.setTouchEventsObserver(object : TouchEventsObserver {
             override fun onTap(point: ScreenPoint) {
