@@ -182,6 +182,34 @@ class DataMarker {
   }
 }
 
+class GeoPoint {
+  GeoPoint({
+    required this.latitude,
+    required this.longitude,
+  });
+
+  /// Координата долготы
+  double latitude;
+
+  /// Координата широты
+  double longitude;
+
+  Object encode() {
+    return <Object?>[
+      latitude,
+      longitude,
+    ];
+  }
+
+  static GeoPoint decode(Object result) {
+    result as List<Object?>;
+    return GeoPoint(
+      latitude: result[0]! as double,
+      longitude: result[1]! as double,
+    );
+  }
+}
+
 class DataCameraStateValue {
   DataCameraStateValue({
     required this.value,
@@ -456,6 +484,9 @@ class _PluginHostApiCodec extends StandardMessageCodec {
     } else if (value is DataPolylineUpdates) {
       buffer.putUint8(137);
       writeValue(buffer, value.encode());
+    } else if (value is GeoPoint) {
+      buffer.putUint8(138);
+      writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
     }
@@ -493,6 +524,9 @@ class _PluginHostApiCodec extends StandardMessageCodec {
       
       case 137:       
         return DataPolylineUpdates.decode(readValue(buffer)!);
+      
+      case 138:       
+        return GeoPoint.decode(readValue(buffer)!);
       
       default:
         return super.readValueOfType(type, buffer);
@@ -600,6 +634,31 @@ class PluginHostApi {
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_updates]) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  /// Построение маршрута
+  ///
+  /// [createRoute] - объект с информацией построение маршрута
+  Future<void> createRoute(GeoPoint arg_startPoint, GeoPoint arg_endPoint) async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'pro.flown.PluginHostApi_$id.createRoute', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(<Object?>[arg_startPoint, arg_endPoint]) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',

@@ -77,6 +77,13 @@ fun toMarker(context: Context, marker: DataMarker): Marker {
     )
 }
 
+fun toGeoPoint(geoPoint: pro.flown.dgis_maps_flutter.GeoPoint): GeoPoint {
+    return GeoPoint(
+        latitude = geoPoint.latitude,
+        longitude = geoPoint.longitude,
+    )
+}
+
 fun toPolyline(polyline: DataPolyline): Polyline {
     return Polyline(
         PolylineOptions(

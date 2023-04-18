@@ -180,6 +180,30 @@ struct DataMarker {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
+struct GeoPoint {
+  /// Координата долготы
+  var latitude: Double
+  /// Координата широты
+  var longitude: Double
+
+  static func fromList(_ list: [Any?]) -> GeoPoint? {
+    let latitude = list[0] as! Double
+    let longitude = list[1] as! Double
+
+    return GeoPoint(
+      latitude: latitude,
+      longitude: longitude
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      latitude,
+      longitude,
+    ]
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
 struct DataCameraStateValue {
   var value: DataCameraState
 
@@ -407,6 +431,8 @@ private class PluginHostApiCodecReader: FlutterStandardReader {
         return DataPolyline.fromList(self.readValue() as! [Any])
       case 137:
         return DataPolylineUpdates.fromList(self.readValue() as! [Any])
+      case 138:
+        return GeoPoint.fromList(self.readValue() as! [Any])
       default:
         return super.readValue(ofType: type)
     }
@@ -444,6 +470,9 @@ private class PluginHostApiCodecWriter: FlutterStandardWriter {
       super.writeValue(value.toList())
     } else if let value = value as? DataPolylineUpdates {
       super.writeByte(137)
+      super.writeValue(value.toList())
+    } else if let value = value as? GeoPoint {
+      super.writeByte(138)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -483,6 +512,10 @@ protocol PluginHostApi {
   ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров
   func updateMarkers(updates: DataMarkerUpdates)
+  /// Построение маршрута
+  ///
+  /// [createRoute] - объект с информацией построение маршрута
+  func createRoute(startPoint: GeoPoint, endPoint: GeoPoint)
   /// Обновление полилайнов
   ///
   /// [polylineUpdates] - объект с информацией об обновлении полилайнов
@@ -563,6 +596,21 @@ class PluginHostApiSetup {
       }
     } else {
       updateMarkersChannel.setMessageHandler(nil)
+    }
+    /// Построение маршрута
+    ///
+    /// [createRoute] - объект с информацией построение маршрута
+    let createRouteChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id).createRoute", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      createRouteChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let startPointArg = args[0] as! GeoPoint
+        let endPointArg = args[1] as! GeoPoint
+        api.createRoute(startPoint: startPointArg, endPoint: endPointArg)
+        reply(wrapResult(nil))
+      }
+    } else {
+      createRouteChannel.setMessageHandler(nil)
     }
     /// Обновление полилайнов
     ///

@@ -20,19 +20,21 @@ import ru.dgis.sdk.map.*
 import ru.dgis.sdk.map.Map
 import ru.dgis.sdk.positioning.registerPlatformLocationSource
 import ru.dgis.sdk.positioning.registerPlatformMagneticSource
+import ru.dgis.sdk.routing.*
 
 class DgisMapController internal constructor(
     id: Int,
     context: Context,
     args: Any?,
     binaryMessenger: BinaryMessenger,
-) : PlatformView, PluginHostApi  {
+) : PlatformView, PluginHostApi {
     private val sdkContext: ru.dgis.sdk.Context
     private val flutterApi = PluginFlutterApi(binaryMessenger, id)
     private val mapView: MapView
     private var methodChannel: MethodChannel
     private lateinit var map: Map
     private lateinit var objectManager: MapObjectManager
+    private lateinit var routeEditor: RouteEditor
     private var myLocationSource: MyLocationMapObjectSource? = null
     private lateinit var cameraStateConnection: AutoCloseable
     private lateinit var dataLoadingConnection: AutoCloseable
@@ -43,6 +45,9 @@ class DgisMapController internal constructor(
         registerPlatformMagneticSource(sdkContext, compassSource)
         val locationSource = CustomLocationManager(context.applicationContext)
         registerPlatformLocationSource(sdkContext, locationSource)
+        routeEditor = RouteEditor(sdkContext)
+        val routeEditorSource = RouteEditorSource(sdkContext, routeEditor)
+        map.addSource(routeEditorSource)
 
         // Создаем канал для общения..
         methodChannel = MethodChannel(binaryMessenger, "fgis")
@@ -68,7 +73,7 @@ class DgisMapController internal constructor(
             override fun onTap(point: ScreenPoint) {
                 map.getRenderedObjects(point, ScreenDistance(1f)).onResult {
                     for (renderedObjectInfo in it) {
-                        if(renderedObjectInfo.item.item.userData != null) {
+                        if (renderedObjectInfo.item.item.userData != null) {
                             val args = mapOf(
                                 "id" to renderedObjectInfo.item.item.userData
                             )
@@ -185,6 +190,22 @@ class DgisMapController internal constructor(
     override fun updateMarkers(updates: DataMarkerUpdates) {
         objectManager.removeObjects(updates.toRemove.map { toMarker(sdkContext, it!!) })
         objectManager.addObjects(updates.toAdd.map { toMarker(sdkContext, it!!) })
+    }
+
+    override fun createRoute(startPoint: GeoPoint, endPoint: GeoPoint) {
+        routeEditor.setRouteParams(
+            RouteEditorRouteParams(
+                startPoint = RouteSearchPoint(
+                    coordinates = toGeoPoint(startPoint)
+                ),
+                finishPoint = RouteSearchPoint(
+                    coordinates = toGeoPoint(endPoint)
+                ),
+                routeSearchOptions = RouteSearchOptions(
+                    car = CarRouteSearchOptions()
+                )
+            )
+        )
     }
 
     override fun updatePolylines(updates: DataPolylineUpdates) {
