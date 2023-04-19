@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:dgis_maps_flutter/src/types/geo_point.dart';
+
 import 'method_channel.g.dart';
 import 'types/types.dart';
 

@@ -5,6 +5,7 @@
 import 'dart:async';
 import 'dart:typed_data' show Float64List, Int32List, Int64List, Uint8List;
 
+import 'package:dgis_maps_flutter/src/types/geo_point.dart';
 import 'package:flutter/foundation.dart' show ReadBuffer, WriteBuffer;
 import 'package:flutter/services.dart';
 
@@ -178,34 +179,6 @@ class DataMarker {
           : null,
       position: DataLatLng.decode(result[2]! as List<Object?>),
       infoText: result[3] as String?,
-    );
-  }
-}
-
-class GeoPoint {
-  GeoPoint({
-    required this.latitude,
-    required this.longitude,
-  });
-
-  /// Координата долготы
-  double latitude;
-
-  /// Координата широты
-  double longitude;
-
-  Object encode() {
-    return <Object?>[
-      latitude,
-      longitude,
-    ];
-  }
-
-  static GeoPoint decode(Object result) {
-    result as List<Object?>;
-    return GeoPoint(
-      latitude: result[0]! as double,
-      longitude: result[1]! as double,
     );
   }
 }
