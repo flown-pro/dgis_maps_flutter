@@ -30,6 +30,12 @@ class DGisMapController {
     );
   }
 
+  /// Получение текущей позиции карты [CameraPosition]
+  Future<void> createRoute(GeoPoint startPoint, GeoPoint endPoint) async {
+    await _completer.future;
+    await _api.createRoute(startPoint, endPoint);
+  }
+
   /// Переход камеры к выбранной точке [CameraPosition]
   Future<void> moveCamera({
     required CameraPosition cameraPosition,
