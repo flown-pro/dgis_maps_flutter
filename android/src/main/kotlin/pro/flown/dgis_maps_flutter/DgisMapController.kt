@@ -69,7 +69,7 @@ class DgisMapController internal constructor(
 
         mapView.getMapAsync { init(it) }
 
-        map.addSource(routeEditorSource)
+//        map.addSource(routeEditorSource)
         mapView.setTouchEventsObserver(object : TouchEventsObserver {
             override fun onTap(point: ScreenPoint) {
                 map.getRenderedObjects(point, ScreenDistance(1f)).onResult {
