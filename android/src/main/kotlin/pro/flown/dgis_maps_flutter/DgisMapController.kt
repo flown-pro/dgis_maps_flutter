@@ -47,7 +47,6 @@ class DgisMapController internal constructor(
         registerPlatformLocationSource(sdkContext, locationSource)
         routeEditor = RouteEditor(sdkContext)
         val routeEditorSource = RouteEditorSource(sdkContext, routeEditor)
-        map.addSource(routeEditorSource)
 
         // Создаем канал для общения..
         methodChannel = MethodChannel(binaryMessenger, "fgis")
@@ -69,6 +68,8 @@ class DgisMapController internal constructor(
         PluginHostApi.setUp(binaryMessenger, id, this)
 
         mapView.getMapAsync { init(it) }
+
+        map.addSource(routeEditorSource)
         mapView.setTouchEventsObserver(object : TouchEventsObserver {
             override fun onTap(point: ScreenPoint) {
                 map.getRenderedObjects(point, ScreenDistance(1f)).onResult {
