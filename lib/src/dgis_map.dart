@@ -27,6 +27,7 @@ class DGisMap extends StatefulWidget {
     required this.initialPosition,
     required this.onTapMarker,
     this.mapTheme = MapTheme.auto,
+    this.onTapMap,
   }) : super(key: key);
 
   final CameraPosition initialPosition;
@@ -34,6 +35,7 @@ class DGisMap extends StatefulWidget {
 
   final MapCreatedCallback? onMapCreated;
   final Function(Marker) onTapMarker;
+  final Function()? onTapMap;
 
   final Set<Marker> markers;
   final Set<Polyline> polylines;
@@ -136,6 +138,15 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
     ).encode();
 
     if (defaultTargetPlatform == TargetPlatform.android) {
+      return AndroidView(
+        viewType: _kChannelName,
+        onPlatformViewCreated: (params) {
+          onViewCreated(params);
+        },
+        gestureRecognizers: {},
+        creationParams: creationParams,
+        creationParamsCodec: const StandardMessageCodec(),
+      );
       return PlatformViewLink(
         viewType: _kChannelName,
         surfaceFactory: (context, PlatformViewController controller) {
@@ -148,7 +159,7 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
         onCreatePlatformView: (params) {
           onViewCreated(params.id);
           final AndroidViewController controller =
-              PlatformViewsService.initExpensiveAndroidView(
+              PlatformViewsService.initSurfaceAndroidView(
             id: params.id,
             viewType: _kChannelName,
             layoutDirection: TextDirection.ltr,
@@ -175,7 +186,8 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
     }
 
     return Text(
-        '$defaultTargetPlatform is not yet supported by the maps plugin');
+      '$defaultTargetPlatform is not yet supported by the maps plugin',
+    );
   }
 
   @override
@@ -196,6 +208,9 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
         final list = _markers;
         widget.onTapMarker(
             list.firstWhere((element) => element.markerId.value == id));
+        break;
+      case 'ontap_map':
+        widget.onTapMap?.call();
         break;
       default:
         throw MissingPluginException();
