@@ -89,12 +89,12 @@ class DgisMapController internal constructor(
                             isMarkerTapped = true;
                         }
                     }
-                    if (!isMarkerTapped) {
-                        methodChannel.invokeMethod(
-                            "ontap_map",
-                            {},
-                        )
-                    }
+//                    if (!isMarkerTapped) {
+//                        methodChannel.invokeMethod(
+//                            "ontap_map",
+//                            {},
+//                        )
+//                    }
                 }
                 super.onTap(point)
             }
