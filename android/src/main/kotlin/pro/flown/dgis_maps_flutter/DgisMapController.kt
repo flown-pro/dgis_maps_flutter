@@ -72,7 +72,7 @@ class DgisMapController internal constructor(
 //        map.addSource(routeEditorSource)
         mapView.setTouchEventsObserver(object : TouchEventsObserver {
             override fun onTap(point: ScreenPoint) {
-                val isMarkerTapped = false;
+                var isMarkerTapped = false;
                 map.getRenderedObjects(point, ScreenDistance(1f)).onResult {
                     for (renderedObjectInfo in it) {
                         if (renderedObjectInfo.item.item.userData != null) {
