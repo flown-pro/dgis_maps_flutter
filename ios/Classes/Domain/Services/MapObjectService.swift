@@ -53,9 +53,9 @@ final class MapObjectService {
     
     init(dgisSdkService: DGisSdkService) {
         
-        self.imageFactory = DGisSdkService.sdk.imageFactory
+        self.imageFactory = try! DGisSdkService.sdk.makeImageFactory()
         self.mapFactory = dgisSdkService.mapFactory
-        self.context = DGisSdkService.sdk.context
+        self.context = try! DGisSdkService.sdk.context
     }
     
     func toggleSelfMarker(isVisible: Bool) {
@@ -126,12 +126,12 @@ final class MapObjectService {
     }
     
     private func data2Polyline(data: DataPolyline) -> DGis.Polyline {
-        var points = [GeoPoint]()
+        var points = [DGis.GeoPoint]()
         data.points.forEach(
             { p in
                 if (p != nil) {
                     points.append(
-                        GeoPoint(
+                        DGis.GeoPoint(
                             latitude: p!.latitude,
                             longitude: p!.longitude
                         )

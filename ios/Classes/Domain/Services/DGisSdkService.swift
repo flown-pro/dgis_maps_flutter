@@ -16,7 +16,7 @@ class DGisSdkService {
         var mapOptions = MapOptions.default
         mapOptions.deviceDensity = DeviceDensity(value: Float(UIScreen.main.nativeScale))
         if (params != nil) {
-            let coordinate = GeoPoint(
+            let coordinate = DGis.GeoPoint(
                 latitude: DGis.Latitude(value: params!.position.latitude),
                 longitude: DGis.Longitude(value: params!.position.longitude)
             )
