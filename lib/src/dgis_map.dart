@@ -50,6 +50,10 @@ class DGisMap extends StatefulWidget {
 class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
   final _apiReady = Completer<void>();
   final _methodChannel = const MethodChannel("fgis");
+  final _basicMethodChannel = const BasicMessageChannel<Object?>(
+    'fgis.ontap_marker',
+    PluginFlutterApi.codec,
+  );
   late final PluginHostApi api;
 
   Set<Marker> _markers = const {};
@@ -59,7 +63,23 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
   @override
   void initState() {
     updateWidgetFields();
+
     _methodChannel.setMethodCallHandler((call) => _handleMethodCall(call));
+    if (api == null) {
+      _basicMethodChannel.setMessageHandler(null);
+    } else {
+      _basicMethodChannel.setMessageHandler((Object? message) async {
+        assert(message != null, 'Argument for fgis.ontap_marker was null.');
+        final List<Object?> args = (message as List<Object?>?)!;
+        final dynamic arg_cameraState = args[0];
+        assert(arg_cameraState != null,
+            'Argument for fgis.ontap_marker was null, expected non-null DataCameraStateValue.');
+        final list = _markers;
+        widget.onTapMarker(list.firstWhere(
+            (element) => element.markerId.value == arg_cameraState['id']));
+        return;
+      });
+    }
     super.initState();
   }
 
