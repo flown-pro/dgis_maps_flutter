@@ -762,6 +762,9 @@ abstract class PluginFlutterApi {
   /// Коллбэк на завршение сохдания нативной карты
   void onNativeMapReady();
 
+  /// Коллбэк на завршение сохдания нативной карты
+  void onMapObjectTapped(dynamic);
+
   static void setup(PluginFlutterApi? api, {BinaryMessenger? binaryMessenger, required int id}) {
     {
       final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
@@ -792,6 +795,24 @@ abstract class PluginFlutterApi {
         channel.setMessageHandler((Object? message) async {
           // ignore message
           api.onNativeMapReady();
+          return;
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+          'fgis.ontap_marker', codec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        channel.setMessageHandler(null);
+      } else {
+        channel.setMessageHandler((Object? message) async {
+          assert(message != null, 'Argument for fgis.ontap_marker was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final dynamic arg_cameraState = args[0];
+          assert(arg_cameraState != null,
+          'Argument for fgis.ontap_marker was null, expected non-null DataCameraStateValue.');
+          api.onMapObjectTapped(arg_cameraState);
           return;
         });
       }
