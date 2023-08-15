@@ -30,6 +30,9 @@ final class CameraMoveService {
     
     func startCameraStateStream() {
         stopCameraStateStream()
+        mapFactory.mapView.addObjectTappedCallback(callback: MapObjectTappedCallback(callback: { objectInfo in
+            self.flutterApi.onMapObjectTapCallback(renderedObjectInfo: objectInfo)
+        }))
         cameraStream = mapFactory.map.camera.stateChannel.sink { state in
             var newState : DataCameraState
             switch (state) {

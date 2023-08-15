@@ -9,6 +9,7 @@ import FlutterMacOS
 #else
 #error("Unsupported platform.")
 #endif
+import DGis
 
 
 
@@ -699,6 +700,14 @@ class PluginFlutterApi {
   }
   var codec: FlutterStandardMessageCodec {
     return PluginFlutterApiCodec.shared
+  }
+  /// Коллбэк на изменение состояния камеры
+  /// [cameraState] - индекс в перечислении [CameraState]
+  func onMapObjectTapCallback(renderedObjectInfo: DGis.RenderedObjectInfo) {
+    let channel = FlutterBasicMessageChannel(name: "fgis.ontap_marker", binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([renderedObjectInfo] as [Any?]) { _ in
+        
+    }
   }
   /// Коллбэк на изменение состояния камеры
   /// [cameraState] - индекс в перечислении [CameraState]
