@@ -769,10 +769,8 @@ class _PluginFlutterApiCodec extends StandardMessageCodec {
     switch (type) {
       case 128:
         return DataCameraStateValue.decode(readValue(buffer)!);
-      case 129:
-        return DataLatLng.decode(readValue(buffer)!);
-      case 12:
-        return DataLatLng.decode(readValue(buffer)!);
+      case 138:
+        return GeoPoint.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
