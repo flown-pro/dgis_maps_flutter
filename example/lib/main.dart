@@ -3,8 +3,6 @@ import 'dart:math';
 import 'package:dgis_maps_flutter/dgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
-import 'dd.dart';
-
 void main() {
   runApp(const MyApp());
 }
@@ -96,11 +94,6 @@ class _MyHomePageState extends State<MyHomePage> {
       markerId: MapObjectId('m${mId++}'),
       position: LatLng(60.0 + mId, 30.0 + mId),
       infoText: 'm${mId++}',
-      bitmap: MarkerBitmap(
-        bytes: selectedMarker,
-        width: 50,
-        height: 50,
-      ),
     ));
     setState(() {});
   }
@@ -155,9 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onCameraStateChanged: (cameraState) {
                 print(cameraState);
               },
-              onTapMarker: (marker) {
-                print(marker.toString());
-              },
+              onTapMarker: (marker) {},
               mapTheme: MapTheme.light,
             ),
           ),
