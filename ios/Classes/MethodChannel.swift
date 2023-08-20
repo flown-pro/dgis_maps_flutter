@@ -671,6 +671,7 @@ private class PluginFlutterApiCodecWriter: FlutterStandardWriter {
       super.writeByte(128)
       super.writeValue(value.toList())
     } else if let value = value as? RenderedObjectInfo {
+        super.writeByte(138)
         super.writeValue([value.closestMapPoint.latitude.value, value.closestMapPoint.longitude.value])
     }else {
       super.writeValue(value)
