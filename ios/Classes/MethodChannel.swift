@@ -670,7 +670,10 @@ private class PluginFlutterApiCodecWriter: FlutterStandardWriter {
     if let value = value as? DataCameraStateValue {
       super.writeByte(128)
       super.writeValue(value.toList())
-    } else {
+    } else if let value = value as? RenderedObjectInfo {
+        super.writeByte(128)
+        super.writeValue([value.closestMapPoint.latitude.value, value.closestMapPoint.longitude.value])
+    }else {
       super.writeValue(value)
     }
   }
