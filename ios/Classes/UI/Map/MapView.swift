@@ -4,7 +4,7 @@ import DGis
 struct MapView: UIViewRepresentable {
     typealias UIViewType = UIView
     typealias Context = UIViewRepresentableContext<Self>
-    typealias TapRecognizerCallback = (CGPoint) -> Void
+    typealias TapRecognizerCallback = (RenderedObjectInfo) -> Void
 
     private var mapFactoryProvider: IMapFactoryProvider?
     private var mapGesturesType: MapGesturesType
@@ -89,7 +89,7 @@ private final class MapContainerView: UIView {
     private let mapUIViewFactory: () -> UIView & IMapView
     private let markerViewOverlay: (UIView & IMarkerViewOverlay)?
 
-    var mapTapRecognizerCallback: ((CGPoint) -> Void)?
+    var mapTapRecognizerCallback: ((RenderedObjectInfo) -> Void)?
 
     private(set) lazy var mapView: IMapView = self.mapUIViewFactory()
 
@@ -110,11 +110,11 @@ private final class MapContainerView: UIView {
 
     private func setupUI() {
         self.mapView.translatesAutoresizingMaskIntoConstraints = false
-        let tapRecognizer = UITapGestureRecognizer(
-            target: self,
-            action: #selector(self.mapViewTapped(_:))
-        )
-        self.mapView.addGestureRecognizer(tapRecognizer)
+       
+        let mapObjectTappedCallback = MapObjectTappedCallback(callback: { [weak self] objectInfo in
+            self?.mapTapRecognizerCallback?(objectInfo)
+        })
+        self.mapView.addObjectTappedCallback(callback: mapObjectTappedCallback)
         self.addSubview(self.mapView)
         NSLayoutConstraint.activate([
             self.mapView.topAnchor.constraint(equalTo: self.topAnchor),
@@ -132,10 +132,6 @@ private final class MapContainerView: UIView {
                 markerViewOverlay.rightAnchor.constraint(equalTo: self.rightAnchor)
             ])
         }
-    }
-
-    @objc private func mapViewTapped(_ sender: UITapGestureRecognizer) {
-        self.mapTapRecognizerCallback?(sender.location(in: self.mapView))
     }
 }
 

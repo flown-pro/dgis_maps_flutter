@@ -1,6 +1,7 @@
 library dgis_maps_flutter;
 
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
@@ -59,6 +60,7 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
   @override
   void initState() {
     updateWidgetFields();
+
     _methodChannel.setMethodCallHandler((call) => _handleMethodCall(call));
     super.initState();
   }
@@ -215,5 +217,70 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
       default:
         throw MissingPluginException();
     }
+  }
+
+  @override
+  void onMapObjectTapped(dynamic) {
+    final list = _markers;
+    if (dynamic is GeoPoint) {
+      Marker? _selectedMarker = findNearestGeoPoint(dynamic, _markers);
+      if (_selectedMarker != null) {
+        widget.onTapMarker(_selectedMarker);
+      }
+    } else {
+      widget.onTapMarker(list
+          .firstWhere((element) => element.markerId.value == dynamic['id']));
+    }
+  }
+
+  double degreesToRadians(double degrees) {
+    return degrees * (pi / 180.0);
+  }
+
+  double calculateDistance(GeoPoint point1, GeoPoint point2) {
+    const earthRadius = 6371.0; // Earth's radius in kilometers
+
+    final lat1Rad = degreesToRadians(point1.latitude);
+    final lon1Rad = degreesToRadians(point1.longitude);
+    final lat2Rad = degreesToRadians(point2.latitude);
+    final lon2Rad = degreesToRadians(point2.longitude);
+
+    final dLat = lat2Rad - lat1Rad;
+    final dLon = lon2Rad - lon1Rad;
+
+    final a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(lat1Rad) * cos(lat2Rad) * sin(dLon / 2) * sin(dLon / 2);
+    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    final distance = earthRadius * c;
+    return distance;
+  }
+
+  Marker? findNearestGeoPoint(GeoPoint targetPoint, Set<Marker> points) {
+    if (points.isEmpty) {
+      return null; // Return null if the list is empty
+    }
+
+    Marker? nearestPoint;
+    double minDistance = double.infinity;
+
+    for (final point in points) {
+      final dist = calculateDistance(
+        targetPoint,
+        GeoPoint(
+          latitude: point.position.latitude,
+          longitude: point.position.longitude,
+        ),
+      );
+      if (dist > 5) {
+        return null;
+      }
+      if (dist < minDistance) {
+        minDistance = dist;
+        nearestPoint = point;
+      }
+    }
+
+    return nearestPoint;
   }
 }

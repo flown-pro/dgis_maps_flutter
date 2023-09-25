@@ -8,6 +8,10 @@
 import DGis
 
 class DgisHostApi : NSObject, PluginHostApi {
+    func createRoute(startPoint: GeoPoint, endPoint: GeoPoint) {
+        
+    }
+    
     
     private let mapFactory : IMapFactory
     private let mapObjectService: MapObjectService
@@ -71,13 +75,13 @@ class DgisHostApi : NSObject, PluginHostApi {
         let geometry = ComplexGeometry(
             geometries: [
                 PointGeometry(
-                    point: GeoPoint(
+                    point: DGis.GeoPoint(
                         latitude: firstPoint.latitude,
                         longitude: firstPoint.longitude
                     )
                 ),
                 PointGeometry(
-                    point: GeoPoint(
+                    point: DGis.GeoPoint(
                         latitude: secondPoint.latitude,
                         longitude: secondPoint.longitude
                     )
@@ -86,13 +90,7 @@ class DgisHostApi : NSObject, PluginHostApi {
         )
         let position = calcPosition(
             camera: mapFactory.map.camera,
-            geometry: geometry,
-            padding: Padding(
-                left: UInt32(padding.left),
-                top: UInt32(padding.top),
-                right: UInt32(padding.right),
-                bottom: UInt32(padding.bottom)
-            )
+            geometry: geometry
         )
         cameraMoveService.moveToLocation(
             position: position,

@@ -9,6 +9,7 @@ import FlutterMacOS
 #else
 #error("Unsupported platform.")
 #endif
+import DGis
 
 
 
@@ -669,7 +670,10 @@ private class PluginFlutterApiCodecWriter: FlutterStandardWriter {
     if let value = value as? DataCameraStateValue {
       super.writeByte(128)
       super.writeValue(value.toList())
-    } else {
+    } else if let value = value as? RenderedObjectInfo {
+        super.writeByte(138)
+        super.writeValue([value.closestMapPoint.latitude.value, value.closestMapPoint.longitude.value])
+    }else {
       super.writeValue(value)
     }
   }
@@ -699,6 +703,14 @@ class PluginFlutterApi {
   }
   var codec: FlutterStandardMessageCodec {
     return PluginFlutterApiCodec.shared
+  }
+  /// Коллбэк на изменение состояния камеры
+  /// [cameraState] - индекс в перечислении [CameraState]
+  func onMapObjectTapCallback(renderedObjectInfo: DGis.RenderedObjectInfo) {
+    let channel = FlutterBasicMessageChannel(name: "fgis.ontap_marker", binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([renderedObjectInfo] as [Any?]) { _ in
+        
+    }
   }
   /// Коллбэк на изменение состояния камеры
   /// [cameraState] - индекс в перечислении [CameraState]
