@@ -69,7 +69,6 @@ class DgisMapController internal constructor(
 
         mapView.getMapAsync { init(it) }
 
-        map.addSource(routeEditorSource)
         mapView.setTouchEventsObserver(object : TouchEventsObserver {
             override fun onTap(point: ScreenPoint) {
                 var isMarkerTapped = false;
@@ -120,6 +119,7 @@ class DgisMapController internal constructor(
         cameraStateConnection = map.camera.stateChannel.connect {
             flutterApi.onCameraStateChanged(toDataCameraStateValue(it)) {}
         }
+        map.addSource(routeEditorSource)
         objectManager = MapObjectManager(map)
 //        val searchManager = SearchManager.createOnlineManager(sdkContext)
 //        searchManager.search(SearchQueryBuilder.fromQueryText("осенний").build()).onResult {
