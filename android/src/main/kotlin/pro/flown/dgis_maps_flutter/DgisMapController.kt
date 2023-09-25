@@ -23,10 +23,10 @@ import ru.dgis.sdk.positioning.registerPlatformMagneticSource
 import ru.dgis.sdk.routing.*
 
 class DgisMapController internal constructor(
-    id: Int,
-    context: Context,
-    args: Any?,
-    binaryMessenger: BinaryMessenger,
+        id: Int,
+        context: Context,
+        args: Any?,
+        binaryMessenger: BinaryMessenger,
 ) : PlatformView, PluginHostApi {
     private val sdkContext: ru.dgis.sdk.Context
     private val flutterApi = PluginFlutterApi(binaryMessenger, id)
@@ -45,8 +45,6 @@ class DgisMapController internal constructor(
         registerPlatformMagneticSource(sdkContext, compassSource)
         val locationSource = CustomLocationManager(context.applicationContext)
         registerPlatformLocationSource(sdkContext, locationSource)
-        routeEditor = RouteEditor(sdkContext)
-        val routeEditorSource = RouteEditorSource(sdkContext, routeEditor)
 
         // Создаем канал для общения..
         methodChannel = MethodChannel(binaryMessenger, "fgis")
@@ -55,7 +53,7 @@ class DgisMapController internal constructor(
         val params = DataCreationParams.fromList(args as List<Any?>)
         mapView = MapView(context, MapOptions().also {
             it.position = CameraPosition(
-                toGeoPoint(params.position), Zoom(params.zoom.toFloat())
+                    toGeoPoint(params.position), Zoom(params.zoom.toFloat())
             )
             val lightTheme = "day"
             val darkTheme = "night"
@@ -76,14 +74,14 @@ class DgisMapController internal constructor(
                     for (renderedObjectInfo in it) {
                         if (renderedObjectInfo.item.item.userData != null) {
                             val args = mapOf(
-                                "id" to renderedObjectInfo.item.item.userData
+                                    "id" to renderedObjectInfo.item.item.userData
                             )
 
                             Log.d("DGIS", "нажатие на камеру")
 
                             methodChannel.invokeMethod(
-                                "ontap_marker",
-                                args
+                                    "ontap_marker",
+                                    args
                             )
                             isMarkerTapped = true;
                         }
@@ -119,6 +117,8 @@ class DgisMapController internal constructor(
         cameraStateConnection = map.camera.stateChannel.connect {
             flutterApi.onCameraStateChanged(toDataCameraStateValue(it)) {}
         }
+        routeEditor = RouteEditor(sdkContext)
+        val routeEditorSource = RouteEditorSource(sdkContext, routeEditor)
         map.addSource(routeEditorSource)
         objectManager = MapObjectManager(map)
 //        val searchManager = SearchManager.createOnlineManager(sdkContext)
@@ -132,9 +132,9 @@ class DgisMapController internal constructor(
 
     override fun changeMyLocationLayerState(isVisible: Boolean) {
         myLocationSource = myLocationSource ?: MyLocationMapObjectSource(
-            sdkContext,
-            MyLocationDirectionBehaviour.FOLLOW_SATELLITE_HEADING,
-            createSmoothMyLocationController()
+                sdkContext,
+                MyLocationDirectionBehaviour.FOLLOW_SATELLITE_HEADING,
+                createSmoothMyLocationController()
         )
         val isMyLocationVisible = map.sources.contains(myLocationSource!!)
         if (isVisible && !isMyLocationVisible) {
@@ -146,27 +146,27 @@ class DgisMapController internal constructor(
 
     override fun getCameraPosition(): DataCameraPosition {
         return DataCameraPosition(
-            target = toDataLatLng(map.camera.position.point),
-            zoom = map.camera.position.zoom.value.toDouble(),
-            bearing = map.camera.position.bearing.value,
-            tilt = map.camera.position.tilt.value.toDouble(),
+                target = toDataLatLng(map.camera.position.point),
+                zoom = map.camera.position.zoom.value.toDouble(),
+                bearing = map.camera.position.bearing.value,
+                tilt = map.camera.position.tilt.value.toDouble(),
         )
     }
 
     override fun moveCamera(
-        cameraPosition: DataCameraPosition,
-        duration: Long?,
-        cameraAnimationType: DataCameraAnimationType,
-        callback: () -> Unit,
+            cameraPosition: DataCameraPosition,
+            duration: Long?,
+            cameraAnimationType: DataCameraAnimationType,
+            callback: () -> Unit,
     ) {
         map.camera.move(
-            CameraPosition(
-                point = toGeoPoint(cameraPosition.target),
-                zoom = Zoom(cameraPosition.zoom.toFloat()),
-                tilt = Tilt(cameraPosition.tilt.toFloat()),
-                bearing = Bearing(cameraPosition.bearing),
-            ), time = Duration.ofMilliseconds(duration ?: 100),
-            animationType = toAnimationType(cameraAnimationType)
+                CameraPosition(
+                        point = toGeoPoint(cameraPosition.target),
+                        zoom = Zoom(cameraPosition.zoom.toFloat()),
+                        tilt = Tilt(cameraPosition.tilt.toFloat()),
+                        bearing = Bearing(cameraPosition.bearing),
+                ), time = Duration.ofMilliseconds(duration ?: 100),
+                animationType = toAnimationType(cameraAnimationType)
         ).onResult { callback() }
     }
 
@@ -175,24 +175,24 @@ class DgisMapController internal constructor(
     }
 
     override fun moveCameraToBounds(
-        firstPoint: DataLatLng,
-        secondPoint: DataLatLng,
-        padding: DataPadding,
-        duration: Long?,
-        cameraAnimationType: DataCameraAnimationType,
-        callback: () -> Unit,
+            firstPoint: DataLatLng,
+            secondPoint: DataLatLng,
+            padding: DataPadding,
+            duration: Long?,
+            cameraAnimationType: DataCameraAnimationType,
+            callback: () -> Unit,
     ) {
         val geometry = ComplexGeometry(
-            listOf(
-                PointGeometry(toGeoPoint(firstPoint)), PointGeometry(toGeoPoint(secondPoint))
-            )
+                listOf(
+                        PointGeometry(toGeoPoint(firstPoint)), PointGeometry(toGeoPoint(secondPoint))
+                )
         )
         val position = calcPosition(
-            map.camera, geometry, toPadding(padding)
+                map.camera, geometry, toPadding(padding)
         )
         map.camera.move(
-            position, time = Duration.ofMilliseconds(duration ?: 100),
-            animationType = toAnimationType(cameraAnimationType)
+                position, time = Duration.ofMilliseconds(duration ?: 100),
+                animationType = toAnimationType(cameraAnimationType)
         ).onResult { callback() }
     }
 
@@ -203,17 +203,17 @@ class DgisMapController internal constructor(
 
     override fun createRoute(startPoint: GeoPoint, endPoint: GeoPoint) {
         routeEditor.setRouteParams(
-            RouteEditorRouteParams(
-                startPoint = RouteSearchPoint(
-                    coordinates = toGeoPoint(startPoint)
-                ),
-                finishPoint = RouteSearchPoint(
-                    coordinates = toGeoPoint(endPoint)
-                ),
-                routeSearchOptions = RouteSearchOptions(
-                    car = CarRouteSearchOptions()
+                RouteEditorRouteParams(
+                        startPoint = RouteSearchPoint(
+                                coordinates = toGeoPoint(startPoint)
+                        ),
+                        finishPoint = RouteSearchPoint(
+                                coordinates = toGeoPoint(endPoint)
+                        ),
+                        routeSearchOptions = RouteSearchOptions(
+                                car = CarRouteSearchOptions()
+                        )
                 )
-            )
         )
     }
 
