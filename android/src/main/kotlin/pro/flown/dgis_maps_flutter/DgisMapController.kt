@@ -35,6 +35,8 @@ class DgisMapController internal constructor(
     private lateinit var map: Map
     private lateinit var objectManager: MapObjectManager
     private lateinit var routeEditor: RouteEditor
+    private lateinit var trafficRouter: TrafficRouter
+    private lateinit var routeMapObjectSource: RouteMapObjectSource
     private var myLocationSource: MyLocationMapObjectSource? = null
     private lateinit var cameraStateConnection: AutoCloseable
     private lateinit var dataLoadingConnection: AutoCloseable
@@ -118,6 +120,9 @@ class DgisMapController internal constructor(
             flutterApi.onCameraStateChanged(toDataCameraStateValue(it)) {}
         }
         routeEditor = RouteEditor(sdkContext)
+        trafficRouter = TrafficRouter(sdkContext)
+        val routeMapObjectSource = RouteMapObjectSource(sdkContext, RouteVisualizationType.NORMAL)
+        map.addSource(routeMapObjectSource)
         val routeEditorSource = RouteEditorSource(sdkContext, routeEditor)
         map.addSource(routeEditorSource)
         objectManager = MapObjectManager(map)
@@ -202,19 +207,44 @@ class DgisMapController internal constructor(
     }
 
     override fun createRoute(startPoint: GeoPoint, endPoint: GeoPoint) {
-        routeEditor.setRouteParams(
-                RouteEditorRouteParams(
-                        startPoint = RouteSearchPoint(
-                                coordinates = toGeoPoint(startPoint)
-                        ),
-                        finishPoint = RouteSearchPoint(
-                                coordinates = toGeoPoint(endPoint)
-                        ),
-                        routeSearchOptions = RouteSearchOptions(
-                                car = CarRouteSearchOptions()
-                        )
+        // Ищем маршрут
+        val routesFuture = trafficRouter.findRoute(
+                startPoint = RouteSearchPoint(
+                        coordinates = toGeoPoint(startPoint)
+                ),
+                finishPoint = RouteSearchPoint(
+                        coordinates = toGeoPoint(endPoint)
+                ),
+                routeSearchOptions = RouteSearchOptions(
+                        car = CarRouteSearchOptions()
                 )
         )
+
+        // После получения маршрута добавляем его на карту
+        routesFuture.onResult { routes: List<TrafficRoute> ->
+            var isActive = true
+            var routeIndex: Long = 0;
+            for (route in routes) {
+                routeMapObjectSource.addObject(
+                        RouteMapObject(route, isActive, index = RouteIndex(routeIndex))
+                )
+                isActive = false
+                routeIndex++
+            }
+        }
+//        routeEditor.setRouteParams(
+//                RouteEditorRouteParams(
+//                        startPoint = RouteSearchPoint(
+//                                coordinates = toGeoPoint(startPoint)
+//                        ),
+//                        finishPoint = RouteSearchPoint(
+//                                coordinates = toGeoPoint(endPoint)
+//                        ),
+//                        routeSearchOptions = RouteSearchOptions(
+//                                car = CarRouteSearchOptions()
+//                        )
+//                )
+//        )
     }
 
     override fun updatePolylines(updates: DataPolylineUpdates) {
