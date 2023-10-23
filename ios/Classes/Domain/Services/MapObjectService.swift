@@ -46,7 +46,7 @@ final class MapObjectService {
     private lazy var mapObjectManager: MapObjectManager = MapObjectManager(map: self.mapFactory.map)
     private lazy var myLocationSource: MyLocationMapObjectSource = MyLocationMapObjectSource(
         context: context,
-        directionBehaviour: .followMagneticHeading
+        controller: MyLocationController(bearingSource: .magnetic)
     )
     private var icons: [TypeSize: DGis.Image] = [:]
     
@@ -84,7 +84,7 @@ final class MapObjectService {
     
     private func data2Marker(data: DataMarker) -> DGis.Marker {
         let icon = data.bitmap == nil ? nil : makeIcon(bitmap: data.bitmap!, size: MarkerSize.medium)
-        return DGis.Marker(
+        return try! DGis.Marker(
             options: MarkerOptions(
                 position: GeoPointWithElevation(
                     latitude: Latitude(floatLiteral: data.position.latitude),
@@ -144,7 +144,7 @@ final class MapObjectService {
             width: LogicalPixel(value: Float(data.width)),
             color: DGis.Color(argb: UInt32(data.color))
         )
-        return DGis.Polyline(options: options)
+        return try! DGis.Polyline(options: options)
     }
     
     func removeAll() {
