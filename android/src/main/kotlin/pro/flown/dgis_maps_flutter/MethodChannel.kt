@@ -204,6 +204,30 @@ data class DataMarker (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
+data class GeoPoint (
+  /** Координата долготы */
+  val latitude: Double,
+  /** Координата широты */
+  val longitude: Double
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): GeoPoint {
+      val latitude = list[0] as Double
+      val longitude = list[1] as Double
+      return GeoPoint(latitude, longitude)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      latitude,
+      longitude,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
 data class DataCameraStateValue (
   val value: DataCameraState
 
@@ -461,6 +485,11 @@ private object PluginHostApiCodec : StandardMessageCodec() {
           DataPolylineUpdates.fromList(it)
         }
       }
+      138.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          GeoPoint.fromList(it)
+        }
+      }
       else -> super.readValueOfType(type, buffer)
     }
   }
@@ -506,6 +535,10 @@ private object PluginHostApiCodec : StandardMessageCodec() {
         stream.write(137)
         writeValue(stream, value.toList())
       }
+      is GeoPoint -> {
+        stream.write(138)
+        writeValue(stream, value.toList())
+      }
       else -> super.writeValue(stream, value)
     }
   }
@@ -535,6 +568,12 @@ interface PluginHostApi {
    * [markerUpdates] - объект с информацией об обновлении маркеров
    */
   fun updateMarkers(updates: DataMarkerUpdates)
+  /**
+   * Построение маршрута
+   *
+   * [createRoute] - объект с информацией построение маршрута
+   */
+  fun createRoute(startPoint: GeoPoint, endPoint: GeoPoint)
   /**
    * Обновление полилайнов
    *
@@ -630,6 +669,26 @@ interface PluginHostApi {
               val args = message as List<Any?>
               val updatesArg = args[0] as DataMarkerUpdates
               api.updateMarkers(updatesArg)
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Error) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "pro.flown.PluginHostApi_$id.createRoute", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            var wrapped = listOf<Any?>()
+            try {
+              val args = message as List<Any?>
+              val startPointArg = args[0] as GeoPoint
+              val endPointArg = args[1] as GeoPoint
+              api.createRoute(startPointArg, endPointArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Error) {
               wrapped = wrapError(exception)

@@ -14,6 +14,7 @@ class DataCreationParams {
     this.zoom = 0,
     this.mapTheme = DataMapTheme.auto,
   });
+
   final DataLatLng position;
   final double zoom;
   final DataMapTheme mapTheme;
@@ -22,6 +23,7 @@ class DataCreationParams {
 // TODO(kit): Documentation
 class DataLatLng {
   const DataLatLng(this.latitude, this.longitude);
+
   final double latitude;
   final double longitude;
 }
@@ -72,8 +74,20 @@ class DataMarker {
   final String? infoText;
 }
 
+// TODO(kit): Documentation
+class GeoPoint {
+  GeoPoint(this.latitude, this.longitude);
+
+  /// Координата долготы
+  final double latitude;
+
+  /// Координата широты
+  final double longitude;
+}
+
 class DataCameraStateValue {
   DataCameraStateValue(this.value);
+
   DataCameraState value;
 }
 
@@ -136,6 +150,7 @@ class DataPadding {
 
 class DataLatLngBounds {
   DataLatLngBounds(this.southwest, this.northeast);
+
   final DataLatLng southwest;
   final DataLatLng northeast;
 }
@@ -165,6 +180,7 @@ class DataCameraPosition {
 // TODO(kit): Documentation
 class DataMapObjectId {
   const DataMapObjectId(this.value);
+
   final String value;
 }
 
@@ -174,6 +190,7 @@ class DataMarkerUpdates {
     this.toRemove = const [],
     this.toAdd = const [],
   });
+
   final List<DataMarker?> toRemove;
   final List<DataMarker?> toAdd;
 }
@@ -184,6 +201,7 @@ class DataPolylineUpdates {
     this.toRemove = const [],
     this.toAdd = const [],
   });
+
   final List<DataPolyline?> toRemove;
   final List<DataPolyline?> toAdd;
 }
@@ -234,6 +252,11 @@ abstract class PluginHostApi {
   ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров
   void updateMarkers(DataMarkerUpdates updates);
+
+  /// Построение маршрута
+  ///
+  /// [createRoute] - объект с информацией построение маршрута
+  void createRoute(GeoPoint startPoint, GeoPoint endPoint);
 
   /// Обновление полилайнов
   ///

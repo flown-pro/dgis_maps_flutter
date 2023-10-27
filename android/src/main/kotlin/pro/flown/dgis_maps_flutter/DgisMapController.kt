@@ -5,6 +5,8 @@ import android.util.Log
 import android.view.View
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.platform.PlatformView
+import io.flutter.plugin.common.MethodCall
+import io.flutter.plugin.common.MethodChannel
 import ru.dgis.sdk.DGis
 import ru.dgis.sdk.Duration
 import ru.dgis.sdk.coordinates.Bearing
@@ -18,18 +20,23 @@ import ru.dgis.sdk.map.*
 import ru.dgis.sdk.map.Map
 import ru.dgis.sdk.positioning.registerPlatformLocationSource
 import ru.dgis.sdk.positioning.registerPlatformMagneticSource
+import ru.dgis.sdk.routing.*
 
 class DgisMapController internal constructor(
-    id: Int,
-    context: Context,
-    args: Any?,
-    binaryMessenger: BinaryMessenger,
+        id: Int,
+        context: Context,
+        args: Any?,
+        binaryMessenger: BinaryMessenger,
 ) : PlatformView, PluginHostApi {
     private val sdkContext: ru.dgis.sdk.Context
     private val flutterApi = PluginFlutterApi(binaryMessenger, id)
     private val mapView: MapView
+    private var methodChannel: MethodChannel
     private lateinit var map: Map
     private lateinit var objectManager: MapObjectManager
+    private lateinit var routeEditor: RouteEditor
+    private lateinit var trafficRouter: TrafficRouter
+    private lateinit var routeMapObjectSource: RouteMapObjectSource
     private var myLocationSource: MyLocationMapObjectSource? = null
     private lateinit var cameraStateConnection: AutoCloseable
     private lateinit var dataLoadingConnection: AutoCloseable
@@ -41,10 +48,14 @@ class DgisMapController internal constructor(
         val locationSource = CustomLocationManager(context.applicationContext)
         registerPlatformLocationSource(sdkContext, locationSource)
 
+        // Создаем канал для общения..
+        methodChannel = MethodChannel(binaryMessenger, "fgis")
+//        methodChannel.setMethodCallHandler(this)
+
         val params = DataCreationParams.fromList(args as List<Any?>)
         mapView = MapView(context, MapOptions().also {
             it.position = CameraPosition(
-                toGeoPoint(params.position), Zoom(params.zoom.toFloat())
+                    toGeoPoint(params.position), Zoom(params.zoom.toFloat())
             )
             val lightTheme = "day"
             val darkTheme = "night"
@@ -55,7 +66,38 @@ class DgisMapController internal constructor(
             }
         })
         PluginHostApi.setUp(binaryMessenger, id, this)
+
         mapView.getMapAsync { init(it) }
+
+        mapView.setTouchEventsObserver(object : TouchEventsObserver {
+            override fun onTap(point: ScreenPoint) {
+                var isMarkerTapped = false;
+                map.getRenderedObjects(point, ScreenDistance(1f)).onResult {
+                    for (renderedObjectInfo in it) {
+                        if (renderedObjectInfo.item.item.userData != null) {
+                            val args = mapOf(
+                                    "id" to renderedObjectInfo.item.item.userData
+                            )
+
+                            Log.d("DGIS", "нажатие на камеру")
+
+                            methodChannel.invokeMethod(
+                                    "ontap_marker",
+                                    args
+                            )
+                            isMarkerTapped = true;
+                        }
+                    }
+//                    if (!isMarkerTapped) {
+//                        methodChannel.invokeMethod(
+//                            "ontap_map",
+//                            {},
+//                        )
+//                    }
+                }
+                super.onTap(point)
+            }
+        })
     }
 
     override fun getView(): View {
@@ -77,6 +119,12 @@ class DgisMapController internal constructor(
         cameraStateConnection = map.camera.stateChannel.connect {
             flutterApi.onCameraStateChanged(toDataCameraStateValue(it)) {}
         }
+        routeEditor = RouteEditor(sdkContext)
+        trafficRouter = TrafficRouter(sdkContext)
+        val routeMapObjectSource = RouteMapObjectSource(sdkContext, RouteVisualizationType.NORMAL)
+        map.addSource(routeMapObjectSource)
+        val routeEditorSource = RouteEditorSource(sdkContext, routeEditor)
+        map.addSource(routeEditorSource)
         objectManager = MapObjectManager(map)
 //        val searchManager = SearchManager.createOnlineManager(sdkContext)
 //        searchManager.search(SearchQueryBuilder.fromQueryText("осенний").build()).onResult {
@@ -89,9 +137,9 @@ class DgisMapController internal constructor(
 
     override fun changeMyLocationLayerState(isVisible: Boolean) {
         myLocationSource = myLocationSource ?: MyLocationMapObjectSource(
-            sdkContext,
-            MyLocationDirectionBehaviour.FOLLOW_SATELLITE_HEADING,
-            createSmoothMyLocationController()
+                sdkContext,
+                MyLocationDirectionBehaviour.FOLLOW_SATELLITE_HEADING,
+                createSmoothMyLocationController()
         )
         val isMyLocationVisible = map.sources.contains(myLocationSource!!)
         if (isVisible && !isMyLocationVisible) {
@@ -103,27 +151,27 @@ class DgisMapController internal constructor(
 
     override fun getCameraPosition(): DataCameraPosition {
         return DataCameraPosition(
-            target = toDataLatLng(map.camera.position.point),
-            zoom = map.camera.position.zoom.value.toDouble(),
-            bearing = map.camera.position.bearing.value,
-            tilt = map.camera.position.tilt.value.toDouble(),
+                target = toDataLatLng(map.camera.position.point),
+                zoom = map.camera.position.zoom.value.toDouble(),
+                bearing = map.camera.position.bearing.value,
+                tilt = map.camera.position.tilt.value.toDouble(),
         )
     }
 
     override fun moveCamera(
-        cameraPosition: DataCameraPosition,
-        duration: Long?,
-        cameraAnimationType: DataCameraAnimationType,
-        callback: () -> Unit,
+            cameraPosition: DataCameraPosition,
+            duration: Long?,
+            cameraAnimationType: DataCameraAnimationType,
+            callback: () -> Unit,
     ) {
         map.camera.move(
-            CameraPosition(
-                point = toGeoPoint(cameraPosition.target),
-                zoom = Zoom(cameraPosition.zoom.toFloat()),
-                tilt = Tilt(cameraPosition.tilt.toFloat()),
-                bearing = Bearing(cameraPosition.bearing),
-            ), time = Duration.ofMilliseconds(duration ?: 100),
-            animationType = toAnimationType(cameraAnimationType)
+                CameraPosition(
+                        point = toGeoPoint(cameraPosition.target),
+                        zoom = Zoom(cameraPosition.zoom.toFloat()),
+                        tilt = Tilt(cameraPosition.tilt.toFloat()),
+                        bearing = Bearing(cameraPosition.bearing),
+                ), time = Duration.ofMilliseconds(duration ?: 100),
+                animationType = toAnimationType(cameraAnimationType)
         ).onResult { callback() }
     }
 
@@ -132,30 +180,71 @@ class DgisMapController internal constructor(
     }
 
     override fun moveCameraToBounds(
-        firstPoint: DataLatLng,
-        secondPoint: DataLatLng,
-        padding: DataPadding,
-        duration: Long?,
-        cameraAnimationType: DataCameraAnimationType,
-        callback: () -> Unit,
+            firstPoint: DataLatLng,
+            secondPoint: DataLatLng,
+            padding: DataPadding,
+            duration: Long?,
+            cameraAnimationType: DataCameraAnimationType,
+            callback: () -> Unit,
     ) {
         val geometry = ComplexGeometry(
-            listOf(
-                PointGeometry(toGeoPoint(firstPoint)), PointGeometry(toGeoPoint(secondPoint))
-            )
+                listOf(
+                        PointGeometry(toGeoPoint(firstPoint)), PointGeometry(toGeoPoint(secondPoint))
+                )
         )
         val position = calcPosition(
-            map.camera, geometry, toPadding(padding)
+                map.camera, geometry, toPadding(padding)
         )
         map.camera.move(
-            position, time = Duration.ofMilliseconds(duration ?: 100),
-            animationType = toAnimationType(cameraAnimationType)
+                position, time = Duration.ofMilliseconds(duration ?: 100),
+                animationType = toAnimationType(cameraAnimationType)
         ).onResult { callback() }
     }
 
     override fun updateMarkers(updates: DataMarkerUpdates) {
         objectManager.removeObjects(updates.toRemove.map { toMarker(sdkContext, it!!) })
         objectManager.addObjects(updates.toAdd.map { toMarker(sdkContext, it!!) })
+    }
+
+    override fun createRoute(startPoint: GeoPoint, endPoint: GeoPoint) {
+        // Ищем маршрут
+        val routesFuture = trafficRouter.findRoute(
+                startPoint = RouteSearchPoint(
+                        coordinates = toGeoPoint(startPoint)
+                ),
+                finishPoint = RouteSearchPoint(
+                        coordinates = toGeoPoint(endPoint)
+                ),
+                routeSearchOptions = RouteSearchOptions(
+                        car = CarRouteSearchOptions()
+                )
+        )
+
+        // После получения маршрута добавляем его на карту
+        routesFuture.onResult { routes: List<TrafficRoute> ->
+            var isActive = true
+            var routeIndex: Long = 0;
+            for (route in routes) {
+                routeMapObjectSource.addObject(
+                        RouteMapObject(route, isActive, index = RouteIndex(routeIndex))
+                )
+                isActive = false
+                routeIndex++
+            }
+        }
+//        routeEditor.setRouteParams(
+//                RouteEditorRouteParams(
+//                        startPoint = RouteSearchPoint(
+//                                coordinates = toGeoPoint(startPoint)
+//                        ),
+//                        finishPoint = RouteSearchPoint(
+//                                coordinates = toGeoPoint(endPoint)
+//                        ),
+//                        routeSearchOptions = RouteSearchOptions(
+//                                car = CarRouteSearchOptions()
+//                        )
+//                )
+//        )
     }
 
     override fun updatePolylines(updates: DataPolylineUpdates) {

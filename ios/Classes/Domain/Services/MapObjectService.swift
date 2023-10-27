@@ -46,16 +46,16 @@ final class MapObjectService {
     private lazy var mapObjectManager: MapObjectManager = MapObjectManager(map: self.mapFactory.map)
     private lazy var myLocationSource: MyLocationMapObjectSource = MyLocationMapObjectSource(
         context: context,
-        directionBehaviour: .followMagneticHeading
+        controller: MyLocationController(bearingSource: .magnetic)
     )
     private var icons: [TypeSize: DGis.Image] = [:]
     
     
     init(dgisSdkService: DGisSdkService) {
         
-        self.imageFactory = DGisSdkService.sdk.imageFactory
+        self.imageFactory = try! DGisSdkService.sdk.makeImageFactory()
         self.mapFactory = dgisSdkService.mapFactory
-        self.context = DGisSdkService.sdk.context
+        self.context = try! DGisSdkService.sdk.context
     }
     
     func toggleSelfMarker(isVisible: Bool) {
@@ -84,7 +84,7 @@ final class MapObjectService {
     
     private func data2Marker(data: DataMarker) -> DGis.Marker {
         let icon = data.bitmap == nil ? nil : makeIcon(bitmap: data.bitmap!, size: MarkerSize.medium)
-        return DGis.Marker(
+        return try! DGis.Marker(
             options: MarkerOptions(
                 position: GeoPointWithElevation(
                     latitude: Latitude(floatLiteral: data.position.latitude),
@@ -126,12 +126,12 @@ final class MapObjectService {
     }
     
     private func data2Polyline(data: DataPolyline) -> DGis.Polyline {
-        var points = [GeoPoint]()
+        var points = [DGis.GeoPoint]()
         data.points.forEach(
             { p in
                 if (p != nil) {
                     points.append(
-                        GeoPoint(
+                        DGis.GeoPoint(
                             latitude: p!.latitude,
                             longitude: p!.longitude
                         )
@@ -144,7 +144,7 @@ final class MapObjectService {
             width: LogicalPixel(value: Float(data.width)),
             color: DGis.Color(argb: UInt32(data.color))
         )
-        return DGis.Polyline(options: options)
+        return try! DGis.Polyline(options: options)
     }
     
     func removeAll() {

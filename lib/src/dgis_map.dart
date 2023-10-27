@@ -1,6 +1,7 @@
 library dgis_maps_flutter;
 
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
@@ -25,13 +26,17 @@ class DGisMap extends StatefulWidget {
     this.onCameraStateChanged,
     this.myLocationEnabled = true,
     required this.initialPosition,
+    required this.onTapMarker,
     this.mapTheme = MapTheme.auto,
+    this.onTapMap,
   }) : super(key: key);
 
   final CameraPosition initialPosition;
   final MapTheme mapTheme;
 
   final MapCreatedCallback? onMapCreated;
+  final Function(Marker) onTapMarker;
+  final Function()? onTapMap;
 
   final Set<Marker> markers;
   final Set<Polyline> polylines;
@@ -45,6 +50,7 @@ class DGisMap extends StatefulWidget {
 
 class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
   final _apiReady = Completer<void>();
+  final _methodChannel = const MethodChannel("fgis");
   late final PluginHostApi api;
 
   Set<Marker> _markers = const {};
@@ -54,6 +60,8 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
   @override
   void initState() {
     updateWidgetFields();
+
+    _methodChannel.setMethodCallHandler((call) => _handleMethodCall(call));
     super.initState();
   }
 
@@ -132,6 +140,15 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
     ).encode();
 
     if (defaultTargetPlatform == TargetPlatform.android) {
+      return AndroidView(
+        viewType: _kChannelName,
+        onPlatformViewCreated: (params) {
+          onViewCreated(params);
+        },
+        gestureRecognizers: {},
+        creationParams: creationParams,
+        creationParamsCodec: const StandardMessageCodec(),
+      );
       return PlatformViewLink(
         viewType: _kChannelName,
         surfaceFactory: (context, PlatformViewController controller) {
@@ -144,7 +161,7 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
         onCreatePlatformView: (params) {
           onViewCreated(params.id);
           final AndroidViewController controller =
-              PlatformViewsService.initExpensiveAndroidView(
+              PlatformViewsService.initSurfaceAndroidView(
             id: params.id,
             viewType: _kChannelName,
             layoutDirection: TextDirection.ltr,
@@ -171,7 +188,8 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
     }
 
     return Text(
-        '$defaultTargetPlatform is not yet supported by the maps plugin');
+      '$defaultTargetPlatform is not yet supported by the maps plugin',
+    );
   }
 
   @override
@@ -183,5 +201,86 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
   @override
   void onNativeMapReady() {
     _apiReady.complete();
+  }
+
+  Future<void> _handleMethodCall(MethodCall call) async {
+    switch (call.method) {
+      case 'ontap_marker':
+        String id = call.arguments['id'];
+        final list = _markers;
+        widget.onTapMarker(
+            list.firstWhere((element) => element.markerId.value == id));
+        break;
+      case 'ontap_map':
+        widget.onTapMap?.call();
+        break;
+      default:
+        throw MissingPluginException();
+    }
+  }
+
+  @override
+  void onMapObjectTapped(dynamic) {
+    final list = _markers;
+    if (dynamic is GeoPoint) {
+      Marker? _selectedMarker = findNearestGeoPoint(dynamic, _markers);
+      if (_selectedMarker != null) {
+        widget.onTapMarker(_selectedMarker);
+      }
+    } else {
+      widget.onTapMarker(list
+          .firstWhere((element) => element.markerId.value == dynamic['id']));
+    }
+  }
+
+  double degreesToRadians(double degrees) {
+    return degrees * (pi / 180.0);
+  }
+
+  double calculateDistance(GeoPoint point1, GeoPoint point2) {
+    const earthRadius = 6371.0; // Earth's radius in kilometers
+
+    final lat1Rad = degreesToRadians(point1.latitude);
+    final lon1Rad = degreesToRadians(point1.longitude);
+    final lat2Rad = degreesToRadians(point2.latitude);
+    final lon2Rad = degreesToRadians(point2.longitude);
+
+    final dLat = lat2Rad - lat1Rad;
+    final dLon = lon2Rad - lon1Rad;
+
+    final a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(lat1Rad) * cos(lat2Rad) * sin(dLon / 2) * sin(dLon / 2);
+    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    final distance = earthRadius * c;
+    return distance;
+  }
+
+  Marker? findNearestGeoPoint(GeoPoint targetPoint, Set<Marker> points) {
+    if (points.isEmpty) {
+      return null; // Return null if the list is empty
+    }
+
+    Marker? nearestPoint;
+    double minDistance = double.infinity;
+
+    for (final point in points) {
+      final dist = calculateDistance(
+        targetPoint,
+        GeoPoint(
+          latitude: point.position.latitude,
+          longitude: point.position.longitude,
+        ),
+      );
+      if (dist > 5) {
+        return null;
+      }
+      if (dist < minDistance) {
+        minDistance = dist;
+        nearestPoint = point;
+      }
+    }
+
+    return nearestPoint;
   }
 }

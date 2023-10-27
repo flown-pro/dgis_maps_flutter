@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:dgis_maps_flutter/src/types/geo_point.dart';
+
 import 'method_channel.g.dart';
 import 'types/types.dart';
 
@@ -28,6 +30,12 @@ class DGisMapController {
       tilt: dataCameraPosition.tilt,
       zoom: dataCameraPosition.zoom,
     );
+  }
+
+  /// Получение текущей позиции карты [CameraPosition]
+  Future<void> createRoute(GeoPoint startPoint, GeoPoint endPoint) async {
+    await _completer.future;
+    await _api.createRoute(startPoint, endPoint);
   }
 
   /// Переход камеры к выбранной точке [CameraPosition]

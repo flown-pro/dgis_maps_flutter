@@ -71,8 +71,16 @@ fun toMarker(context: Context, marker: DataMarker): Marker {
                 context,
                 R.drawable.dgis_ic_road_event_marker_comment
             ),
-            text = marker.infoText ?: ""
+            text = marker.infoText ?: "",
+            userData = marker.markerId.value
         )
+    )
+}
+
+fun toGeoPoint(geoPoint: pro.flown.dgis_maps_flutter.GeoPoint): GeoPoint {
+    return GeoPoint(
+        latitude = geoPoint.latitude,
+        longitude = geoPoint.longitude,
     )
 }
 

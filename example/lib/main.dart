@@ -148,6 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onCameraStateChanged: (cameraState) {
                 print(cameraState);
               },
+              onTapMarker: (marker) {},
               mapTheme: MapTheme.light,
             ),
           ),

@@ -9,6 +9,7 @@ import FlutterMacOS
 #else
 #error("Unsupported platform.")
 #endif
+import DGis
 
 
 
@@ -175,6 +176,30 @@ struct DataMarker {
       bitmap?.toList(),
       position.toList(),
       infoText,
+    ]
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct GeoPoint {
+  /// Координата долготы
+  var latitude: Double
+  /// Координата широты
+  var longitude: Double
+
+  static func fromList(_ list: [Any?]) -> GeoPoint? {
+    let latitude = list[0] as! Double
+    let longitude = list[1] as! Double
+
+    return GeoPoint(
+      latitude: latitude,
+      longitude: longitude
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      latitude,
+      longitude,
     ]
   }
 }
@@ -407,6 +432,8 @@ private class PluginHostApiCodecReader: FlutterStandardReader {
         return DataPolyline.fromList(self.readValue() as! [Any])
       case 137:
         return DataPolylineUpdates.fromList(self.readValue() as! [Any])
+      case 138:
+        return GeoPoint.fromList(self.readValue() as! [Any])
       default:
         return super.readValue(ofType: type)
     }
@@ -444,6 +471,9 @@ private class PluginHostApiCodecWriter: FlutterStandardWriter {
       super.writeValue(value.toList())
     } else if let value = value as? DataPolylineUpdates {
       super.writeByte(137)
+      super.writeValue(value.toList())
+    } else if let value = value as? GeoPoint {
+      super.writeByte(138)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -483,6 +513,10 @@ protocol PluginHostApi {
   ///
   /// [markerUpdates] - объект с информацией об обновлении маркеров
   func updateMarkers(updates: DataMarkerUpdates)
+  /// Построение маршрута
+  ///
+  /// [createRoute] - объект с информацией построение маршрута
+  func createRoute(startPoint: GeoPoint, endPoint: GeoPoint)
   /// Обновление полилайнов
   ///
   /// [polylineUpdates] - объект с информацией об обновлении полилайнов
@@ -564,6 +598,21 @@ class PluginHostApiSetup {
     } else {
       updateMarkersChannel.setMessageHandler(nil)
     }
+    /// Построение маршрута
+    ///
+    /// [createRoute] - объект с информацией построение маршрута
+    let createRouteChannel = FlutterBasicMessageChannel(name: "pro.flown.PluginHostApi_\(id).createRoute", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      createRouteChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let startPointArg = args[0] as! GeoPoint
+        let endPointArg = args[1] as! GeoPoint
+        api.createRoute(startPoint: startPointArg, endPoint: endPointArg)
+        reply(wrapResult(nil))
+      }
+    } else {
+      createRouteChannel.setMessageHandler(nil)
+    }
     /// Обновление полилайнов
     ///
     /// [polylineUpdates] - объект с информацией об обновлении полилайнов
@@ -621,7 +670,10 @@ private class PluginFlutterApiCodecWriter: FlutterStandardWriter {
     if let value = value as? DataCameraStateValue {
       super.writeByte(128)
       super.writeValue(value.toList())
-    } else {
+    } else if let value = value as? RenderedObjectInfo {
+        super.writeByte(138)
+        super.writeValue([value.closestMapPoint.latitude.value, value.closestMapPoint.longitude.value])
+    }else {
       super.writeValue(value)
     }
   }
@@ -651,6 +703,14 @@ class PluginFlutterApi {
   }
   var codec: FlutterStandardMessageCodec {
     return PluginFlutterApiCodec.shared
+  }
+  /// Коллбэк на изменение состояния камеры
+  /// [cameraState] - индекс в перечислении [CameraState]
+  func onMapObjectTapCallback(renderedObjectInfo: DGis.RenderedObjectInfo) {
+    let channel = FlutterBasicMessageChannel(name: "fgis.ontap_marker", binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([renderedObjectInfo] as [Any?]) { _ in
+        
+    }
   }
   /// Коллбэк на изменение состояния камеры
   /// [cameraState] - индекс в перечислении [CameraState]
