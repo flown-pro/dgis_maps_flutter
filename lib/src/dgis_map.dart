@@ -281,6 +281,6 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
       }
     }
 
-    return null;
+    return nearestPoint;
   }
 }
