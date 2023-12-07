@@ -273,14 +273,15 @@ class _DGisMapState extends State<DGisMap> implements PluginFlutterApi {
         ),
       );
       if (dist > 5) {
-        return null;
+        continue;
       }
       if (dist < minDistance) {
         minDistance = dist;
         nearestPoint = point;
+        return nearestPoint;
       }
     }
 
-    return nearestPoint;
+    return null;
   }
 }
