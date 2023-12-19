@@ -46,7 +46,8 @@ final class MapObjectService {
     private lazy var mapObjectManager: MapObjectManager = MapObjectManager(map: self.mapFactory.map)
     private lazy var myLocationSource: MyLocationMapObjectSource = MyLocationMapObjectSource(
         context: context,
-        controller: MyLocationController(bearingSource: .magnetic)
+        directionBehaviour: .followMagneticHeading
+        // controller: MyLocationController(bearingSource: .magnetic)
     )
     private var icons: [TypeSize: DGis.Image] = [:]
     
